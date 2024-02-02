@@ -27,7 +27,9 @@
             tools:ignore="LockedOrientationActivity" />
         <activity
             android:name=".PuzzleActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
