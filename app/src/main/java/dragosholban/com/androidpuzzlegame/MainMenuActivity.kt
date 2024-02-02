@@ -27,7 +27,7 @@ class MainMenuActivity : Activity() {
     fun gallery(view: View) {
         SettingsHelper.load(this)
         if (!SettingsHelper.load(this).uncoveredPics.isEmpty()) {
-            startActivity(Intent(this, GalleryActivity.class))
+            startActivity(Intent(this, GalleryActivity::class.java))
         } else {
             Toast.makeText(this, R.string.main_menu_activity_play_to_uncover, Toast.LENGTH_SHORT).show()
         }
