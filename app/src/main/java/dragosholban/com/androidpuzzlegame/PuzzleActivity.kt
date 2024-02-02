@@ -1,5 +1,6 @@
 package dragosholban.com.androidpuzzlegame
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
@@ -22,7 +23,7 @@ import java.io.IOException
 import java.util.Collections
 import java.util.Random
 
-class PuzzleActivity : AppCompatActivity() {
+class PuzzleActivity : Activity() {
     var pieces: ArrayList<PuzzlePiece?>? = null
     var mCurrentPhotoPath: String? = null
     var mCurrentPhotoUri: String? = null
