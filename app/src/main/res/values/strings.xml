@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AndroidPuzzleGame</string>
+    <string name="app_name">Jigsaw Puzzle Girls</string>
     <string name="main_menu_activity_play_the_game">Play!</string>
     <string name="main_menu_activity_unlocked_gallery">Gallery of revealed pictures</string>
     <string name="main_menu_activity_more_apps">More apps like this</string>

@@ -11,22 +11,27 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
-import androidx.exifinterface.media.ExifInterface
 import android.net.Uri
 import android.os.Bundle
+import android.view.View
 import android.view.Window
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import androidx.exifinterface.media.ExifInterface
+import com.bumptech.glide.Glide
 import java.io.IOException
-import java.util.Collections
 import java.util.Random
+import java.util.concurrent.TimeUnit
+import kotlin.math.abs
+import kotlin.math.roundToInt
+
 
 class PuzzleActivity : Activity() {
-    var pieces: ArrayList<PuzzlePiece?>? = null
-    var mCurrentPhotoPath: String? = null
-    var mCurrentPhotoUri: String? = null
+    private var pieces: MutableList<PuzzlePiece> = mutableListOf()
+    private var mCurrentPhotoPath: String? = null
+    private var mCurrentPhotoUri: String? = null
+    private var imageFileName: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -34,15 +39,15 @@ class PuzzleActivity : Activity() {
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val intent = intent
-        val assetName = intent.getStringExtra("assetName")
+        imageFileName = intent.getStringExtra("assetName")
         mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
         mCurrentPhotoUri = intent.getStringExtra("mCurrentPhotoUri")
 
         // run image related code after the view was laid out
         // to have all dimensions calculated
         imageView.post {
-            if (assetName != null) {
-                setPicFromAsset(assetName, imageView)
+            if (imageFileName != null) {
+                setPicFromAsset(imageFileName!!, imageView)
             } else if (mCurrentPhotoPath != null) {
                 setPicFromPath(mCurrentPhotoPath!!, imageView)
             } else if (mCurrentPhotoUri != null) {
@@ -51,9 +56,9 @@ class PuzzleActivity : Activity() {
             pieces = splitImage()
             val touchListener = TouchListener(this@PuzzleActivity)
             // shuffle pieces order
-            Collections.shuffle(pieces)
-            for (piece in pieces!!) {
-                piece!!.setOnTouchListener(touchListener)
+            pieces.shuffle()
+            for (piece in pieces) {
+                piece.setOnTouchListener(touchListener)
                 layout.addView(piece)
                 // randomize position, on the bottom of the screen
                 val lParams = piece.layoutParams as RelativeLayout.LayoutParams
@@ -79,13 +84,12 @@ class PuzzleActivity : Activity() {
             val photoH = bmOptions.outHeight
 
             // Determine how much to scale down the image
-            val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+            val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
             `is`.reset()
 
             // Decode the image file into a Bitmap sized to fill the View
             bmOptions.inJustDecodeBounds = false
             bmOptions.inSampleSize = scaleFactor
-            bmOptions.inPurgeable = true
             val bitmap = BitmapFactory.decodeStream(`is`, Rect(-1, -1, -1, -1), bmOptions)
             imageView.setImageBitmap(bitmap)
         } catch (e: IOException) {
@@ -94,12 +98,11 @@ class PuzzleActivity : Activity() {
         }
     }
 
-    private fun splitImage(): ArrayList<PuzzlePiece?> {
-        val rows = 4
-        val cols = 4
-        val piecesNumber = rows * cols
+    private fun splitImage(): MutableList<PuzzlePiece> {
+        val rows = 2
+        val cols = 2
         val imageView = findViewById<ImageView>(R.id.imageView)
-        val pieces = ArrayList<PuzzlePiece?>(piecesNumber)
+        val pieces = mutableListOf<PuzzlePiece>()
 
         // Get the scaled bitmap of the source image
         val drawable = imageView.drawable as BitmapDrawable
@@ -109,14 +112,14 @@ class PuzzleActivity : Activity() {
         val scaledBitmapTop = dimensions[1]
         val scaledBitmapWidth = dimensions[2]
         val scaledBitmapHeight = dimensions[3]
-        val croppedImageWidth = scaledBitmapWidth - 2 * Math.abs(scaledBitmapLeft)
-        val croppedImageHeight = scaledBitmapHeight - 2 * Math.abs(scaledBitmapTop)
+        val croppedImageWidth = scaledBitmapWidth - 2 * abs(scaledBitmapLeft)
+        val croppedImageHeight = scaledBitmapHeight - 2 * abs(scaledBitmapTop)
         val scaledBitmap =
             Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth, scaledBitmapHeight, true)
         val croppedBitmap = Bitmap.createBitmap(
             scaledBitmap,
-            Math.abs(scaledBitmapLeft),
-            Math.abs(scaledBitmapTop),
+            abs(scaledBitmapLeft),
+            abs(scaledBitmapTop),
             croppedImageWidth,
             croppedImageHeight
         )
@@ -295,8 +298,8 @@ class PuzzleActivity : Activity() {
         val origH = d.intrinsicHeight
 
         // Calculate the actual dimensions
-        val actW = Math.round(origW * scaleX)
-        val actH = Math.round(origH * scaleY)
+        val actW = (origW * scaleX).roundToInt()
+        val actH = (origH * scaleY).roundToInt()
         ret[2] = actW
         ret[3] = actH
 
@@ -313,14 +316,20 @@ class PuzzleActivity : Activity() {
 
     fun checkGameOver() {
         if (isGameOver) {
-            finish()
+            val konfetti = findViewById<ImageView>(R.id.konfettiView)
+            Glide
+                .with(konfetti)
+                .asGif()
+                .load(R.drawable.confetti2)
+                .into(konfetti)
+            konfetti.visibility = View.VISIBLE
         }
     }
 
     private val isGameOver: Boolean
-        private get() {
-            for (piece in pieces!!) {
-                if (piece!!.canMove) {
+        get() {
+            for (piece in pieces) {
+                if (piece.canMove) {
                     return false
                 }
             }
@@ -340,12 +349,11 @@ class PuzzleActivity : Activity() {
         val photoH = bmOptions.outHeight
 
         // Determine how much to scale down the image
-        val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+        val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
-        bmOptions.inPurgeable = true
         val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
         var rotatedBitmap = bitmap
 

@@ -10,7 +10,7 @@ import com.batodev.picsofprettygirls9.activities.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 
 class GalleryActivity : Activity() {
-    private var images: MutableList<String>? = null
+    private var images: MutableList<String> = mutableListOf()
     private var index: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
