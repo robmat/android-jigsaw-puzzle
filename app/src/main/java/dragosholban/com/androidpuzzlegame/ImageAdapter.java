@@ -1,5 +1,6 @@
 package dragosholban.com.androidpuzzlegame;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -47,6 +48,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     // create a new ImageView for each item referenced by the Adapter
+    @SuppressLint("InflateParams")
     public View getView(final int position, View convertView, ViewGroup parent) {
         Settings settings = SettingsHelper.INSTANCE.load(mContext);
         if (convertView == null) {
@@ -57,30 +59,28 @@ public class ImageAdapter extends BaseAdapter {
         final ImageView imageView = convertView.findViewById(R.id.gridImageview);
         imageView.setImageBitmap(null);
         // run image related code after the view was laid out
-        imageView.post(() -> {
-            handler.post(() -> {
-                try {
-                    Bitmap picFromAsset = getPicFromAsset(imageView.getHeight(), imageView.getWidth(), files[position], am);
-                    assert picFromAsset != null;
-                    Bitmap mutableBitmap = Bitmap.createBitmap(picFromAsset.getWidth(), picFromAsset.getHeight(), Bitmap.Config.ARGB_8888);
-                    // Create a canvas to draw on the mutable bitmap
-                    Canvas canvas = new Canvas(mutableBitmap);
-                    // Create a paint with the desired alpha value
-                    Paint alphaPaint = new Paint();
-                    if (!settings.getUncoveredPics().contains(files[position])) {
-                        alphaPaint.setAlpha(30);
-                    } else {
-                        Log.d(ImageAdapter.class.getSimpleName(), "re");
-                    }
-                    // Draw the original bitmap onto the canvas with the alpha paint
-                    canvas.drawBitmap(picFromAsset, 0, 0, alphaPaint);
-                    imageView.setImageBitmap(mutableBitmap);
-                } catch (IOException e) {
-                    Log.w(ImageAdapter.class.getSimpleName(), e.getLocalizedMessage());
-                    throw new RuntimeException(e);
+        imageView.post(() -> handler.post(() -> {
+            try {
+                Bitmap picFromAsset = getPicFromAsset(imageView.getHeight(), imageView.getWidth(), files[position], am);
+                assert picFromAsset != null;
+                Bitmap mutableBitmap = Bitmap.createBitmap(picFromAsset.getWidth(), picFromAsset.getHeight(), Bitmap.Config.ARGB_8888);
+                // Create a canvas to draw on the mutable bitmap
+                Canvas canvas = new Canvas(mutableBitmap);
+                // Create a paint with the desired alpha value
+                Paint alphaPaint = new Paint();
+                if (!settings.getUncoveredPics().contains(files[position])) {
+                    alphaPaint.setAlpha(30);
+                } else {
+                    Log.d(ImageAdapter.class.getSimpleName(), "re");
                 }
-            });
-        });
+                // Draw the original bitmap onto the canvas with the alpha paint
+                canvas.drawBitmap(picFromAsset, 0, 0, alphaPaint);
+                imageView.setImageBitmap(mutableBitmap);
+            } catch (IOException e) {
+                Log.w(ImageAdapter.class.getSimpleName(), e.getLocalizedMessage());
+                throw new RuntimeException(e);
+            }
+        }));
         return convertView;
     }
 
