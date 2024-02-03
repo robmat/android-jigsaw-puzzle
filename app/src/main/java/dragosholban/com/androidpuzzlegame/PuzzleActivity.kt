@@ -22,7 +22,6 @@ import androidx.exifinterface.media.ExifInterface
 import com.bumptech.glide.Glide
 import java.io.IOException
 import java.util.Random
-import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.roundToInt
 
@@ -323,6 +322,11 @@ class PuzzleActivity : Activity() {
                 .load(R.drawable.confetti2)
                 .into(konfetti)
             konfetti.visibility = View.VISIBLE
+            val settings = SettingsHelper.load(this)
+            imageFileName?.let {
+                settings.uncoveredPics.add(it)
+                SettingsHelper.save(this, settings)
+            }
         }
     }
 

@@ -2,7 +2,6 @@ package dragosholban.com.androidpuzzlegame
 
 import android.app.Activity
 import android.util.Log
-import com.batodev.picsofprettygirls9.activities.SettingsHelper
 
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest

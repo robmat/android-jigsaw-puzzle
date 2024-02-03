@@ -39,6 +39,7 @@ class ImagePickActivity : Activity() {
                     )
                     intent.putExtra("assetName", files!![i % files.size])
                     startActivity(intent)
+                    finish()
                 }
         } catch (e: IOException) {
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()

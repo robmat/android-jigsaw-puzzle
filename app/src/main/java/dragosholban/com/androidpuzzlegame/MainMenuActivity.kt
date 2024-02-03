@@ -8,7 +8,6 @@ import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.Toast
-import com.batodev.picsofprettygirls9.activities.SettingsHelper
 
 class MainMenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

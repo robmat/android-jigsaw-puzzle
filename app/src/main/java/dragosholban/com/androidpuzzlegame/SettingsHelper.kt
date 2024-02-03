@@ -1,10 +1,8 @@
-package com.batodev.picsofprettygirls9.activities
+package dragosholban.com.androidpuzzlegame
 
 import android.app.Activity
 import android.content.Context
-import android.preference.PreferenceManager
 import androidx.core.content.edit
-import dragosholban.com.androidpuzzlegame.Settings
 
 private const val PREFS = "prefs"
 
@@ -19,8 +17,8 @@ private const val LAST_SEEN_PIC = "lastSeenPic"
 private const val UNCOVERED_PICS = "uncoveredPics"
 
 object SettingsHelper {
-    fun save(activity: Activity, settings: Settings) {
-        val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    fun save(context: Context, settings: Settings) {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         prefs.edit {
             putInt(DISPLAY_ADD_EVERY_X_PIC_VIEW, settings.displayAddEveryXPicView)
             putInt(ADD_COUNTER, settings.addCounter)
@@ -30,8 +28,8 @@ object SettingsHelper {
         }
     }
 
-    fun load(activity: Activity) : Settings {
-        val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+    fun load(context: Context) : Settings {
+        val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val settings = Settings()
         settings.displayAddEveryXPicView = prefs.getInt(DISPLAY_ADD_EVERY_X_PIC_VIEW, 3)
         settings.addCounter = prefs.getInt(ADD_COUNTER, 0)

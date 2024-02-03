@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.Window
 import android.widget.ImageButton
-import com.batodev.picsofprettygirls9.activities.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 
 class GalleryActivity : Activity() {
