@@ -1,5 +1,9 @@
 package dragosholban.com.androidpuzzlegame;
 
+import static dragosholban.com.androidpuzzlegame.ImageAdapter.getPicFromAsset;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -14,10 +18,13 @@ import android.widget.ImageView;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ImageAdapter extends BaseAdapter {
-    private Context mContext;
-    private AssetManager am;
+    private final Context mContext;
+    private final AssetManager am;
     private String[] files;
 
     public ImageAdapter(Context c) {
@@ -43,6 +50,7 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     // create a new ImageView for each item referenced by the Adapter
+    @SuppressLint("InflateParams")
     public View getView(final int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
             final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
@@ -52,34 +60,21 @@ public class ImageAdapter extends BaseAdapter {
         final ImageView imageView = convertView.findViewById(R.id.gridImageview);
         imageView.setImageBitmap(null);
         // run image related code after the view was laid out
-        imageView.post(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncTask<Void, Void, Void>() {
-                    private Bitmap bitmap;
-                    @Override
-                    protected Void doInBackground(Void... voids) {
-                        bitmap = getPicFromAsset(imageView, files[position]);
-                        return null;
-                    }
-
-                    @Override
-                    protected void onPostExecute(Void aVoid) {
-                        super.onPostExecute(aVoid);
-                        imageView.setImageBitmap(bitmap);
-                    }
-                }.execute();
-            }
+        imageView.post(() -> {
+            LoadImageAsyncTask asyncTask = new LoadImageAsyncTask(
+                    imageView.getHeight(),
+                    imageView.getWidth(),
+                    am,
+                    position,
+                    files,
+                    imageView::setImageBitmap);
+            asyncTask.execute();
         });
 
         return convertView;
     }
 
-    private Bitmap getPicFromAsset(ImageView imageView, String assetName) {
-        // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
-
+    static Bitmap getPicFromAsset(int targetH, int targetW, String assetName, AssetManager am) {
         if(targetW == 0 || targetH == 0) {
             // view has no dimensions set
             return null;
@@ -110,5 +105,35 @@ public class ImageAdapter extends BaseAdapter {
 
             return null;
         }
+    }
+}
+class LoadImageAsyncTask extends AsyncTask<Void, Void, Void> {
+    int targetW;
+    int targetH;
+    AssetManager am;
+    int position;
+    String[] files;
+    Bitmap bitmap;
+    Consumer<Bitmap> consumer;
+
+    public LoadImageAsyncTask(int targetW, int targetH, AssetManager am, int position, String[] files, Consumer<Bitmap> consumer) {
+        this.targetW = targetW;
+        this.targetH = targetH;
+        this.am = am;
+        this.position = position;
+        this.files = files;
+        this.consumer = consumer;
+    }
+
+    @Override
+    protected Void doInBackground(Void... voids) {
+        bitmap = getPicFromAsset(targetH, targetW, files[position], am);
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void aVoid) {
+        super.onPostExecute(aVoid);
+        consumer.accept(bitmap);
     }
 }

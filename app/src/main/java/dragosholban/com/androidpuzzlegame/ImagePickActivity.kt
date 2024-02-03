@@ -22,7 +22,7 @@ import java.text.DateFormat
 import java.util.Date
 
 class ImagePickActivity : Activity() {
-    var mCurrentPhotoPath: String? = null
+    private var mCurrentPhotoPath: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -33,7 +33,7 @@ class ImagePickActivity : Activity() {
             val grid = findViewById<GridView>(R.id.grid)
             grid.adapter = ImageAdapter(this)
             grid.onItemClickListener =
-                OnItemClickListener { adapterView: AdapterView<*>?, view: View?, i: Int, l: Long ->
+                OnItemClickListener { _: AdapterView<*>?, _: View?, i: Int, _: Long ->
                     val intent = Intent(
                         applicationContext, PuzzleActivity::class.java
                     )
@@ -47,7 +47,6 @@ class ImagePickActivity : Activity() {
 
     fun onImageFromCameraClick(view: View?) {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        //        if (intent.resolveActivity(getPackageManager()) != null) {
         var photoFile: File? = null
         try {
             photoFile = createImageFile()
@@ -63,7 +62,6 @@ class ImagePickActivity : Activity() {
             intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
             startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
         }
-        //        }
     }
 
     @Throws(IOException::class)
