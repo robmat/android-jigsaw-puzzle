@@ -16,13 +16,12 @@ import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import dragosholban.com.androidpuzzlegame.PuzzleActivity
 import java.io.File
 import java.io.IOException
 import java.text.DateFormat
 import java.util.Date
 
-class MainActivity : Activity() {
+class ImagePickActivity : Activity() {
     var mCurrentPhotoPath: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

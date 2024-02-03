@@ -22,7 +22,7 @@ class MainMenuActivity : Activity() {
     }
 
     fun play(view: View) {
-        startActivity(Intent(this, MainActivity::class.java))
+        startActivity(Intent(this, ImagePickActivity::class.java))
     }
     fun gallery(view: View) {
         SettingsHelper.load(this)
