@@ -63,7 +63,7 @@ class PuzzleActivity : Activity() {
                 // randomize position, on the bottom of the screen
                 val lParams = piece.layoutParams as RelativeLayout.LayoutParams
                 lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
-                lParams.topMargin = layout.height - piece.pieceHeight
+                lParams.topMargin = layout.height - piece.pieceHeight - Random().nextInt(300)
                 piece.layoutParams = lParams
             }
         }
