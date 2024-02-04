@@ -27,6 +27,8 @@ import kotlin.math.roundToInt
 
 
 class PuzzleActivity : Activity() {
+    private var puzzlesHeight: Int = 4
+    private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
     private var mCurrentPhotoPath: String? = null
     private var mCurrentPhotoUri: String? = null
@@ -41,6 +43,8 @@ class PuzzleActivity : Activity() {
         imageFileName = intent.getStringExtra("assetName")
         mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
         mCurrentPhotoUri = intent.getStringExtra("mCurrentPhotoUri")
+        puzzlesWidth = intent.getIntExtra("width", 4)
+        puzzlesHeight = intent.getIntExtra("height", 3)
 
         // run image related code after the view was laid out
         // to have all dimensions calculated
@@ -98,8 +102,8 @@ class PuzzleActivity : Activity() {
     }
 
     private fun splitImage(): MutableList<PuzzlePiece> {
-        val rows = 2
-        val cols = 2
+        val rows = puzzlesHeight
+        val cols = puzzlesWidth
         val imageView = findViewById<ImageView>(R.id.imageView)
         val pieces = mutableListOf<PuzzlePiece>()
 

@@ -7,12 +7,19 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
+import android.view.LayoutInflater
 import android.view.View
 import android.view.Window
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
+import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.GridView
+import android.widget.RadioButton
+import android.widget.RadioGroup
+import android.widget.Spinner
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -21,7 +28,16 @@ import java.io.IOException
 import java.text.DateFormat
 import java.util.Date
 
+
+private const val CUSTOM = "Custom"
+
+private const val HARD = "Hard"
+
+private const val MEDIUM = "Medium"
+
+
 class ImagePickActivity : Activity() {
+    private var files: Array<String> = arrayOf()
     private var mCurrentPhotoPath: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,21 +45,140 @@ class ImagePickActivity : Activity() {
         setContentView(R.layout.activity_main)
         val am = assets
         try {
-            val files = am.list("img")
+            files = am.list("img") ?: arrayOf()
             val grid = findViewById<GridView>(R.id.grid)
             grid.adapter = ImageAdapter(this)
             grid.onItemClickListener =
-                OnItemClickListener { _: AdapterView<*>?, _: View?, i: Int, _: Long ->
-                    val intent = Intent(
-                        applicationContext, PuzzleActivity::class.java
-                    )
-                    intent.putExtra("assetName", files!![i % files.size])
-                    startActivity(intent)
-                    finish()
+                OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
+                    showStartGamePopup(itemClickedIndex)
                 }
         } catch (e: IOException) {
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showStartGamePopup(itemClickedIndex: Int) {
+        val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        val popupView: View = inflater.inflate(R.layout.start_game_popup, null)
+        val radioGroup = popupView.findViewById<RadioGroup>(R.id.radioGroup)
+        val dropdownHeight = popupView.findViewById<Spinner>(R.id.dropdown_height)
+        val dropdownWidth = popupView.findViewById<Spinner>(R.id.dropdown_width)
+        val adapter: ArrayAdapter<Int> = ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, listOf(3,4,5,6,7,8,9))
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        dropdownHeight.adapter = adapter
+        dropdownWidth.adapter = adapter
+        val builder: AlertDialog.Builder = AlertDialog.Builder(this)
+        builder.setView(popupView)
+        builder.setCancelable(true)
+
+        val settings = SettingsHelper.load(this)
+        when(settings.lastSetDifficulty) {
+            EASY -> {
+                popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked = true
+                easy(dropdownHeight, dropdownWidth)
+            }
+            MEDIUM -> {
+                popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked = true
+                medium(dropdownHeight, dropdownWidth)
+            }
+            HARD -> {
+                popupView.findViewById<RadioButton>(R.id.hardRadioButton).isChecked = true
+                hard(dropdownHeight, dropdownWidth)
+            }
+            CUSTOM -> {
+                popupView.findViewById<RadioButton>(R.id.customRadioButton).isChecked = true
+                custom(dropdownHeight, dropdownWidth, popupView, settings)
+            }
+        }
+
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
+            when (checkedId) {
+                R.id.customRadioButton -> {
+                    custom(dropdownHeight, dropdownWidth, popupView, settings)
+                }
+                R.id.easyRadioButton -> {
+                    easy(dropdownHeight, dropdownWidth)
+                }
+                R.id.mediumRadioButton -> {
+                    medium(dropdownHeight, dropdownWidth)
+                }
+                R.id.hardRadioButton -> {
+                    hard(dropdownHeight, dropdownWidth)
+                }
+            }
+        }
+        val alertDialog = builder.create()
+        alertDialog.show()
+        val startButton = popupView.findViewById<Button>(R.id.startButton)
+        startButton.setOnClickListener { // Handle start button click
+            finish()
+            val intent = Intent(
+                applicationContext, PuzzleActivity::class.java
+            )
+            intent.putExtra("assetName", files[itemClickedIndex % files.size])
+            intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
+            intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
+            startActivity(intent)
+            settings.lastSetDifficultyCustomWidth = dropdownWidth.selectedItemId.toInt()
+            settings.lastSetDifficultyCustomHeight = dropdownHeight.selectedItemId.toInt()
+            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+                settings.lastSetDifficulty = EASY
+            }
+            if (popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked) {
+                settings.lastSetDifficulty = MEDIUM
+            }
+            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+                settings.lastSetDifficulty = HARD
+            }
+            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+                settings.lastSetDifficulty = CUSTOM
+            }
+            SettingsHelper.save(this, settings)
+        }
+    }
+
+    private fun custom(
+        dropdownHeight: Spinner,
+        dropdownWidth: Spinner,
+        popupView: View,
+        settings: Settings,
+    ) {
+        dropdownHeight.isEnabled = true
+        dropdownWidth.isEnabled = true
+        popupView.findViewById<Spinner>(R.id.dropdown_width)
+            .setSelection(settings.lastSetDifficultyCustomWidth)
+        popupView.findViewById<Spinner>(R.id.dropdown_height)
+            .setSelection(settings.lastSetDifficultyCustomHeight)
+    }
+
+    private fun hard(
+        dropdownHeight: Spinner,
+        dropdownWidth: Spinner,
+    ) {
+        dropdownHeight.isEnabled = false
+        dropdownWidth.isEnabled = false
+        dropdownHeight.setSelection(3)
+        dropdownWidth.setSelection(2)
+    }
+
+    private fun medium(
+        dropdownHeight: Spinner,
+        dropdownWidth: Spinner,
+    ) {
+        dropdownHeight.isEnabled = false
+        dropdownWidth.isEnabled = false
+        dropdownHeight.setSelection(2)
+        dropdownWidth.setSelection(1)
+    }
+
+    private fun easy(
+        dropdownHeight: Spinner,
+        dropdownWidth: Spinner,
+    ) {
+        dropdownHeight.isEnabled = false
+        dropdownWidth.isEnabled = false
+        dropdownHeight.setSelection(1)
+        dropdownWidth.setSelection(0)
     }
 
     fun onImageFromCameraClick(view: View?) {
@@ -98,7 +233,7 @@ class ImagePickActivity : Activity() {
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String>,
-        grantResults: IntArray
+        grantResults: IntArray,
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE) {
@@ -142,6 +277,7 @@ class ImagePickActivity : Activity() {
     }
 
     companion object {
+        val EASY = "Easy"
         private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
         private const val REQUEST_IMAGE_CAPTURE = 1
         const val REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 3

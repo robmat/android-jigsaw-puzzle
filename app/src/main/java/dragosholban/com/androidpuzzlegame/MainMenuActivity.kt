@@ -15,9 +15,6 @@ class MainMenuActivity : Activity() {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.main_menu_activity)
         SettingsHelper.load(this)
-        findViewById<Button>(R.id.main_menu_activity_play_the_game).isActivated = true
-        findViewById<Button>(R.id.main_menu_activity_unlocked_gallery).isActivated = true
-        findViewById<Button>(R.id.main_menu_activity_more_apps).isActivated = true
     }
 
     fun play(view: View) {

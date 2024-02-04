@@ -70,8 +70,6 @@ public class ImageAdapter extends BaseAdapter {
                 Paint alphaPaint = new Paint();
                 if (!settings.getUncoveredPics().contains(files[position])) {
                     alphaPaint.setAlpha(30);
-                } else {
-                    Log.d(ImageAdapter.class.getSimpleName(), "re");
                 }
                 // Draw the original bitmap onto the canvas with the alpha paint
                 canvas.drawBitmap(picFromAsset, 0, 0, alphaPaint);
