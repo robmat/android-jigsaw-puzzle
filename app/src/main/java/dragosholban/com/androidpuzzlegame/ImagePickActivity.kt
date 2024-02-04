@@ -72,6 +72,7 @@ class ImagePickActivity : Activity() {
         builder.setCancelable(true)
 
         val settings = SettingsHelper.load(this)
+        val customRadioButton = popupView.findViewById<RadioButton>(R.id.customRadioButton)
         when(settings.lastSetDifficulty) {
             EASY -> {
                 popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked = true
@@ -86,7 +87,7 @@ class ImagePickActivity : Activity() {
                 hard(dropdownHeight, dropdownWidth)
             }
             CUSTOM -> {
-                popupView.findViewById<RadioButton>(R.id.customRadioButton).isChecked = true
+                customRadioButton.isChecked = true
                 custom(dropdownHeight, dropdownWidth, popupView, settings)
             }
         }
@@ -111,7 +112,7 @@ class ImagePickActivity : Activity() {
         alertDialog.show()
         val startButton = popupView.findViewById<Button>(R.id.startButton)
         startButton.setOnClickListener { // Handle start button click
-            finish()
+            val customChecked = customRadioButton.isChecked
             val intent = Intent(
                 applicationContext, PuzzleActivity::class.java
             )
@@ -119,21 +120,25 @@ class ImagePickActivity : Activity() {
             intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
             intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
             startActivity(intent)
-            settings.lastSetDifficultyCustomWidth = dropdownWidth.selectedItemId.toInt()
-            settings.lastSetDifficultyCustomHeight = dropdownHeight.selectedItemId.toInt()
+            if (customChecked) {
+                settings.lastSetDifficultyCustomWidth = dropdownWidth.selectedItemId.toInt()
+                settings.lastSetDifficultyCustomHeight = dropdownHeight.selectedItemId.toInt()
+            }
             if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
                 settings.lastSetDifficulty = EASY
             }
             if (popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked) {
                 settings.lastSetDifficulty = MEDIUM
             }
-            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+            if (popupView.findViewById<RadioButton>(R.id.hardRadioButton).isChecked) {
                 settings.lastSetDifficulty = HARD
             }
-            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+            if (customChecked) {
                 settings.lastSetDifficulty = CUSTOM
             }
             SettingsHelper.save(this, settings)
+            alertDialog.dismiss()
+            finish()
         }
     }
 

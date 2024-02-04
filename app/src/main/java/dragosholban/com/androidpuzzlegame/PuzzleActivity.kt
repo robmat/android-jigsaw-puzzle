@@ -154,7 +154,7 @@ class PuzzleActivity : Activity() {
                     pieceWidth + offsetX,
                     pieceHeight + offsetY
                 )
-                val piece = PuzzlePiece(applicationContext)
+                val piece = PuzzlePiece(this)
                 piece.setImageBitmap(pieceBitmap)
                 piece.xCoord = xCoord - offsetX + imageView.left
                 piece.yCoord = yCoord - offsetY + imageView.top
