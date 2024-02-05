@@ -10,7 +10,7 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.interstitial.InterstitialAd
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
-const val AD_ID = "ca-app-pub-9667420067790140/1663821176"
+const val AD_ID = "ca-app-pub-9667420067790140/7403183964"
 
 object AdHelper {
     fun showAdIfNeeded(activity: Activity) {
