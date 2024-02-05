@@ -11,6 +11,7 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
@@ -33,6 +34,14 @@ class PuzzleActivity : Activity() {
     private var mCurrentPhotoPath: String? = null
     private var mCurrentPhotoUri: String? = null
     private var imageFileName: String? = null
+    private val winSoundIds = listOf(
+        R.raw.success_1,
+        R.raw.success_2,
+        R.raw.success_3,
+        R.raw.success_4,
+        R.raw.success_5,
+        R.raw.success_6
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -331,6 +340,9 @@ class PuzzleActivity : Activity() {
                 settings.uncoveredPics.add(it)
                 SettingsHelper.save(this, settings)
             }
+            val mp = MediaPlayer.create(this, winSoundIds.random())
+            mp.setOnCompletionListener { mp.release() }
+            mp.start()
         }
     }
 
