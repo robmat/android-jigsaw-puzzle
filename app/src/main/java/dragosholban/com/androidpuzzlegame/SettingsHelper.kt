@@ -47,7 +47,7 @@ object SettingsHelper {
         settings.lastSetDifficultyCustomWidth = prefs.getInt(LAST_SET_DIFFICULTY_CUSTOM_WIDTH, 0)
         settings.lastSetDifficulty = prefs.getString(LAST_SET_DIFFICULTY, ImagePickActivity.EASY)!!
         settings.addCounter = prefs.getInt(ADD_COUNTER, 0)
-        settings.lastSeenPic = prefs.getInt(LAST_SEEN_PIC, -1)
+        settings.lastSeenPic = prefs.getInt(LAST_SEEN_PIC, 0)
         settings.uncoveredPics = prefs.getString(UNCOVERED_PICS, "")!!.split(SEPARATOR).toMutableList()
         settings.uncoveredPics.remove("")
         return settings

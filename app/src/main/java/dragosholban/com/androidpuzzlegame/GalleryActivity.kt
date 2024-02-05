@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import android.widget.ImageButton
 import com.github.chrisbanes.photoview.PhotoView
 
 class GalleryActivity : Activity() {
@@ -16,11 +15,10 @@ class GalleryActivity : Activity() {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.gallery_activity)
-        this.images = SettingsHelper.load(this).uncoveredPics
-        SettingsHelper.load(this)
-        index = SettingsHelper.load(this).lastSeenPic
+        val settings = SettingsHelper.load(this)
+        this.images = settings.uncoveredPics
+        index = settings.lastSeenPic
         setImage(index)
-        findViewById<ImageButton>(R.id.gallery_back_btn).isActivated = true
     }
     fun backClicked(view: View) {
         finish()
@@ -49,7 +47,7 @@ class GalleryActivity : Activity() {
     private fun setImage(index: Int) {
         if (index >= 0 && index < images!!.size) {
             findViewById<PhotoView>(R.id.gallery_activity_background)
-                .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("memo-images/${images!![index]}")))
+                .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("img/${images!![index]}")))
             this.index = index
         } else {
             setImage(index - 1)
