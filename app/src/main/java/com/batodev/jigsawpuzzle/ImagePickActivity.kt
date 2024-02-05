@@ -1,4 +1,4 @@
-package dragosholban.com.androidpuzzlegame
+package com.batodev.jigsawpuzzle
 
 import android.Manifest
 import android.app.Activity

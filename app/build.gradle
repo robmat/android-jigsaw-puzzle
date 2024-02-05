@@ -6,7 +6,7 @@ plugins {
 
 android {
     defaultConfig {
-        applicationId "dragosholban.com.androidpuzzlegame"
+        applicationId "com.batodev.jigsawpuzzle"
         minSdkVersion 24
         compileSdk 34
         targetSdkVersion 34
@@ -24,7 +24,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    namespace 'dragosholban.com.androidpuzzlegame'
+    namespace 'com.batodev.jigsawpuzzle'
 }
 
 dependencies {

@@ -1,4 +1,4 @@
-package dragosholban.com.androidpuzzlegame
+package com.batodev.jigsawpuzzle
 
 import android.media.MediaPlayer
 import android.view.MotionEvent

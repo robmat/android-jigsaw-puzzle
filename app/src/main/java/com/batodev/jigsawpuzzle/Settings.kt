@@ -1,4 +1,4 @@
-package dragosholban.com.androidpuzzlegame
+package com.batodev.jigsawpuzzle
 
 class Settings {
     var uncoveredPics: MutableList<String> = ArrayList()

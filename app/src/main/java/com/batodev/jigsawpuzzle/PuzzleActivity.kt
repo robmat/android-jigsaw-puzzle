@@ -1,4 +1,4 @@
-package dragosholban.com.androidpuzzlegame
+package com.batodev.jigsawpuzzle
 
 import android.app.Activity
 import android.graphics.Bitmap
