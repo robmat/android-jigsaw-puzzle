@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Gradle files
 .gradle/
 build/
@@ -32,7 +31,7 @@ google-services.json
 
 # Android Profiling
 *.hprof
-=======
+
 *.iml
 .gradle
 /local.properties
@@ -42,4 +41,4 @@ google-services.json
 /build
 /captures
 .externalNativeBuild
->>>>>>> d7bcc3b (feat: initial commit)
+
