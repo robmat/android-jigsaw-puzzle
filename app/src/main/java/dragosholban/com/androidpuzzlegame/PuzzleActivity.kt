@@ -16,6 +16,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
@@ -343,6 +344,8 @@ class PuzzleActivity : Activity() {
             val mp = MediaPlayer.create(this, winSoundIds.random())
             mp.setOnCompletionListener { mp.release() }
             mp.start()
+            findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
+            Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -404,5 +407,9 @@ class PuzzleActivity : Activity() {
                 matrix, true
             )
         }
+    }
+
+    fun playAgain(view: View) {
+        finish()
     }
 }

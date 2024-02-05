@@ -11,4 +11,6 @@
     <string name="easy">Easy</string>
     <string name="columns">Columns</string>
     <string name="rows">Rows</string>
+    <string name="puzzle_activity_play_again">Play again</string>
+    <string name="image_added_to_gallery">New image available in the gallery.</string>
 </resources>
