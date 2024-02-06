@@ -1,15 +1,16 @@
 package com.batodev.jigsawpuzzle
 
 import android.Manifest
-import android.app.Activity
+import android.content.ContentValues
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
-import android.view.Window
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
@@ -19,30 +20,29 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Spinner
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
+import androidx.appcompat.app.AppCompatActivity
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
-import java.text.DateFormat
-import java.util.Date
 
 
 private const val CUSTOM = "Custom"
-
 private const val HARD = "Hard"
-
 private const val MEDIUM = "Medium"
+private const val CAMERA_REQUEST = 1888
 
 
-class ImagePickActivity : Activity() {
+class ImagePickActivity : AppCompatActivity() {
+    private var imageUri: Uri? = null
+    private var photoTakenFilePath: Uri? = null
     private var files: Array<String> = arrayOf()
     private var mCurrentPhotoPath: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.image_pick_activity)
+        supportActionBar?.hide();
         val am = assets
         try {
             files = am.list("img") ?: arrayOf()
@@ -50,20 +50,24 @@ class ImagePickActivity : Activity() {
             grid.adapter = ImageAdapter(this)
             grid.onItemClickListener =
                 OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
-                    showStartGamePopup(itemClickedIndex)
+                    showStartGamePopup(itemClickedIndex, null)
                 }
         } catch (e: IOException) {
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun showStartGamePopup(itemClickedIndex: Int) {
+    private fun showStartGamePopup(itemClickedIndex: Int?, mCurrentPhotoPath: String?) {
         val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popupView: View = inflater.inflate(R.layout.start_game_popup, null)
         val radioGroup = popupView.findViewById<RadioGroup>(R.id.radioGroup)
         val dropdownHeight = popupView.findViewById<Spinner>(R.id.dropdown_height)
         val dropdownWidth = popupView.findViewById<Spinner>(R.id.dropdown_width)
-        val adapter: ArrayAdapter<Int> = ArrayAdapter<Int>(this, android.R.layout.simple_spinner_item, listOf(3,4,5,6,7,8,9))
+        val adapter: ArrayAdapter<Int> = ArrayAdapter<Int>(
+            this,
+            android.R.layout.simple_spinner_item,
+            listOf(3, 4, 5, 6, 7, 8, 9)
+        )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         dropdownHeight.adapter = adapter
         dropdownWidth.adapter = adapter
@@ -73,19 +77,22 @@ class ImagePickActivity : Activity() {
 
         val settings = SettingsHelper.load(this)
         val customRadioButton = popupView.findViewById<RadioButton>(R.id.customRadioButton)
-        when(settings.lastSetDifficulty) {
+        when (settings.lastSetDifficulty) {
             EASY -> {
                 popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked = true
                 easy(dropdownHeight, dropdownWidth)
             }
+
             MEDIUM -> {
                 popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked = true
                 medium(dropdownHeight, dropdownWidth)
             }
+
             HARD -> {
                 popupView.findViewById<RadioButton>(R.id.hardRadioButton).isChecked = true
                 hard(dropdownHeight, dropdownWidth)
             }
+
             CUSTOM -> {
                 customRadioButton.isChecked = true
                 custom(dropdownHeight, dropdownWidth, popupView, settings)
@@ -97,12 +104,15 @@ class ImagePickActivity : Activity() {
                 R.id.customRadioButton -> {
                     custom(dropdownHeight, dropdownWidth, popupView, settings)
                 }
+
                 R.id.easyRadioButton -> {
                     easy(dropdownHeight, dropdownWidth)
                 }
+
                 R.id.mediumRadioButton -> {
                     medium(dropdownHeight, dropdownWidth)
                 }
+
                 R.id.hardRadioButton -> {
                     hard(dropdownHeight, dropdownWidth)
                 }
@@ -113,10 +123,13 @@ class ImagePickActivity : Activity() {
         val startButton = popupView.findViewById<Button>(R.id.startButton)
         startButton.setOnClickListener { // Handle start button click
             val customChecked = customRadioButton.isChecked
-            val intent = Intent(
-                applicationContext, PuzzleActivity::class.java
-            )
-            intent.putExtra("assetName", files[itemClickedIndex % files.size])
+            val intent = Intent(applicationContext, PuzzleActivity::class.java)
+            itemClickedIndex?.let {
+                intent.putExtra("assetName", files[itemClickedIndex % files.size])
+            }
+            mCurrentPhotoPath?.let {
+                intent.putExtra("mCurrentPhotoPath", mCurrentPhotoPath)
+            }
             intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
             intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
             startActivity(intent)
@@ -186,99 +199,41 @@ class ImagePickActivity : Activity() {
         dropdownWidth.setSelection(0)
     }
 
-    fun onImageFromCameraClick(view: View?) {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        var photoFile: File? = null
-        try {
-            photoFile = createImageFile()
-        } catch (e: IOException) {
-            Toast.makeText(this, e.message, Toast.LENGTH_LONG).show()
-        }
-        if (photoFile != null) {
-            val photoUri = FileProvider.getUriForFile(
-                this,
-                applicationContext.packageName + ".fileprovider",
-                photoFile
-            )
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)
-        }
-    }
-
-    @Throws(IOException::class)
-    private fun createImageFile(): File? {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            // permission not granted, initiate request
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE
-            )
-        } else {
-            // Create an image file name
-            val timeStamp = DateFormat.getDateTimeInstance().format(Date())
-            val imageFileName = "JPEG_" + timeStamp + "_"
-            val storageDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-            val image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",  /* suffix */
-                storageDir /* directory */
-            )
-            mCurrentPhotoPath = image.absolutePath // save this to use in the intent
-            return image
-        }
-        return null
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray,
+    private val cameraActivityResultLauncher = registerForActivityResult(
+    ActivityResultContracts.StartActivityForResult()
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE) {
-            if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                onImageFromCameraClick(View(this))
+        imageUri?.let {
+            val parcelFileDescriptor = contentResolver.openFileDescriptor(it, "r")
+            val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
+            val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
+            val pathToSave = File(filesDir.absolutePath,"temp.jpg")
+            FileOutputStream(pathToSave).use {
+                image.compress(Bitmap.CompressFormat.JPEG, 90, it)
             }
+            showStartGamePopup(null, pathToSave.toString())
         }
-    }
+    };
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            val intent = Intent(this, PuzzleActivity::class.java)
-            intent.putExtra("mCurrentPhotoPath", mCurrentPhotoPath)
-            startActivity(intent)
+
+    fun onImageFromCameraClick(view: View?) {
+        if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
+            checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED
+        ) {
+            val permission =
+                arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            requestPermissions(permission, 112)
         }
-        if (requestCode == REQUEST_IMAGE_GALLERY && resultCode == RESULT_OK) {
-            val uri = data.data
-            val intent = Intent(this, PuzzleActivity::class.java)
-            intent.putExtra("mCurrentPhotoUri", uri.toString())
-            startActivity(intent)
-        }
+        val values = ContentValues()
+        values.put(MediaStore.Images.Media.TITLE, "New Picture")
+        values.put(MediaStore.Images.Media.DESCRIPTION, "From the Camera")
+        imageUri = contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+        cameraActivityResultLauncher.launch(cameraIntent)
     }
 
     fun onImageFromGalleryClick(view: View?) {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-                REQUEST_PERMISSION_READ_EXTERNAL_STORAGE
-            )
-        } else {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.setType("image/*")
-            startActivityForResult(intent, REQUEST_IMAGE_GALLERY)
-        }
+
     }
 
     companion object {

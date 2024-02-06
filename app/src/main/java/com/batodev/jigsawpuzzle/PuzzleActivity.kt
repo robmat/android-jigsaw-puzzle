@@ -340,12 +340,12 @@ class PuzzleActivity : Activity() {
             imageFileName?.let {
                 settings.uncoveredPics.add(it)
                 SettingsHelper.save(this, settings)
+                Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
             }
             val mp = MediaPlayer.create(this, winSoundIds.random())
             mp.setOnCompletionListener { mp.release() }
             mp.start()
             findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
-            Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
         }
     }
 
