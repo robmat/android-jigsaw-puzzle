@@ -33,7 +33,6 @@ class PuzzleActivity : Activity() {
     private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
     private var mCurrentPhotoPath: String? = null
-    private var mCurrentPhotoUri: String? = null
     private var imageFileName: String? = null
     private val winSoundIds = listOf(
         R.raw.success_1,
@@ -52,7 +51,6 @@ class PuzzleActivity : Activity() {
         val intent = intent
         imageFileName = intent.getStringExtra("assetName")
         mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
-        mCurrentPhotoUri = intent.getStringExtra("mCurrentPhotoUri")
         puzzlesWidth = intent.getIntExtra("width", 4)
         puzzlesHeight = intent.getIntExtra("height", 3)
 
@@ -63,8 +61,6 @@ class PuzzleActivity : Activity() {
                 setPicFromAsset(imageFileName!!, imageView)
             } else if (mCurrentPhotoPath != null) {
                 setPicFromPath(mCurrentPhotoPath!!, imageView)
-            } else if (mCurrentPhotoUri != null) {
-                imageView.setImageURI(Uri.parse(mCurrentPhotoUri))
             }
             pieces = splitImage()
             val touchListener = TouchListener(this@PuzzleActivity)

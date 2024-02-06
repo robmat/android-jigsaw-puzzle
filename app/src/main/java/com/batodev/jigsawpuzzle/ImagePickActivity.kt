@@ -36,9 +36,7 @@ private const val CAMERA_REQUEST = 1888
 
 class ImagePickActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
-    private var photoTakenFilePath: Uri? = null
     private var files: Array<String> = arrayOf()
-    private var mCurrentPhotoPath: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_pick_activity)
@@ -128,7 +126,7 @@ class ImagePickActivity : AppCompatActivity() {
                 intent.putExtra("assetName", files[itemClickedIndex % files.size])
             }
             mCurrentPhotoPath?.let {
-                intent.putExtra("mCurrentPhotoPath", mCurrentPhotoPath)
+                intent.putExtra("mCurrentPhotoPath", it)
             }
             intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
             intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
@@ -200,20 +198,24 @@ class ImagePickActivity : AppCompatActivity() {
     }
 
     private val cameraActivityResultLauncher = registerForActivityResult(
-    ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult()
     ) {
         imageUri?.let {
-            val parcelFileDescriptor = contentResolver.openFileDescriptor(it, "r")
+            copyFileAndStartGame(it)
+        }
+    };
+
+    private fun copyFileAndStartGame(it: Uri) {
+       contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
             val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
             val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-            val pathToSave = File(filesDir.absolutePath,"temp.jpg")
+            val pathToSave = File(filesDir.absolutePath, "temp.jpg")
             FileOutputStream(pathToSave).use {
                 image.compress(Bitmap.CompressFormat.JPEG, 90, it)
             }
             showStartGamePopup(null, pathToSave.toString())
         }
-    };
-
+    }
 
     fun onImageFromCameraClick(view: View?) {
         if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
@@ -232,15 +234,17 @@ class ImagePickActivity : AppCompatActivity() {
         cameraActivityResultLauncher.launch(cameraIntent)
     }
 
-    fun onImageFromGalleryClick(view: View?) {
+    private var pickImageFromGallery = registerForActivityResult<String, Uri>(
+        ActivityResultContracts.GetContent()
+    ) {
+        copyFileAndStartGame(it)
+    }
 
+    fun onImageFromGalleryClick(view: View?) {
+        pickImageFromGallery.launch("image/*")
     }
 
     companion object {
-        val EASY = "Easy"
-        private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 2
-        private const val REQUEST_IMAGE_CAPTURE = 1
-        const val REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 3
-        const val REQUEST_IMAGE_GALLERY = 4
+        const val EASY = "Easy"
     }
 }
