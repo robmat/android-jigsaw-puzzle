@@ -35,7 +35,7 @@ class GalleryActivity : Activity() {
     }
 
     fun rightClicked(view: View) {
-        if (index < images!!.size) index++
+        if (index < images.size) index++
         setImage(index)
         val settings = SettingsHelper.load(this)
         settings.lastSeenPic = index
@@ -45,9 +45,9 @@ class GalleryActivity : Activity() {
     }
 
     private fun setImage(index: Int) {
-        if (index >= 0 && index < images!!.size) {
+        if (index >= 0 && index < images.size) {
             findViewById<PhotoView>(R.id.gallery_activity_background)
-                .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("img/${images!![index]}")))
+                .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("img/${images[index]}")))
             this.index = index
         } else {
             setImage(index - 1)
