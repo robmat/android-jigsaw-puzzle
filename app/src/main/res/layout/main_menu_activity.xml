@@ -16,7 +16,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:orientation="vertical">
 
         <TextView
@@ -35,7 +35,7 @@
             android:id="@+id/main_menu_activity_play_the_game"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
+            android:layout_marginTop="230dp"
             android:background="@drawable/orange_button_background"
             android:onClick="play"
             android:soundEffectsEnabled="true"
@@ -46,7 +46,7 @@
             android:id="@+id/main_menu_activity_unlocked_gallery"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
+            android:layout_marginTop="10dp"
             android:background="@drawable/orange_button_background"
             android:onClick="gallery"
             android:soundEffectsEnabled="true"
@@ -57,11 +57,16 @@
             android:id="@+id/main_menu_activity_more_apps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="30dp"
+            android:layout_margin="10dp"
             android:background="@drawable/orange_button_background"
             android:onClick="moreApps"
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_more_apps"
             android:textSize="20sp" />
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/umberfox_logo"
+            android:contentDescription="@string/app_name" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
