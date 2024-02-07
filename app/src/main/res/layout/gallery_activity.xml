@@ -46,4 +46,17 @@
         android:translationZ="999dp"
         app:layout_constraintBottom_toBottomOf="@id/gallery_activity_background"
         app:layout_constraintLeft_toLeftOf="@id/gallery_activity_background" />
+
+    <ImageButton
+        android:id="@+id/gallery_share_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:contentDescription="@string/app_name"
+        android:onClick="shareClicked"
+        android:src="@drawable/ic_share_36p"
+        android:textColor="@color/white"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/gallery_activity_background"
+        app:layout_constraintLeft_toRightOf="@id/gallery_back_btn" />
 </androidx.constraintlayout.widget.ConstraintLayout>
