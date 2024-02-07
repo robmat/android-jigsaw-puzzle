@@ -121,8 +121,8 @@ class PuzzleActivity : Activity() {
         val scaledBitmapTop = dimensions[1]
         val scaledBitmapWidth = dimensions[2]
         val scaledBitmapHeight = dimensions[3]
-        val croppedImageWidth = (scaledBitmapWidth - 2 * abs(scaledBitmapLeft))
-        val croppedImageHeight = (scaledBitmapHeight - 2 * abs(scaledBitmapTop))
+        val croppedImageWidth = (scaledBitmapWidth /*- 2 * abs(scaledBitmapLeft)*/)
+        val croppedImageHeight = (scaledBitmapHeight/* - 2 * abs(scaledBitmapTop)*/)
         val scaledBitmap =
             Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth, scaledBitmapHeight, true)
         val croppedBitmap = Bitmap.createBitmap(
