@@ -15,6 +15,7 @@ class MainMenuActivity : Activity() {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.main_menu_activity)
         SettingsHelper.load(this)
+        AdHelper.loadAd(this)
     }
 
     fun play(view: View) {

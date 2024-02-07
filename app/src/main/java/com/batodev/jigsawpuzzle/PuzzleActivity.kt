@@ -342,6 +342,7 @@ class PuzzleActivity : Activity() {
             mp.setOnCompletionListener { mp.release() }
             mp.start()
             findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
+            AdHelper.showAd(this)
         }
     }
 

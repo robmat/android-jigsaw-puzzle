@@ -45,7 +45,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/radioGroup"
         android:textSize="20sp"
-        android:text="@string/columns" />
+        android:text="@string/rows" />
 
     <Spinner
         android:id="@+id/dropdown_height"
@@ -65,7 +65,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/dropdown_height"
         android:textSize="20sp"
-        android:text="@string/rows" />
+        android:text="@string/columns" />
 
     <Spinner
         android:id="@+id/dropdown_width"
