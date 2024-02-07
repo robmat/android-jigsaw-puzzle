@@ -78,11 +78,28 @@
         android:textSize="20sp"
         android:enabled="false" />
 
+    <CheckBox
+        android:id="@+id/background_image_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:layout_below="@id/dropdown_width" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/dropdown_width"
+        android:padding="2dp"
+        android:textSize="20sp"
+        android:labelFor="@id/background_image_checkbox"
+        android:layout_toEndOf="@id/background_image_checkbox"
+        android:text="@string/show_image_as_background" />
+
     <Button
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/dropdown_width"
+        android:layout_below="@id/background_image_checkbox"
         android:layout_marginTop="16dp"
         android:background="@drawable/orange_button_background"
         android:text="@string/start"

@@ -8,7 +8,5 @@ class Settings {
     var lastSetDifficulty = "Easy"
     var lastSetDifficultyCustomHeight = 3
     var lastSetDifficultyCustomWidth = 3
-    override fun toString(): String {
-        return "Settings(uncoveredPics=$uncoveredPics, lastSeenPic=$lastSeenPic, addCounter=$addCounter, displayAddEveryXPicView=$displayAddEveryXPicView, lastSetDifficulty='$lastSetDifficulty', lastSetDifficultyCustomHeight=$lastSetDifficultyCustomHeight, lastSetDifficultyCustomWidth=$lastSetDifficultyCustomWidth)"
-    }
+    var showImageInBackgroundOfThePuzzle = true
 }

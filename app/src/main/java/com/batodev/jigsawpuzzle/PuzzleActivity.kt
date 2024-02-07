@@ -20,6 +20,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.exifinterface.media.ExifInterface
 import com.bumptech.glide.Glide
 import java.io.IOException
@@ -48,6 +49,7 @@ class PuzzleActivity : Activity() {
         setContentView(R.layout.activity_puzzle)
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val imageView = findViewById<ImageView>(R.id.imageView)
+        val settings = SettingsHelper.load(this)
         val intent = intent
         imageFileName = intent.getStringExtra("assetName")
         mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
@@ -74,6 +76,9 @@ class PuzzleActivity : Activity() {
                 lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
                 lParams.topMargin = layout.height - piece.pieceHeight - Random().nextInt(300)
                 piece.layoutParams = lParams
+            }
+            if (!settings.showImageInBackgroundOfThePuzzle) {
+                imageView.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.none))
             }
         }
     }

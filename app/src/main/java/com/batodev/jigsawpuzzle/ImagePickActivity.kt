@@ -15,6 +15,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.GridView
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -120,37 +121,63 @@ class ImagePickActivity : AppCompatActivity() {
         alertDialog.show()
         val startButton = popupView.findViewById<Button>(R.id.startButton)
         startButton.setOnClickListener { // Handle start button click
-            val customChecked = customRadioButton.isChecked
-            val intent = Intent(applicationContext, PuzzleActivity::class.java)
-            itemClickedIndex?.let {
-                intent.putExtra("assetName", files[itemClickedIndex % files.size])
-            }
-            mCurrentPhotoPath?.let {
-                intent.putExtra("mCurrentPhotoPath", it)
-            }
-            intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
-            intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
-            startActivity(intent)
-            if (customChecked) {
-                settings.lastSetDifficultyCustomWidth = dropdownWidth.selectedItemId.toInt()
-                settings.lastSetDifficultyCustomHeight = dropdownHeight.selectedItemId.toInt()
-            }
-            if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
-                settings.lastSetDifficulty = EASY
-            }
-            if (popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked) {
-                settings.lastSetDifficulty = MEDIUM
-            }
-            if (popupView.findViewById<RadioButton>(R.id.hardRadioButton).isChecked) {
-                settings.lastSetDifficulty = HARD
-            }
-            if (customChecked) {
-                settings.lastSetDifficulty = CUSTOM
-            }
-            SettingsHelper.save(this, settings)
-            alertDialog.dismiss()
-            finish()
+            startTheGame(
+                customRadioButton,
+                itemClickedIndex,
+                mCurrentPhotoPath,
+                dropdownWidth,
+                dropdownHeight,
+                settings,
+                popupView,
+                alertDialog
+            )
         }
+        popupView.findViewById<CheckBox>(R.id.background_image_checkbox).setOnCheckedChangeListener { _, value ->
+            settings.showImageInBackgroundOfThePuzzle = value
+            SettingsHelper.save(this, settings)
+        }
+    }
+
+    private fun startTheGame(
+        customRadioButton: RadioButton,
+        itemClickedIndex: Int?,
+        mCurrentPhotoPath: String?,
+        dropdownWidth: Spinner,
+        dropdownHeight: Spinner,
+        settings: Settings,
+        popupView: View,
+        alertDialog: AlertDialog
+    ) {
+        val customChecked = customRadioButton.isChecked
+        val intent = Intent(applicationContext, PuzzleActivity::class.java)
+        itemClickedIndex?.let {
+            intent.putExtra("assetName", files[itemClickedIndex % files.size])
+        }
+        mCurrentPhotoPath?.let {
+            intent.putExtra("mCurrentPhotoPath", it)
+        }
+        intent.putExtra("width", Integer.valueOf(dropdownWidth.selectedItem.toString()))
+        intent.putExtra("height", Integer.valueOf(dropdownHeight.selectedItem.toString()))
+        startActivity(intent)
+        if (customChecked) {
+            settings.lastSetDifficultyCustomWidth = dropdownWidth.selectedItemId.toInt()
+            settings.lastSetDifficultyCustomHeight = dropdownHeight.selectedItemId.toInt()
+        }
+        if (popupView.findViewById<RadioButton>(R.id.easyRadioButton).isChecked) {
+            settings.lastSetDifficulty = EASY
+        }
+        if (popupView.findViewById<RadioButton>(R.id.mediumRadioButton).isChecked) {
+            settings.lastSetDifficulty = MEDIUM
+        }
+        if (popupView.findViewById<RadioButton>(R.id.hardRadioButton).isChecked) {
+            settings.lastSetDifficulty = HARD
+        }
+        if (customChecked) {
+            settings.lastSetDifficulty = CUSTOM
+        }
+        SettingsHelper.save(this, settings)
+        alertDialog.dismiss()
+        finish()
     }
 
     private fun custom(
