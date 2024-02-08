@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.View
 import android.view.Window
+import android.widget.Button
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import com.github.chrisbanes.photoview.PhotoView
@@ -24,7 +25,22 @@ class GalleryActivity : Activity() {
         this.images = settings.uncoveredPics
         index = settings.lastSeenPic
         setImage(index)
+        checkIfImageLeftRightButtonsShouldBeVisible()
     }
+
+    private fun checkIfImageLeftRightButtonsShouldBeVisible() {
+        if (index <= 0) {
+            findViewById<Button>(R.id.gallery_left).visibility = View.GONE
+        } else {
+            findViewById<Button>(R.id.gallery_left).visibility = View.VISIBLE
+        }
+        if (index >= images.size - 1) {
+            findViewById<Button>(R.id.gallery_right).visibility = View.GONE
+        } else {
+            findViewById<Button>(R.id.gallery_right).visibility = View.VISIBLE
+        }
+    }
+
     fun backClicked(view: View) {
         finish()
     }
@@ -37,6 +53,7 @@ class GalleryActivity : Activity() {
         settings.addCounter++
         SettingsHelper.save(this, settings)
         AdHelper.showAdIfNeeded(this)
+        checkIfImageLeftRightButtonsShouldBeVisible()
     }
 
     fun rightClicked(view: View) {
@@ -47,6 +64,7 @@ class GalleryActivity : Activity() {
         settings.addCounter++
         SettingsHelper.save(this, settings)
         AdHelper.showAdIfNeeded(this)
+        checkIfImageLeftRightButtonsShouldBeVisible()
     }
 
     private fun setImage(index: Int) {
