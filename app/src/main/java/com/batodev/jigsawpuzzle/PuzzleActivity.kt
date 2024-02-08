@@ -12,7 +12,6 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.Window
@@ -23,7 +22,10 @@ import android.widget.Toast
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.exifinterface.media.ExifInterface
 import com.bumptech.glide.Glide
+import java.io.FileOutputStream
 import java.io.IOException
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.util.Random
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -43,6 +45,7 @@ class PuzzleActivity : Activity() {
         R.raw.success_5,
         R.raw.success_6
     )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -319,10 +322,6 @@ class PuzzleActivity : Activity() {
 
         // Get image position
         // We assume that the image is centered into ImageView
-        val imgViewW = imageView.width
-        val imgViewH = imageView.height
-        val top = (imgViewH - actH) / 2
-        val left = (imgViewW - actW) / 2
         ret[0] = 0//left
         ret[1] = 0//top
         return ret
@@ -367,6 +366,7 @@ class PuzzleActivity : Activity() {
         val targetH = imageView.height
 
         // Get the dimensions of the bitmap
+        cropToAspectRatio(mCurrentPhotoPath)
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
@@ -398,6 +398,39 @@ class PuzzleActivity : Activity() {
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
         }
         imageView.setImageBitmap(rotatedBitmap)
+    }
+
+    private fun cropToAspectRatio(mCurrentPhotoPath: String) {
+        val aspectRatio: BigDecimal = BigDecimal(2).divide(BigDecimal(3), 5, RoundingMode.HALF_UP)
+        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
+        val width =  BigDecimal(bitmap.width)
+        val height =  BigDecimal(bitmap.height)
+
+        val targetWidth: Int
+        val targetHeight: Int
+
+        // Calculate the dimensions of the cropped region based on the aspect ratio
+        if (width / height > aspectRatio) {
+            targetWidth = (height * aspectRatio).toInt()
+            targetHeight = height.toInt()
+        } else {
+            targetWidth = width.toInt()
+            targetHeight = (width / aspectRatio).toInt()
+        }
+
+        // Calculate the coordinates of the top-left corner of the cropped region
+        val left = (width.toInt() - targetWidth) / 2
+        val top = (height.toInt() - targetHeight) / 2
+
+        // Create a Rect object representing the cropping region
+        val rect = Rect(left, top, left + targetWidth, top + targetHeight)
+
+        // Crop the bitmap to the specified region
+        val croppedBitmap =
+            Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
+        FileOutputStream(mCurrentPhotoPath).use {
+            croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
+        }
     }
 
     companion object {
