@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+  <string name="main_menu_activity_play_the_game">遊ぶ！</string>
+  <string name="main_menu_activity_unlocked_gallery">公開された写真のギャラリー</string>
+  <string name="main_menu_activity_more_apps">このようなアプリをもっと見る</string>
+  <string name="main_menu_activity_play_to_uncover">まずはゲームをプレイしてみよう</string>
+  <string name="start">ゲームをスタート</string>
+  <string name="custom_size">カスタムサイズ</string>
+  <string name="hard">難しい</string>
+  <string name="medium">中くらい</string>
+  <string name="easy">簡単</string>
+  <string name="columns">コラム</string>
+  <string name="rows">行</string>
+  <string name="puzzle_activity_play_again">再びプレー</string>
+  <string name="image_added_to_gallery">新しい画像がギャラリーにあります。</string>
+  <string name="show_image_as_background">画像を後ろに表示</string>
+</resources>

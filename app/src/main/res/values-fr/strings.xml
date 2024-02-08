@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+  <string name="main_menu_activity_play_the_game">Jouer!</string>
+  <string name="main_menu_activity_unlocked_gallery">Galerie de photos dévoilées</string>
+  <string name="main_menu_activity_more_apps">Plus d\'applications comme celle-ci</string>
+  <string name="main_menu_activity_play_to_uncover">Jouez d\'abord au jeu</string>
+  <string name="start">Démarrer jeu</string>
+  <string name="custom_size">Format personnalisé</string>
+  <string name="hard">Dur</string>
+  <string name="medium">Moyen</string>
+  <string name="easy">Facile</string>
+  <string name="columns">Colonnes</string>
+  <string name="rows">Lignes</string>
+  <string name="puzzle_activity_play_again">Rejouer</string>
+  <string name="image_added_to_gallery">Nouvelle image disponible dans la galerie.</string>
+  <string name="show_image_as_background">Afficher l\'image au dos</string>
+</resources>
