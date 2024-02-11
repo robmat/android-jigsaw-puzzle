@@ -19,59 +19,76 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class PuzzleCutter {
+
+    static int numProcessors = Runtime.getRuntime().availableProcessors();
+    static ExecutorService executor = null;
+
     public static List<Bitmap> cut(
-            Bitmap sourceImage,
+            final Bitmap sourceImage,
             int rows,
             int cols,
             String svgString,
-            ImageView imageView,
+            final ImageView imageView,
             PuzzleActivity puzzleActivity,
             List<PuzzlePiece> pieces) throws SVGParseException {
-        List<Bitmap> result = new ArrayList<>();
-        long startTime = System.currentTimeMillis();
+        final List<Bitmap> result = new ArrayList<>();
+        final long startTime = System.currentTimeMillis();
         SVG svg = SVG.getFromString(svgString);
         int width = sourceImage.getWidth();
         int height = sourceImage.getHeight();
-        Bitmap puzzleGridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        final Bitmap puzzleGridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas puzzleGridCanvas = new Canvas(puzzleGridBitmap);
         Paint whiteFill = new Paint();
         whiteFill.setStyle(Paint.Style.FILL);
         whiteFill.setColor(Color.WHITE);
         puzzleGridCanvas.drawRect(0, 0, width, height, whiteFill);
         svg.renderToCanvas(puzzleGridCanvas);
-//        imageView.setImageDrawable(new BitmapDrawable(activity.getResources(), puzzleGridBitmap));
 
-        Point[][] puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols);
+        executor = Executors.newFixedThreadPool(numProcessors);
+
+        final Point[][] puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols);
         int puzzleIndex = 0;
         for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
             for (int colIndex = 0; colIndex < cols; colIndex++) {
-                Point puzzleCenter = puzzlesCenterPoints[rowIndex][colIndex];
-                Region reg = floodFill(puzzleGridBitmap, puzzleCenter.x, puzzleCenter.y);
-                int regionWidth = reg.getWidth();
-                int regionHeight = reg.getHeight();
-                int regionMinX = reg.getMinX();
-                int regionMinY = reg.getMinY();
-                Bitmap puzzleBitmap = Bitmap.createBitmap(regionWidth + 1, regionHeight + 1, Bitmap.Config.ARGB_8888);
+                final PuzzlePiece piece = pieces.get(puzzleIndex++);
+                int finalRowIndex = rowIndex;
+                int finalColIndex = colIndex;
+                Runnable puzzleCutJob = () -> {
+                    Point puzzleCenter = puzzlesCenterPoints[finalRowIndex][finalColIndex];
+                    Region reg = floodFill(puzzleGridBitmap, puzzleCenter.x, puzzleCenter.y);
+                    final int regionWidth = reg.getWidth();
+                    final int regionHeight = reg.getHeight();
+                    final int regionMinX = reg.getMinX();
+                    final int regionMinY = reg.getMinY();
+                    final Bitmap puzzleBitmap = Bitmap.createBitmap(regionWidth + 1, regionHeight + 1, Bitmap.Config.ARGB_8888);
 
-                System.out.println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms");
-                reg.points().forEach(point -> {
-                    int rgbSource = sourceImage.getPixel(point.x(), point.y());
-                    int x = point.x() - regionMinX;
-                    int y = point.y() - regionMinY;
-                    puzzleBitmap.setPixel(x, y, rgbSource);
-                });
-                result.add(puzzleBitmap);
-                PuzzlePiece piece = pieces.get(puzzleIndex++);
-                piece.setImageBitmap(puzzleBitmap);
-                piece.pieceWidth = regionWidth;
-                piece.pieceHeight = regionHeight;
-                piece.xCoord = regionMinX + imageView.getLeft() + 4;
-                piece.yCoord = regionMinY + imageView.getTop() + 7;
+                    System.out.println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms");
+                    reg.points().forEach(point -> {
+                        int rgbSource = sourceImage.getPixel(point.x(), point.y());
+                        int x = point.x() - regionMinX;
+                        int y = point.y() - regionMinY;
+                        puzzleBitmap.setPixel(x, y, rgbSource);
+                    });
+                    result.add(puzzleBitmap);
+                    Runnable setPuzzleImageAndPositions = () -> {
+                        piece.setImageBitmap(puzzleBitmap);
+                        piece.pieceWidth = regionWidth;
+                        piece.pieceHeight = regionHeight;
+                        piece.xCoord = regionMinX + imageView.getLeft() + 4;
+                        piece.yCoord = regionMinY + imageView.getTop() + 7;
+                    };
+                    puzzleActivity.postToHandler(setPuzzleImageAndPositions);
+                };
+                executor.submit(puzzleCutJob);
                 System.out.println("Filling target took: " + (System.currentTimeMillis() - startTime) + "ms");
             }
         }
+        executor.shutdown();
         return result;
     }
 

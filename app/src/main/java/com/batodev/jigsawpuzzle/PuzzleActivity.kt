@@ -348,4 +348,8 @@ class PuzzleActivity : AppCompatActivity() {
     fun playAgain(view: View) {
         finish()
     }
+
+    fun postToHandler(r: Runnable) {
+        handler.post(r)
+    }
 }
