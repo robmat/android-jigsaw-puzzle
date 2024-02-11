@@ -1,7 +1,6 @@
 package com.batodev.jigsawpuzzle
 
 import android.Manifest
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -9,7 +8,6 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -26,8 +24,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -42,6 +39,7 @@ private const val CAMERA_PERMISSION_REQUEST_CODE = 1
 private const val EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 2
 
 class ImagePickActivity : AppCompatActivity() {
+    private var photoUri: Uri? = null
     private var files: Array<String> = arrayOf()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -231,25 +229,11 @@ class ImagePickActivity : AppCompatActivity() {
     }
 
     private val cameraActivityResultLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
+        ActivityResultContracts.TakePicture()
     ) { ar ->
-        if (ar.resultCode == Activity.RESULT_OK) {
-            val resultIntent = ar.data
-            resultIntent?.let {
-                val extras = it.extras
-                extras?.let {
-                    val photoAny: Any? = extras.get("data")
-                    if (photoAny is Bitmap) {
-                        val photoBitmap = photoAny as Bitmap
-                        photoBitmap.let { bm ->
-                            val pathToSave = File(filesDir, "temp.jpg")
-                            FileOutputStream(pathToSave).use { fos ->
-                                bm.compress(Bitmap.CompressFormat.JPEG, 90, fos)
-                            }
-                            showStartGamePopup(null, pathToSave.toString())
-                        }
-                    }
-                }
+        if (ar) {
+            photoUri?.let {
+                showStartGamePopup(null, photoUri.toString())
             }
         }
     }
@@ -262,7 +246,8 @@ class ImagePickActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                cameraActivityResultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+                setImageUri()
+                cameraActivityResultLauncher.launch(photoUri)
             } else {
                 Toast.makeText(this, "Camera permission denied.", Toast.LENGTH_SHORT).show()
             }
@@ -285,8 +270,21 @@ class ImagePickActivity : AppCompatActivity() {
                 CAMERA_PERMISSION_REQUEST_CODE
             )
         } else {
-            cameraActivityResultLauncher.launch(Intent(MediaStore.ACTION_IMAGE_CAPTURE))
+            setImageUri()
+            cameraActivityResultLauncher.launch(photoUri)
         }
+    }
+
+    private fun setImageUri() {
+        val directory = File(filesDir, "camera_images")
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        photoUri = FileProvider.getUriForFile(
+            this,
+            applicationContext.packageName + ".fileprovider",
+            File(directory, "temp.jpg")
+        );
     }
 
     private fun copyFileAndStartGame(it: Uri?) {
@@ -294,7 +292,7 @@ class ImagePickActivity : AppCompatActivity() {
             contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
                 val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
                 val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-                val pathToSave = File(filesDir.absolutePath, "temp.jpg")
+                val pathToSave = File(File(filesDir, "camera_images"), "temp.jpg")
                 FileOutputStream(pathToSave).use {
                     image.compress(Bitmap.CompressFormat.JPEG, 90, it)
                 }

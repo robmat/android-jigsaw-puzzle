@@ -1,33 +1,30 @@
 package com.batodev.jigsawpuzzle
 
-import android.app.Activity
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
-import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.exifinterface.media.ExifInterface
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.bumptech.glide.Glide
 import com.caverock.androidsvg.SVG
+import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.math.BigDecimal
@@ -35,13 +32,13 @@ import java.math.RoundingMode
 import java.util.Random
 import kotlin.math.abs
 import kotlin.math.roundToInt
+import kotlin.system.measureTimeMillis
 
 
 class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
     private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
-    private var mCurrentPhotoPath: String? = null
     private var imageFileName: String? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val winSoundIds = listOf(
@@ -62,7 +59,6 @@ class PuzzleActivity : AppCompatActivity() {
         val settings = SettingsHelper.load(this)
         val intent = intent
         imageFileName = intent.getStringExtra("assetName")
-        mCurrentPhotoPath = intent.getStringExtra("mCurrentPhotoPath")
         puzzlesWidth = intent.getIntExtra("width", 4)
         puzzlesHeight = intent.getIntExtra("height", 3)
 
@@ -71,8 +67,11 @@ class PuzzleActivity : AppCompatActivity() {
         imageView.post {
             if (imageFileName != null) {
                 setPicFromAsset(imageFileName!!, imageView)
-            } else if (mCurrentPhotoPath != null) {
-                setPicFromPath(mCurrentPhotoPath!!, imageView)
+            } else if (intent.getStringExtra("mCurrentPhotoPath") != null) {
+                val time = measureTimeMillis {
+                    setPicFromPath(imageView)
+                }
+                Log.d(PuzzleActivity::class.java.simpleName, "setPicFromPath took: $time ms")
             }
             pieces = splitImage()
             val touchListener = TouchListener(this@PuzzleActivity)
@@ -90,6 +89,7 @@ class PuzzleActivity : AppCompatActivity() {
             if (!settings.showImageInBackgroundOfThePuzzle) {
                 imageView.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.none))
             }
+            findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
         }
     }
 
@@ -261,13 +261,16 @@ class PuzzleActivity : AppCompatActivity() {
             return true
         }
 
-    private fun setPicFromPath(mCurrentPhotoPath: String, imageView: ImageView) {
+    private fun setPicFromPath(imageView: ImageView) {
         // Get the dimensions of the View
         val targetW = imageView.width
         val targetH = imageView.height
-
+        val mCurrentPhotoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
         // Get the dimensions of the bitmap
-        cropToAspectRatio(mCurrentPhotoPath)
+        val time = measureTimeMillis {
+            cropToAspectRatio(mCurrentPhotoPath)
+        }
+        Log.d(PuzzleActivity::class.java.simpleName, "cropToAspectRatio took: $time ms")
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
@@ -281,23 +284,8 @@ class PuzzleActivity : AppCompatActivity() {
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
         val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        var rotatedBitmap = bitmap
+        val rotatedBitmap = bitmap
 
-        // rotate bitmap if needed
-        try {
-            val ei = ExifInterface(mCurrentPhotoPath)
-            val orientation = ei.getAttributeInt(
-                ExifInterface.TAG_ORIENTATION,
-                ExifInterface.ORIENTATION_UNDEFINED
-            )
-            when (orientation) {
-                ExifInterface.ORIENTATION_ROTATE_90 -> rotatedBitmap = rotateImage(bitmap, 90f)
-                ExifInterface.ORIENTATION_ROTATE_180 -> rotatedBitmap = rotateImage(bitmap, 180f)
-                ExifInterface.ORIENTATION_ROTATE_270 -> rotatedBitmap = rotateImage(bitmap, 270f)
-            }
-        } catch (e: IOException) {
-            Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
-        }
         imageView.setImageBitmap(rotatedBitmap)
     }
 
@@ -327,8 +315,7 @@ class PuzzleActivity : AppCompatActivity() {
         val rect = Rect(left, top, left + targetWidth, top + targetHeight)
 
         // Crop the bitmap to the specified region
-        val croppedBitmap =
-            Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
+        val croppedBitmap = Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
         FileOutputStream(mCurrentPhotoPath).use {
             croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
         }
