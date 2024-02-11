@@ -13,12 +13,15 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.view.Window
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.exifinterface.media.ExifInterface
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
@@ -34,12 +37,13 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 
-class PuzzleActivity : Activity() {
+class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
     private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
     private var mCurrentPhotoPath: String? = null
     private var imageFileName: String? = null
+    private val handler: Handler = Handler(Looper.getMainLooper())
     private val winSoundIds = listOf(
         R.raw.success_1,
         R.raw.success_2,
@@ -51,7 +55,7 @@ class PuzzleActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        requestWindowFeature(Window.FEATURE_NO_TITLE)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val imageView = findViewById<ImageView>(R.id.imageView)
@@ -132,8 +136,8 @@ class PuzzleActivity : Activity() {
         val scaledBitmapTop = dimensions[1]
         val scaledBitmapWidth = dimensions[2]
         val scaledBitmapHeight = dimensions[3]
-        val croppedImageWidth = (scaledBitmapWidth /*- 2 * abs(scaledBitmapLeft)*/)
-        val croppedImageHeight = (scaledBitmapHeight/* - 2 * abs(scaledBitmapTop)*/)
+        val croppedImageWidth = (scaledBitmapWidth)
+        val croppedImageHeight = (scaledBitmapHeight)
         val scaledBitmap =
             Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth, scaledBitmapHeight, true)
         val croppedBitmap = Bitmap.createBitmap(
@@ -151,11 +155,14 @@ class PuzzleActivity : Activity() {
         puzzleCurvesGenerator.yn = rows.toDouble()
         val svgString = puzzleCurvesGenerator.generateSvg()
         // paint grid on image
-//        val svg = SVG.getFromString(svgString)
-//        val bitmapCopy = bitmap.copy(bitmap.config, true)
-//        val canvas = Canvas(bitmapCopy)
-//        svg.renderToCanvas(canvas)
-//        imageView.setImageBitmap(bitmapCopy)
+        val bitmapCopy = Bitmap.createBitmap(croppedBitmap.width, croppedBitmap.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmapCopy)
+        val paint = Paint()
+        paint.alpha = 70
+        canvas.drawBitmap(croppedBitmap, 0.0f, 0.0f, paint)
+        val svg = SVG.getFromString(svgString)
+        svg.renderToCanvas(canvas)
+        imageView.setImageBitmap(bitmapCopy)
 
         // Calculate the with and height of the pieces
         val pieceWidth = croppedImageWidth / cols
@@ -163,7 +170,6 @@ class PuzzleActivity : Activity() {
 
         // Create each bitmap piece and add it to the resulting array
         var yCoord = 0
-        var puzzlIndex = 0
         for (row in 0 until rows) {
             var xCoord = 0
             for (col in 0 until cols) {

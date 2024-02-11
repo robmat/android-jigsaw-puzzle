@@ -6,8 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Handler;
 import android.widget.ImageView;
 
+import com.batodev.jigsawpuzzle.PuzzleActivity;
 import com.batodev.jigsawpuzzle.PuzzlePiece;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGParseException;
@@ -25,7 +27,7 @@ public class PuzzleCutter {
             int cols,
             String svgString,
             ImageView imageView,
-            Activity activity,
+            PuzzleActivity puzzleActivity,
             List<PuzzlePiece> pieces) throws SVGParseException {
         List<Bitmap> result = new ArrayList<>();
         long startTime = System.currentTimeMillis();
@@ -39,7 +41,7 @@ public class PuzzleCutter {
         whiteFill.setColor(Color.WHITE);
         puzzleGridCanvas.drawRect(0, 0, width, height, whiteFill);
         svg.renderToCanvas(puzzleGridCanvas);
-        imageView.setImageDrawable(new BitmapDrawable(activity.getResources(), puzzleGridBitmap));
+//        imageView.setImageDrawable(new BitmapDrawable(activity.getResources(), puzzleGridBitmap));
 
         Point[][] puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols);
         int puzzleIndex = 0;

@@ -1,110 +1,113 @@
-package com.batodev.jigsawpuzzle;
+package com.batodev.jigsawpuzzle
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.os.Handler;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.AssetManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import android.widget.ImageView
+import com.batodev.jigsawpuzzle.SettingsHelper.load
+import java.io.IOException
 
-import java.io.IOException;
-import java.io.InputStream;
+class ImageAdapter(private val mContext: Context) : BaseAdapter() {
+    private val am: AssetManager = mContext.assets
+    private var files: Array<String>? = null
+    private val handler = Handler(Looper.getMainLooper())
 
-public class ImageAdapter extends BaseAdapter {
-    private final Context mContext;
-    private final AssetManager am;
-    private String[] files;
-    private final Handler handler = new Handler();
-
-    public ImageAdapter(Context c) {
-        mContext = c;
-        am = mContext.getAssets();
+    init {
         try {
-            files = am.list("img");
-        } catch (IOException e) {
-            e.printStackTrace();
+            files = am.list("img")
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
     }
 
-    public int getCount() {
-        return files.length;
+    override fun getCount(): Int {
+        return files!!.size
     }
 
-    public Object getItem(int position) {
-        return null;
+    override fun getItem(position: Int): Any? {
+        return null
     }
 
-    public long getItemId(int position) {
-        return 0;
+    override fun getItemId(position: Int): Long {
+        return 0
     }
 
     // create a new ImageView for each item referenced by the Adapter
     @SuppressLint("InflateParams")
-    public View getView(final int position, View convertView, ViewGroup parent) {
-        Settings settings = SettingsHelper.INSTANCE.load(mContext);
-        if (convertView == null) {
-            final LayoutInflater layoutInflater = LayoutInflater.from(mContext);
-            convertView = layoutInflater.inflate(R.layout.grid_element, null);
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        val settings = load(mContext)
+        var convertViewVar = convertView
+        if (convertViewVar == null) {
+            val layoutInflater = LayoutInflater.from(mContext)
+            convertViewVar = layoutInflater.inflate(R.layout.grid_element, null)
         }
-
-        final ImageView imageView = convertView.findViewById(R.id.gridImageview);
-        imageView.setImageBitmap(null);
+        val imageView = convertViewVar!!.findViewById<ImageView>(R.id.gridImageview)
+        imageView.setImageBitmap(null)
         // run image related code after the view was laid out
-        imageView.post(() -> handler.post(() -> {
-            try {
-                Bitmap picFromAsset = getPicFromAsset(imageView.getHeight(), imageView.getWidth(), files[position], am);
-                assert picFromAsset != null;
-                Bitmap mutableBitmap = Bitmap.createBitmap(picFromAsset.getWidth(), picFromAsset.getHeight(), Bitmap.Config.ARGB_8888);
-                // Create a canvas to draw on the mutable bitmap
-                Canvas canvas = new Canvas(mutableBitmap);
-                // Create a paint with the desired alpha value
-                Paint alphaPaint = new Paint();
-                if (!settings.getUncoveredPics().contains(files[position])) {
-                    alphaPaint.setAlpha(30);
+        imageView.post {
+            handler.post {
+                try {
+                    val picFromAsset = getPicFromAsset(imageView.height, imageView.width, files!![position], am)!!
+                    val mutableBitmap = Bitmap.createBitmap(
+                        picFromAsset.width, picFromAsset.height, Bitmap.Config.ARGB_8888
+                    )
+                    val canvas = Canvas(mutableBitmap)
+                    val alphaPaint = Paint()
+                    if (!settings.uncoveredPics.contains(files!![position])) {
+                        alphaPaint.alpha = 30
+                    }
+                    // Draw the original bitmap onto the canvas with the alpha paint
+                    canvas.drawBitmap(picFromAsset, 0f, 0f, alphaPaint)
+                    imageView.setImageBitmap(mutableBitmap)
+                } catch (e: IOException) {
+                    Log.w(ImageAdapter::class.java.simpleName, e.localizedMessage)
+                    throw RuntimeException(e)
                 }
-                // Draw the original bitmap onto the canvas with the alpha paint
-                canvas.drawBitmap(picFromAsset, 0, 0, alphaPaint);
-                imageView.setImageBitmap(mutableBitmap);
-            } catch (IOException e) {
-                Log.w(ImageAdapter.class.getSimpleName(), e.getLocalizedMessage());
-                throw new RuntimeException(e);
             }
-        }));
-        return convertView;
+        }
+        return convertViewVar
     }
 
-    static Bitmap getPicFromAsset(int targetH, int targetW, String assetName, AssetManager am) throws IOException {
-        if (targetW == 0 || targetH == 0) {
-            // view has no dimensions set
-            return null;
+    companion object {
+        @Throws(IOException::class)
+        fun getPicFromAsset(
+            targetH: Int,
+            targetW: Int,
+            assetName: String,
+            am: AssetManager,
+        ): Bitmap? {
+            if (targetW == 0 || targetH == 0) {
+                // view has no dimensions set
+                return null
+            }
+            val `is` = am.open("img/$assetName")
+            // Get the dimensions of the bitmap
+            val bmOptions = BitmapFactory.Options()
+            bmOptions.inJustDecodeBounds = true
+            BitmapFactory.decodeStream(`is`, Rect(-1, -1, -1, -1), bmOptions)
+            val photoW = bmOptions.outWidth
+            val photoH = bmOptions.outHeight
+
+            // Determine how much to scale down the image
+            val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+            `is`.reset()
+
+            // Decode the image file into a Bitmap sized to fill the View
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            return BitmapFactory.decodeStream(`is`, Rect(-1, -1, -1, -1), bmOptions)
         }
-
-        InputStream is = am.open("img/" + assetName);
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeStream(is, new Rect(-1, -1, -1, -1), bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        is.reset();
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-
-        return BitmapFactory.decodeStream(is, new Rect(-1, -1, -1, -1), bmOptions);
     }
 }
