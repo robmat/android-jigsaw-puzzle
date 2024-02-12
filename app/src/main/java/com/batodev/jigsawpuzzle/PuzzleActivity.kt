@@ -86,7 +86,7 @@ class PuzzleActivity : AppCompatActivity() {
                 lParams.topMargin = layout.height - piece.pieceHeight - Random().nextInt(300)
                 piece.layoutParams = lParams
             }
-            if (!settings.showImageInBackgroundOfThePuzzle) {
+            if (!settings.showImageInBackgroundOfThePuzzle) { //TODO move to image generator
                 imageView.setImageDrawable(AppCompatResources.getDrawable(this, R.drawable.none))
             }
             findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
