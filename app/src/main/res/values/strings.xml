@@ -14,4 +14,6 @@
     <string name="puzzle_activity_play_again">Play again</string>
     <string name="image_added_to_gallery">New image available in the gallery.</string>
     <string name="show_image_as_background">Show image in the back</string>
+    <string name="how_many_puzzles">How many puzzle pieces?</string>
+    <string name="show_puzzle_grid">Show puzzle shapes</string>
 </resources>

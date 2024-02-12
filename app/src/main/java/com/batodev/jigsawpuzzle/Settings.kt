@@ -5,8 +5,8 @@ class Settings {
     var lastSeenPic = 0
     var addCounter = 0
     var displayAddEveryXPicView = 2
-    var lastSetDifficulty = "Easy"
-    var lastSetDifficultyCustomHeight = 3
+    var showGridInBackgroundOfThePuzzle = true
+    var lastSetDifficultyCustomHeight = 5
     var lastSetDifficultyCustomWidth = 3
     var showImageInBackgroundOfThePuzzle = true
 }
