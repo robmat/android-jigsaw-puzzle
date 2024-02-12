@@ -217,9 +217,13 @@ class ImagePickActivity : AppCompatActivity() {
     private fun copyFileAndStartGame(it: Uri?) {
         it?.let {
             contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
+                val directory = File(filesDir, "camera_images")
+                if (!directory.exists()) {
+                    directory.mkdirs()
+                }
                 val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
                 val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
-                val pathToSave = File(File(filesDir, "camera_images"), "temp.jpg")
+                val pathToSave = File(directory, "temp.jpg")
                 FileOutputStream(pathToSave).use {
                     image.compress(Bitmap.CompressFormat.JPEG, 90, it)
                 }
