@@ -99,7 +99,7 @@ class GalleryActivity : AppCompatActivity() {
         }
         val shareIntent = Intent(Intent.ACTION_SEND)
         val applicationId = this.application.applicationContext.packageName
-        val uri = FileProvider.getUriForFile(this, "${applicationId}.file-provider", fileShared)
+        val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
         shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
         shareIntent.type = "image/*"
         ContextCompat.startActivity(this, shareIntent, null)
