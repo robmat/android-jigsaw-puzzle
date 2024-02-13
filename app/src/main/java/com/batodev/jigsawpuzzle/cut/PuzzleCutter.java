@@ -89,6 +89,15 @@ public class PuzzleCutter {
             }
         }
         executor.shutdown();
+        new Thread(() -> {
+            try {
+                boolean terminated = executor.awaitTermination(1, TimeUnit.HOURS);
+                System.out.println(terminated);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            puzzleActivity.postToHandler(puzzleActivity::hideProgressSpinner);
+        }).start();
         return result;
     }
 

@@ -85,8 +85,11 @@ class PuzzleActivity : AppCompatActivity() {
                 lParams.topMargin = layout.height - piece.pieceHeight - Random().nextInt(300)
                 piece.layoutParams = lParams
             }
-            findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
         }
+    }
+
+    fun hideProgressSpinner() {
+        handler.post { findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE }
     }
 
     private fun setPicFromAsset(assetName: String, imageView: ImageView) {
