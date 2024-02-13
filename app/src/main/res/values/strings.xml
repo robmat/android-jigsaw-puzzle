@@ -1,11 +1,10 @@
 <resources>
     <string name="app_name" translatable="false">Puzzled Girls</string>
-    <string name="main_menu_activity_play_the_game">Play!</string>
+    <string name="main_menu_activity_play_the_game">Let\'s play!</string>
     <string name="main_menu_activity_unlocked_gallery">Gallery of revealed pictures</string>
     <string name="main_menu_activity_more_apps">More apps like this</string>
     <string name="main_menu_activity_play_to_uncover">Play the game first</string>
-    <string name="start">Start game</string>
-    <string name="custom_size">Custom size</string>
+    <string name="start">Start the game</string>
     <string name="hard">Hard</string>
     <string name="medium">Medium</string>
     <string name="easy">Easy</string>

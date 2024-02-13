@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-  <string name="main_menu_activity_play_the_game">کھیلیں!</string>
+      
+
+    
+  
   <string name="main_menu_activity_unlocked_gallery">انکشاف شدہ تصاویر کی گیلری</string>
+      
+  
   <string name="main_menu_activity_more_apps">اس طرح کی مزید ایپس</string>
+      
+  
   <string name="main_menu_activity_play_to_uncover">پہلے گیم کھیلیں</string>
-  <string name="start">کھیل شروع کریں۔</string>
-  <string name="custom_size">حسب ضرورت سائز</string>
+      
+
+    
+
+    
+  
   <string name="hard">سخت</string>
+      
+  
   <string name="medium">درمیانہ</string>
+      
+  
   <string name="easy">آسان</string>
+      
+  
   <string name="columns">کالم</string>
+      
+  
   <string name="rows">قطاریں</string>
+      
+  
   <string name="puzzle_activity_play_again">دوبارہ کھیلو</string>
+      
+  
   <string name="image_added_to_gallery">نئی تصویر گیلری میں دستیاب ہے۔</string>
+      
+  
   <string name="show_image_as_background">پیچھے کی تصویر دکھائیں۔</string>
+    
+  
+  <string name="how_many_puzzles">کتنے پہیلی کے ٹکڑے ہیں؟</string>
+    
+  <string name="show_puzzle_grid">پہیلی کی شکلیں دکھائیں۔</string>
+  
+  <string name="main_menu_activity_play_the_game">چلو کھیلتے ہیں!</string>
+  <string name="start">کھیل شروع کریں۔</string>
 </resources>

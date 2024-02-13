@@ -59,6 +59,6 @@
         android:layout_below="@id/difficulty_spinner"
         android:layout_marginTop="16dp"
         android:background="@drawable/orange_button_background"
-        android:text="@string/start"
+        android:text="@string/main_menu_activity_play_the_game"
         android:textSize="20sp" />
 </RelativeLayout>

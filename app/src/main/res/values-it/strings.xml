@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-  <string name="main_menu_activity_play_the_game">Giocare!</string>
+      
+
+    
+  
   <string name="main_menu_activity_unlocked_gallery">Galleria delle immagini rivelate</string>
+      
+  
   <string name="main_menu_activity_more_apps">Altre app come questa</string>
+      
+  
   <string name="main_menu_activity_play_to_uncover">Prima gioca</string>
-  <string name="start">Inizia il gioco</string>
-  <string name="custom_size">Formato personalizzato</string>
+      
+
+    
+
+    
+  
   <string name="hard">Difficile</string>
+      
+  
   <string name="medium">medio</string>
+      
+  
   <string name="easy">Facile</string>
+      
+  
   <string name="columns">Colonne</string>
+      
+  
   <string name="rows">Righe</string>
+      
+  
   <string name="puzzle_activity_play_again">Gioca di nuovo</string>
+      
+  
   <string name="image_added_to_gallery">Nuova immagine disponibile nella gallery.</string>
+      
+  
   <string name="show_image_as_background">Mostra l\'immagine sul retro</string>
+    
+  
+  <string name="how_many_puzzles">Quanti pezzi del puzzle?</string>
+    
+  <string name="show_puzzle_grid">Mostra le forme del puzzle</string>
+  
+  <string name="main_menu_activity_play_the_game">Giochiamo!</string>
+  <string name="start">Inizia il gioco</string>
 </resources>

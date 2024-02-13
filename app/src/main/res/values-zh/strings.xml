@@ -1,17 +1,50 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-  <string name="main_menu_activity_play_the_game">玩！</string>
+      
+
+    
+  
   <string name="main_menu_activity_unlocked_gallery">曝光的图片库</string>
+      
+  
   <string name="main_menu_activity_more_apps">更多类似的应用程序</string>
+      
+  
   <string name="main_menu_activity_play_to_uncover">先玩游戏</string>
-  <string name="start">开始游戏</string>
-  <string name="custom_size">自定义大小</string>
+      
+
+    
+
+    
+  
   <string name="hard">难的</string>
+      
+  
   <string name="medium">中等的</string>
+      
+  
   <string name="easy">简单的</string>
+      
+  
   <string name="columns">列</string>
+      
+  
   <string name="rows">行数</string>
+      
+  
   <string name="puzzle_activity_play_again">再玩一次</string>
+      
+  
   <string name="image_added_to_gallery">图库中提供了新图像。</string>
+      
+  
   <string name="show_image_as_background">在后面显示图像</string>
+    
+  
+  <string name="how_many_puzzles">有多少块拼图？</string>
+    
+  <string name="show_puzzle_grid">显示拼图形状</string>
+  
+  <string name="main_menu_activity_play_the_game">让我们玩！</string>
+  <string name="start">开始游戏</string>
 </resources>
