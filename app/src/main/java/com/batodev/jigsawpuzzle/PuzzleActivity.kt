@@ -19,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.RelativeLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.exifinterface.media.ExifInterface
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.bumptech.glide.Glide
@@ -267,15 +268,9 @@ class PuzzleActivity : AppCompatActivity() {
         }
 
     private fun setPicFromPath(imageView: ImageView) {
-        // Get the dimensions of the View
         val targetW = imageView.width
         val targetH = imageView.height
         val mCurrentPhotoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
-        // Get the dimensions of the bitmap
-        val time = measureTimeMillis {
-            cropToAspectRatio(mCurrentPhotoPath)
-        }
-        Log.d(PuzzleActivity::class.java.simpleName, "cropToAspectRatio took: $time ms")
         val bmOptions = BitmapFactory.Options()
         bmOptions.inJustDecodeBounds = true
         BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
@@ -289,14 +284,31 @@ class PuzzleActivity : AppCompatActivity() {
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
         val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
-        val rotatedBitmap = bitmap
+        val rotatedBitmap = uprightBitmap(bitmap, mCurrentPhotoPath)
+        val croppedBitmap = cropToAspectRatio(rotatedBitmap)
 
-        imageView.setImageBitmap(rotatedBitmap)
+        imageView.setImageBitmap(croppedBitmap)
     }
 
-    private fun cropToAspectRatio(mCurrentPhotoPath: String) {
+    private fun uprightBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
+        val exifInterface = ExifInterface(imagePath)
+        val orientation = exifInterface.getAttributeInt(
+            ExifInterface.TAG_ORIENTATION,
+            ExifInterface.ORIENTATION_NORMAL
+        )
+
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    private fun cropToAspectRatio(bitmap: Bitmap): Bitmap {
         val aspectRatio: BigDecimal = BigDecimal(2).divide(BigDecimal(3), 5, RoundingMode.HALF_UP)
-        val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath)
         val width = BigDecimal(bitmap.width)
         val height = BigDecimal(bitmap.height)
 
@@ -320,11 +332,7 @@ class PuzzleActivity : AppCompatActivity() {
         val rect = Rect(left, top, left + targetWidth, top + targetHeight)
 
         // Crop the bitmap to the specified region
-        val croppedBitmap =
-            Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
-        FileOutputStream(mCurrentPhotoPath).use {
-            croppedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, it)
-        }
+        return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
     }
 
     companion object {

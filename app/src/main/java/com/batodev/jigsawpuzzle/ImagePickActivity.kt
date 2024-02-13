@@ -25,6 +25,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 
@@ -221,13 +222,19 @@ class ImagePickActivity : AppCompatActivity() {
                 if (!directory.exists()) {
                     directory.mkdirs()
                 }
-                val fileDescriptor = parcelFileDescriptor!!.fileDescriptor
-                val image = BitmapFactory.decodeFileDescriptor(fileDescriptor)
                 val pathToSave = File(directory, "temp.jpg")
-                FileOutputStream(pathToSave).use {
-                    image.compress(Bitmap.CompressFormat.JPEG, 90, it)
+                parcelFileDescriptor?.fileDescriptor?.let {
+                    val inputStream = FileInputStream(it)
+                    val outputStream = FileOutputStream(pathToSave)
+                    inputStream.use { input ->
+                        outputStream.use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    outputStream.close()
+                    inputStream.close()
+                    showStartGamePopup(null, pathToSave.toString())
                 }
-                showStartGamePopup(null, pathToSave.toString())
             }
         }
     }
