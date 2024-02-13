@@ -1,210 +1,243 @@
-package com.batodev.jigsawpuzzle.cut;
+package com.batodev.jigsawpuzzle.cut
 
-public class PuzzleCurvesGenerator {
-    public String generateSvg() {
-        var data = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\" ";
-        data += "width=\"" + width + "\" height=\"" + height + "\" viewBox=\"0 0 " + width + " " + height + "\">\n";
-        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\"";
-        data += gen_dh();
-        data += "\" />\n";
-        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\"";
-        data += gen_dv();
-        data += "\" />\n";
-        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\"";
-        data += gen_db();
-        data += "\" />\n";
-        data += "</svg>";
-        return data;
+import kotlin.math.floor
+import kotlin.math.roundToInt
+import kotlin.math.sin
+
+class PuzzleCurvesGenerator {
+    fun generateSvg(): String {
+        var data = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\" "
+        data += "width=\"$width\" height=\"$height\" viewBox=\"0 0 $width $height\">\n"
+        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\""
+        data += genHorizontalCurves()
+        data += "\" />\n"
+        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\""
+        data += genVerticalCurves()
+        data += "\" />\n"
+        data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\""
+        data += genBorder()
+        data += "\" />\n"
+        data += "</svg>"
+        return data
     }
 
-    public double seed = 2;
-    public double a, b, c, d, e, t = 0.1, j = 0.05, xi, yi, xn, yn, offset, width, height, radius;
-    public boolean flip, vertical;
-
-    public double random() {
-        var x = Math.sin(seed) * 10000;
-        seed += 1;
-        return x - Math.floor(x);
+    private var seed = 2.0
+    private var a = 0.0
+    private var b = 0.0
+    private var c = 0.0
+    private var d = 0.0
+    private var e = 0.0
+    private var t = 0.1
+    private var j = 0.05
+    private var xi = 0.0
+    private var yi = 0.0
+    var xn = 0.0
+    var yn = 0.0
+    private var offset = 0.0
+    var width = 0.0
+    var height = 0.0
+    private var radius = 0.0
+    private var flip = false
+    private var vertical = false
+    private fun random(): Double {
+        val x = sin(seed) * 10000
+        seed += 1.0
+        return x - floor(x)
     }
 
-    public double uniform(double min, double max) {
-        var r = random();
-        return min + r * (max - min);
+    private fun uniform(min: Double, max: Double): Double {
+        val r = random()
+        return min + r * (max - min)
     }
 
-    public boolean rBool() {
-        return random() > 0.5;
+    private fun rBool(): Boolean {
+        return random() > 0.5
     }
 
-    public void first() {
-        e = uniform(-j, j);
-        next();
+    private fun first() {
+        e = uniform(-j, j)
+        next()
     }
 
-    public void next() {
-        var flipold = flip;
-        flip = rBool();
-        a = (flip == flipold ? -e : e);
-        b = uniform(-j, j);
-        c = uniform(-j, j);
-        d = uniform(-j, j);
-        e = uniform(-j, j);
+    operator fun next() {
+        val flipold = flip
+        flip = rBool()
+        a = if (flip == flipold) -e else e
+        b = uniform(-j, j)
+        c = uniform(-j, j)
+        d = uniform(-j, j)
+        e = uniform(-j, j)
     }
 
-    public double sl() {
-        return vertical ? height / yn : width / xn;
+    private fun sl(): Double {
+        return if (vertical) height / yn else width / xn
     }
 
-    public double sw() {
-        return vertical ? width / xn : height / yn;
+    private fun sw(): Double {
+        return if (vertical) width / xn else height / yn
     }
 
-    public double ol() {
-        return offset + sl() * (vertical ? yi : xi);
+    private fun ol(): Double {
+        return offset + sl() * if (vertical) yi else xi
     }
 
-    public double ow() {
-        return offset + sw() * (vertical ? xi : yi);
+    private fun ow(): Double {
+        return offset + sw() * if (vertical) xi else yi
     }
 
-    public double l(double v) {
-        var ret = ol() + sl() * v;
-        return (double) Math.round(ret * 100) / 100;
+    private fun l(v: Double): Double {
+        val ret = ol() + sl() * v
+        return (ret * 100).roundToInt().toDouble() / 100
     }
 
-    public double w(double v) {
-        var ret = ow() + sw() * v * (flip ? -1.0 : 1.0);
-        return (double) Math.round(ret * 100) / 100;
+    private fun w(v: Double): Double {
+        val ret = ow() + sw() * v * if (flip) -1.0 else 1.0
+        return (ret * 100).roundToInt().toDouble() / 100
     }
 
-    public double p0l() {
-        return l(0.0);
+    private fun p0l(): Double {
+        return l(0.0)
     }
 
-    public double p0w() {
-        return w(0.0);
+    private fun p0w(): Double {
+        return w(0.0)
     }
 
-    public double p1l() {
-        return l(0.2);
+    private fun p1l(): Double {
+        return l(0.2)
     }
 
-    public double p1w() {
-        return w(a);
+    private fun p1w(): Double {
+        return w(a)
     }
 
-    public double p2l() {
-        return l(0.5 + b + d);
+    private fun p2l(): Double {
+        return l(0.5 + b + d)
     }
 
-    public double p2w() {
-        return w(-t + c);
+    private fun p2w(): Double {
+        return w(-t + c)
     }
 
-    public double p3l() {
-        return l(0.5 - t + b);
+    private fun p3l(): Double {
+        return l(0.5 - t + b)
     }
 
-    public double p3w() {
-        return w(t + c);
+    private fun p3w(): Double {
+        return w(t + c)
     }
 
-    public double p4l() {
-        return l(0.5 - 2.0 * t + b - d);
+    private fun p4l(): Double {
+        return l(0.5 - 2.0 * t + b - d)
     }
 
-    public double p4w() {
-        return w(3.0 * t + c);
+    private fun p4w(): Double {
+        return w(3.0 * t + c)
     }
 
-    public double p5l() {
-        return l(0.5 + 2.0 * t + b - d);
+    private fun p5l(): Double {
+        return l(0.5 + 2.0 * t + b - d)
     }
 
-    public double p5w() {
-        return w(3.0 * t + c);
+    private fun p5w(): Double {
+        return w(3.0 * t + c)
     }
 
-    public double p6l() {
-        return l(0.5 + t + b);
+    private fun p6l(): Double {
+        return l(0.5 + t + b)
     }
 
-    public double p6w() {
-        return w(t + c);
+    private fun p6w(): Double {
+        return w(t + c)
     }
 
-    public double p7l() {
-        return l(0.5 + b + d);
+    private fun p7l(): Double {
+        return l(0.5 + b + d)
     }
 
-    public double p7w() {
-        return w(-t + c);
+    private fun p7w(): Double {
+        return w(-t + c)
     }
 
-    public double p8l() {
-        return l(0.8);
+    private fun p8l(): Double {
+        return l(0.8)
     }
 
-    public double p8w() {
-        return w(e);
+    private fun p8w(): Double {
+        return w(e)
     }
 
-    public double p9l() {
-        return l(1.0);
+    private fun p9l(): Double {
+        return l(1.0)
     }
 
-    public double p9w() {
-        return w(0.0);
+    private fun p9w(): Double {
+        return w(0.0)
     }
 
-    public String gen_dh() {
-        StringBuilder str = new StringBuilder();
-        vertical = false;
-
-        for (yi = 1; yi < yn; ++yi) {
-            xi = 0;
-            first();
-            str.append("M ").append(p0l()).append(",").append(p0w()).append(" ");
-            for (; xi < xn; ++xi) {
-                str.append("C ").append(p1l()).append(" ").append(p1w()).append(" ").append(p2l()).append(" ").append(p2w()).append(" ").append(p3l()).append(" ").append(p3w()).append(" ");
-                str.append("C ").append(p4l()).append(" ").append(p4w()).append(" ").append(p5l()).append(" ").append(p5w()).append(" ").append(p6l()).append(" ").append(p6w()).append(" ");
-                str.append("C ").append(p7l()).append(" ").append(p7w()).append(" ").append(p8l()).append(" ").append(p8w()).append(" ").append(p9l()).append(" ").append(p9w()).append(" ");
-                next();
+    private fun genHorizontalCurves(): String {
+        val str = StringBuilder()
+        vertical = false
+        yi = 1.0
+        while (yi < yn) {
+            xi = 0.0
+            first()
+            str.append("M ").append(p0l()).append(",").append(p0w()).append(" ")
+            while (xi < xn) {
+                str.append("C ").append(p1l()).append(" ").append(p1w()).append(" ").append(p2l())
+                    .append(" ").append(p2w()).append(" ").append(p3l()).append(" ").append(p3w())
+                    .append(" ")
+                str.append("C ").append(p4l()).append(" ").append(p4w()).append(" ").append(p5l())
+                    .append(" ").append(p5w()).append(" ").append(p6l()).append(" ").append(p6w())
+                    .append(" ")
+                str.append("C ").append(p7l()).append(" ").append(p7w()).append(" ").append(p8l())
+                    .append(" ").append(p8w()).append(" ").append(p9l()).append(" ").append(p9w())
+                    .append(" ")
+                next()
+                ++xi
             }
+            ++yi
         }
-        return str.toString();
+        return str.toString()
     }
 
-    public String gen_dv() {
-        StringBuilder str = new StringBuilder();
-        vertical = true;
-
-        for (xi = 1; xi < xn; ++xi) {
-            yi = 0;
-            first();
-            str.append("M ").append(p0w()).append(",").append(p0l()).append(" ");
-            for (; yi < yn; ++yi) {
-                str.append("C ").append(p1w()).append(" ").append(p1l()).append(" ").append(p2w()).append(" ").append(p2l()).append(" ").append(p3w()).append(" ").append(p3l()).append(" ");
-                str.append("C ").append(p4w()).append(" ").append(p4l()).append(" ").append(p5w()).append(" ").append(p5l()).append(" ").append(p6w()).append(" ").append(p6l()).append(" ");
-                str.append("C ").append(p7w()).append(" ").append(p7l()).append(" ").append(p8w()).append(" ").append(p8l()).append(" ").append(p9w()).append(" ").append(p9l()).append(" ");
-                next();
+    private fun genVerticalCurves(): String {
+        val str = StringBuilder()
+        vertical = true
+        xi = 1.0
+        while (xi < xn) {
+            yi = 0.0
+            first()
+            str.append("M ").append(p0w()).append(",").append(p0l()).append(" ")
+            while (yi < yn) {
+                str.append("C ").append(p1w()).append(" ").append(p1l()).append(" ").append(p2w())
+                    .append(" ").append(p2l()).append(" ").append(p3w()).append(" ").append(p3l())
+                    .append(" ")
+                str.append("C ").append(p4w()).append(" ").append(p4l()).append(" ").append(p5w())
+                    .append(" ").append(p5l()).append(" ").append(p6w()).append(" ").append(p6l())
+                    .append(" ")
+                str.append("C ").append(p7w()).append(" ").append(p7l()).append(" ").append(p8w())
+                    .append(" ").append(p8l()).append(" ").append(p9w()).append(" ").append(p9l())
+                    .append(" ")
+                next()
+                ++yi
             }
+            ++xi
         }
-        return str.toString();
+        return str.toString()
     }
 
-    public String gen_db() {
-        var str = "";
-
-        str += "M " + (offset + radius) + " " + (offset) + " ";
-        str += "L " + (offset + width - radius) + " " + (offset) + " ";
-        str += "A " + (radius) + " " + (radius) + " 0 0 1 " + (offset + width) + " " + (offset + radius) + " ";
-        str += "L " + (offset + width) + " " + (offset + height - radius) + " ";
-        str += "A " + (radius) + " " + (radius) + " 0 0 1 " + (offset + width - radius) + " " + (offset + height) + " ";
-        str += "L " + (offset + radius) + " " + (offset + height) + " ";
-        str += "A " + (radius) + " " + (radius) + " 0 0 1 " + (offset) + " " + (offset + height - radius) + " ";
-        str += "L " + (offset) + " " + (offset + radius) + " ";
-        str += "A " + (radius) + " " + (radius) + " 0 0 1 " + (offset + radius) + " " + (offset) + " ";
-        return str;
+    private fun genBorder(): String {
+        var str = ""
+        str += "M " + (offset + radius) + " " + offset + " "
+        str += "L " + (offset + width - radius) + " " + offset + " "
+        str += "A " + radius + " " + radius + " 0 0 1 " + (offset + width) + " " + (offset + radius) + " "
+        str += "L " + (offset + width) + " " + (offset + height - radius) + " "
+        str += "A " + radius + " " + radius + " 0 0 1 " + (offset + width - radius) + " " + (offset + height) + " "
+        str += "L " + (offset + radius) + " " + (offset + height) + " "
+        str += "A " + radius + " " + radius + " 0 0 1 " + offset + " " + (offset + height - radius) + " "
+        str += "L " + offset + " " + (offset + radius) + " "
+        str += "A " + radius + " " + radius + " 0 0 1 " + (offset + radius) + " " + offset + " "
+        return str
     }
 }

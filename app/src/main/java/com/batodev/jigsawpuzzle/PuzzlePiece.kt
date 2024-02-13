@@ -1,15 +1,12 @@
-package com.batodev.jigsawpuzzle;
+package com.batodev.jigsawpuzzle
 
-import android.content.Context;
+import android.content.Context
+import androidx.appcompat.widget.AppCompatImageView
 
-public class PuzzlePiece extends androidx.appcompat.widget.AppCompatImageView {
-    public int xCoord;
-    public int yCoord;
-    public int pieceWidth;
-    public int pieceHeight;
-    public boolean canMove = true;
-
-    public PuzzlePiece(Context context) {
-        super(context);
-    }
+class PuzzlePiece(context: Context?) : AppCompatImageView(context!!) {
+    var xCoord = 0
+    var yCoord = 0
+    var pieceWidth = 0
+    var pieceHeight = 0
+    var canMove = true
 }
