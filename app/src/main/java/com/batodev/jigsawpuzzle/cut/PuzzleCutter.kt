@@ -1,206 +1,214 @@
-package com.batodev.jigsawpuzzle.cut;
+package com.batodev.jigsawpuzzle.cut
 
-import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Handler;
-import android.widget.ImageView;
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.widget.ImageView
+import com.batodev.jigsawpuzzle.PuzzleActivity
+import com.batodev.jigsawpuzzle.PuzzlePiece
+import com.caverock.androidsvg.SVG
+import com.caverock.androidsvg.SVGParseException
+import java.util.ArrayDeque
+import java.util.Queue
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.function.Consumer
 
-import com.batodev.jigsawpuzzle.PuzzleActivity;
-import com.batodev.jigsawpuzzle.PuzzlePiece;
-import com.caverock.androidsvg.SVG;
-import com.caverock.androidsvg.SVGParseException;
-
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-public class PuzzleCutter {
-
-    static int numProcessors = Runtime.getRuntime().availableProcessors();
-    static ExecutorService executor = null;
-
-    public static List<Bitmap> cut(
-            final Bitmap sourceImage,
-            int rows,
-            int cols,
-            String svgString,
-            final ImageView imageView,
-            PuzzleActivity puzzleActivity,
-            List<PuzzlePiece> pieces) throws SVGParseException {
-        final List<Bitmap> result = new ArrayList<>();
-        final long startTime = System.currentTimeMillis();
-        SVG svg = SVG.getFromString(svgString);
-        int width = sourceImage.getWidth();
-        int height = sourceImage.getHeight();
-        final Bitmap puzzleGridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas puzzleGridCanvas = new Canvas(puzzleGridBitmap);
-        Paint whiteFill = new Paint();
-        whiteFill.setStyle(Paint.Style.FILL);
-        whiteFill.setColor(Color.WHITE);
-        puzzleGridCanvas.drawRect(0, 0, width, height, whiteFill);
-        svg.renderToCanvas(puzzleGridCanvas);
-
-        executor = Executors.newFixedThreadPool(numProcessors);
-
-        final Point[][] puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols);
-        int puzzleIndex = 0;
-        for (int rowIndex = 0; rowIndex < rows; rowIndex++) {
-            for (int colIndex = 0; colIndex < cols; colIndex++) {
-                final PuzzlePiece piece = pieces.get(puzzleIndex++);
-                int finalRowIndex = rowIndex;
-                int finalColIndex = colIndex;
-                Runnable puzzleCutJob = () -> {
-                    Point puzzleCenter = puzzlesCenterPoints[finalRowIndex][finalColIndex];
-                    Region reg = floodFill(puzzleGridBitmap, puzzleCenter.x, puzzleCenter.y);
-                    final int regionWidth = reg.getWidth();
-                    final int regionHeight = reg.getHeight();
-                    final int regionMinX = reg.getMinX();
-                    final int regionMinY = reg.getMinY();
-                    final Bitmap puzzleBitmap = Bitmap.createBitmap(regionWidth + 1, regionHeight + 1, Bitmap.Config.ARGB_8888);
-
-                    System.out.println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms");
-                    reg.points().forEach(point -> {
-                        int rgbSource = sourceImage.getPixel(point.x(), point.y());
-                        int x = point.x() - regionMinX;
-                        int y = point.y() - regionMinY;
-                        puzzleBitmap.setPixel(x, y, rgbSource);
-                    });
-                    result.add(puzzleBitmap);
-                    Runnable setPuzzleImageAndPositions = () -> {
-                        piece.setImageBitmap(puzzleBitmap);
-                        piece.pieceWidth = regionWidth;
-                        piece.pieceHeight = regionHeight;
-                        piece.xCoord = regionMinX + imageView.getLeft() + 4;
-                        piece.yCoord = regionMinY + imageView.getTop() + 7;
-                    };
-                    puzzleActivity.postToHandler(setPuzzleImageAndPositions);
-                };
-                executor.submit(puzzleCutJob);
-                System.out.println("Filling target took: " + (System.currentTimeMillis() - startTime) + "ms");
+object PuzzleCutter {
+    private val numProcessors = Runtime.getRuntime().availableProcessors()
+    @Throws(SVGParseException::class)
+    fun cut(
+        sourceImage: Bitmap,
+        rows: Int,
+        cols: Int,
+        svgString: String?,
+        imageView: ImageView,
+        puzzleActivity: PuzzleActivity,
+        pieces: List<PuzzlePiece>
+    ): List<Bitmap> {
+        val result: MutableList<Bitmap> = ArrayList()
+        val startTime = System.currentTimeMillis()
+        val svg = SVG.getFromString(svgString)
+        val width = sourceImage.width
+        val height = sourceImage.height
+        val puzzleGridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val puzzleGridCanvas = Canvas(puzzleGridBitmap)
+        val whiteFill = Paint()
+        whiteFill.style = Paint.Style.FILL
+        whiteFill.color = Color.WHITE
+        puzzleGridCanvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), whiteFill)
+        svg.renderToCanvas(puzzleGridCanvas)
+        val executor = Executors.newFixedThreadPool(numProcessors)
+        val puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols)
+        var puzzleIndex = 0
+        for (rowIndex in 0 until rows) {
+            for (colIndex in 0 until cols) {
+                val piece = pieces[puzzleIndex++]
+                val puzzleCutJob = Runnable {
+                    val puzzleCenter = puzzlesCenterPoints[rowIndex][colIndex]
+                    val reg = floodFill(puzzleGridBitmap, puzzleCenter!!.x, puzzleCenter.y)
+                    val regionWidth = reg.width
+                    val regionHeight = reg.height
+                    val regionMinX = reg.minX
+                    val regionMinY = reg.minY
+                    val puzzleBitmap = Bitmap.createBitmap(
+                        regionWidth + 1,
+                        regionHeight + 1,
+                        Bitmap.Config.ARGB_8888
+                    )
+                    println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms")
+                    reg.points.forEach(Consumer { (x1, y1): Point ->
+                        val rgbSource = sourceImage.getPixel(x1, y1)
+                        val x = x1 - regionMinX
+                        val y = y1 - regionMinY
+                        puzzleBitmap.setPixel(x, y, rgbSource)
+                    })
+                    result.add(puzzleBitmap)
+                    val setPuzzleImageAndPositions = Runnable {
+                        piece.setImageBitmap(puzzleBitmap)
+                        piece.pieceWidth = regionWidth
+                        piece.pieceHeight = regionHeight
+                        piece.xCoord = regionMinX + imageView.left + 4
+                        piece.yCoord = regionMinY + imageView.top + 7
+                    }
+                    puzzleActivity.postToHandler(setPuzzleImageAndPositions)
+                }
+                executor.submit(puzzleCutJob)
+                println("Filling target took: " + (System.currentTimeMillis() - startTime) + "ms")
             }
         }
-        executor.shutdown();
-        new Thread(() -> {
+        executor.shutdown()
+        Thread {
             try {
-                boolean terminated = executor.awaitTermination(1, TimeUnit.HOURS);
-                System.out.println(terminated);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                val terminated = executor.awaitTermination(1, TimeUnit.HOURS)
+                println(terminated)
+            } catch (e: InterruptedException) {
+                throw RuntimeException(e)
             }
-            puzzleActivity.postToHandler(puzzleActivity::hideProgressSpinner);
-        }).start();
-        return result;
+            puzzleActivity.postToHandler { puzzleActivity.hideProgressSpinner() }
+        }.start()
+        return result
     }
 
-    private static Region floodFill(Bitmap image, int startX, int startY) {
-        Region reg = new Region(new ArrayList<>(), startX, startY);
-        Queue<Point> queue = new ArrayDeque<>();
-        int width = image.getWidth();
-        int height = image.getHeight();
+    private fun floodFill(image: Bitmap, startX: Int, startY: Int): Region {
+        val reg = Region(ArrayList(), startX, startY)
+        val queue: Queue<Point> = ArrayDeque()
+        val width = image.width
+        val height = image.height
 
         // Check if starting point is within image bounds
         if (startX < 0 || startY < 0 || startX >= width || startY >= height) {
-            return reg;
+            return reg
         }
 
         // Check if starting point color is same as target color
         if (image.getPixel(startX, startY) != Color.WHITE) {
-            return reg;
+            return reg
         }
 
         // Add starting point to queue
-        queue.add(new Point(startX, startY));
+        queue.add(Point(startX, startY))
 
         // Perform flood fill
         while (!queue.isEmpty()) {
-            Point current = queue.poll();
-            int x = current.x;
-            int y = current.y;
+            val point = queue.poll()!!
+            val x = point.x
+            val y = point.y
 
             // Check current pixel color
             if (image.getPixel(x, y) != Color.WHITE) {
-                continue;
+                continue
             }
 
             // Fill current pixel with fill color
-            image.setPixel(x, y, Color.GREEN);
-            reg.points.add(new Point(x, y));
+            image.setPixel(x, y, Color.GREEN)
+            reg.points.add(Point(x, y))
 
             // Add neighboring pixels to queue
             if (x > 0) {
-                queue.add(new Point(x - 1, y));
+                queue.add(Point(x - 1, y))
             }
             if (x < width - 1) {
-                queue.add(new Point(x + 1, y));
+                queue.add(Point(x + 1, y))
             }
             if (y > 0) {
-                queue.add(new Point(x, y - 1));
+                queue.add(Point(x, y - 1))
             }
             if (y < height - 1) {
-                queue.add(new Point(x, y + 1));
+                queue.add(Point(x, y + 1))
             }
         }
-        return reg;
+        return reg
     }
 
-    private static Point[][] divideImage(Bitmap image, int rows, int cols) {
-        int width = image.getWidth();
-        int height = image.getHeight();
+    private fun divideImage(image: Bitmap, rows: Int, cols: Int): Array<Array<Point?>> {
+        val width = image.width
+        val height = image.height
 
         // Calculate the width and height of each cell
-        int cellWidth = width / cols;
-        int cellHeight = height / rows;
-
-        Point[][] cellCenters = new Point[rows][cols];
+        val cellWidth = width / cols
+        val cellHeight = height / rows
+        val cellCenters = Array(rows) { arrayOfNulls<Point>(cols) }
 
         // Loop through each cell and find its center
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
+        for (i in 0 until rows) {
+            for (j in 0 until cols) {
                 // Calculate the coordinates of the cell center
-                int centerX = (j * cellWidth) + (cellWidth / 2);
-                int centerY = (i * cellHeight) + (cellHeight / 2);
-                cellCenters[i][j] = new Point(centerX, centerY);
+                val centerX = j * cellWidth + cellWidth / 2
+                val centerY = i * cellHeight + cellHeight / 2
+                cellCenters[i][j] = Point(centerX, centerY)
             }
         }
-
-        return cellCenters;
+        return cellCenters
     }
 
-    record Point(int x, int y) {
+    internal class Point(var x: Int, var y: Int) {
+        operator fun component1(): Int {
+            return x
+        }
+
+        operator fun component2(): Int {
+            return y
+        }
     }
+    internal class Region(points: MutableCollection<Point>, startX: Int, startY: Int) {
+        private val maxX: Int
+            get() = points.stream().map(Point::x).max { obj: Int, anotherInteger: Int? ->
+                obj.compareTo(
+                    anotherInteger!!
+                )
+            }.orElse(0)
+        val minX: Int
+            get() = points.stream().map(Point::x).min { obj: Int, anotherInteger: Int? ->
+                obj.compareTo(
+                    anotherInteger!!
+                )
+            }.orElse(0)
+        private val maxY: Int
+            get() = points.stream().map(Point::y).max { obj: Int, anotherInteger: Int? ->
+                obj.compareTo(
+                    anotherInteger!!
+                )
+            }.orElse(0)
+        val minY: Int
+            get() = points.stream().map(Point::y).min { obj: Int, anotherInteger: Int? ->
+                obj.compareTo(
+                    anotherInteger!!
+                )
+            }.orElse(0)
+        val width: Int
+            get() = maxX - minX
+        val height: Int
+            get() = maxY - minY
+        val points: MutableCollection<Point>
+        private val startX: Int
+        private val startY: Int
 
-    record Region(Collection<Point> points, int startX, int startY) {
-        int getMaxX() {
-            return points().stream().map(Point::x).max(Integer::compareTo).orElse(0);
-        }
-
-        int getMinX() {
-            return points().stream().map(Point::x).min(Integer::compareTo).orElse(0);
-        }
-
-        int getMaxY() {
-            return points().stream().map(Point::y).max(Integer::compareTo).orElse(0);
-        }
-
-        int getMinY() {
-            return points().stream().map(Point::y).min(Integer::compareTo).orElse(0);
-        }
-
-        int getWidth() {
-            return getMaxX() - getMinX();
-        }
-
-        int getHeight() {
-            return getMaxY() - getMinY();
+        init {
+            this.points = points
+            this.startX = startX
+            this.startY = startY
         }
     }
 }
