@@ -8,8 +8,8 @@ android {
     defaultConfig {
         applicationId "com.batodev.jigsawpuzzle"
         minSdkVersion 24
-        compileSdk 34
-        targetSdkVersion 34
+        compileSdk 35
+        targetSdkVersion 35
         versionCode 5
         versionName "1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
