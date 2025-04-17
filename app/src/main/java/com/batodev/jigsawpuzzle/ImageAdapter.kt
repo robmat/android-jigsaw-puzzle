@@ -18,6 +18,7 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import com.batodev.jigsawpuzzle.SettingsHelper.load
 import java.io.IOException
+import androidx.core.graphics.createBitmap
 
 class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     private val am: AssetManager = mContext.assets
@@ -60,9 +61,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
             handler.post {
                 try {
                     val picFromAsset = getPicFromAsset(imageView.height, imageView.width, files!![position], am)!!
-                    val mutableBitmap = Bitmap.createBitmap(
-                        picFromAsset.width, picFromAsset.height, Bitmap.Config.ARGB_8888
-                    )
+                    val mutableBitmap = createBitmap(picFromAsset.width, picFromAsset.height)
                     val canvas = Canvas(mutableBitmap)
                     val alphaPaint = Paint()
                     if (!settings.uncoveredPics.contains(files!![position])) {
@@ -72,7 +71,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
                     canvas.drawBitmap(picFromAsset, 0f, 0f, alphaPaint)
                     imageView.setImageBitmap(mutableBitmap)
                 } catch (e: IOException) {
-                    Log.w(ImageAdapter::class.java.simpleName, e.localizedMessage)
+                    Log.w(ImageAdapter::class.java.simpleName, e.localizedMessage!!)
                     throw RuntimeException(e)
                 }
             }
@@ -101,7 +100,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
             val photoH = bmOptions.outHeight
 
             // Determine how much to scale down the image
-            val scaleFactor = Math.min(photoW / targetW, photoH / targetH)
+            val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
             `is`.reset()
 
             // Decode the image file into a Bitmap sized to fill the View

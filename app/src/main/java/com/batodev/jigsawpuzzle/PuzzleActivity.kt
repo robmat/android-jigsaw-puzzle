@@ -31,6 +31,8 @@ import java.util.Random
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
+import androidx.core.graphics.scale
+import androidx.core.graphics.createBitmap
 
 
 class PuzzleActivity : AppCompatActivity() {
@@ -138,7 +140,7 @@ class PuzzleActivity : AppCompatActivity() {
         val croppedImageWidth = (scaledBitmapWidth)
         val croppedImageHeight = (scaledBitmapHeight)
         val scaledBitmap =
-            Bitmap.createScaledBitmap(bitmap, scaledBitmapWidth, scaledBitmapHeight, true)
+            bitmap.scale(scaledBitmapWidth, scaledBitmapHeight)
         val croppedBitmap = Bitmap.createBitmap(
             scaledBitmap,
             abs(scaledBitmapLeft),
@@ -155,7 +157,7 @@ class PuzzleActivity : AppCompatActivity() {
         val svgString = puzzleCurvesGenerator.generateSvg()
         // paint grid on image
         val bitmapCopy =
-            Bitmap.createBitmap(croppedBitmap.width, croppedBitmap.height, Bitmap.Config.ARGB_8888)
+            createBitmap(croppedBitmap.width, croppedBitmap.height)
         val canvas = Canvas(bitmapCopy)
         val paint = Paint()
         paint.alpha = 70
@@ -329,17 +331,6 @@ class PuzzleActivity : AppCompatActivity() {
 
         // Crop the bitmap to the specified region
         return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
-    }
-
-    companion object {
-        fun rotateImage(source: Bitmap, angle: Float): Bitmap {
-            val matrix = Matrix()
-            matrix.postRotate(angle)
-            return Bitmap.createBitmap(
-                source, 0, 0, source.width, source.height,
-                matrix, true
-            )
-        }
     }
 
     fun playAgain(view: View) {

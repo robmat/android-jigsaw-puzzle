@@ -14,6 +14,9 @@ import java.util.Queue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.get
+import androidx.core.graphics.set
 
 object PuzzleCutter {
     private val numProcessors = Runtime.getRuntime().availableProcessors()
@@ -25,14 +28,14 @@ object PuzzleCutter {
         svgString: String?,
         imageView: ImageView,
         puzzleActivity: PuzzleActivity,
-        pieces: List<PuzzlePiece>
+        pieces: List<PuzzlePiece>,
     ): List<Bitmap> {
         val result: MutableList<Bitmap> = ArrayList()
         val startTime = System.currentTimeMillis()
         val svg = SVG.getFromString(svgString)
         val width = sourceImage.width
         val height = sourceImage.height
-        val puzzleGridBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val puzzleGridBitmap = createBitmap(width, height)
         val puzzleGridCanvas = Canvas(puzzleGridBitmap)
         val whiteFill = Paint()
         whiteFill.style = Paint.Style.FILL
@@ -52,17 +55,13 @@ object PuzzleCutter {
                     val regionHeight = reg.height
                     val regionMinX = reg.minX
                     val regionMinY = reg.minY
-                    val puzzleBitmap = Bitmap.createBitmap(
-                        regionWidth + 1,
-                        regionHeight + 1,
-                        Bitmap.Config.ARGB_8888
-                    )
+                    val puzzleBitmap = createBitmap(regionWidth + 1, regionHeight + 1)
                     println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms")
                     reg.points.forEach(Consumer { (x1, y1): Point ->
-                        val rgbSource = sourceImage.getPixel(x1, y1)
+                        val rgbSource = sourceImage[x1, y1]
                         val x = x1 - regionMinX
                         val y = y1 - regionMinY
-                        puzzleBitmap.setPixel(x, y, rgbSource)
+                        puzzleBitmap[x, y] = rgbSource
                     })
                     result.add(puzzleBitmap)
                     val setPuzzleImageAndPositions = Runnable {
@@ -92,7 +91,7 @@ object PuzzleCutter {
     }
 
     private fun floodFill(image: Bitmap, startX: Int, startY: Int): Region {
-        val reg = Region(ArrayList(), startX, startY)
+        val reg = Region(ArrayList())
         val queue: Queue<Point> = ArrayDeque()
         val width = image.width
         val height = image.height
@@ -103,7 +102,7 @@ object PuzzleCutter {
         }
 
         // Check if starting point color is same as target color
-        if (image.getPixel(startX, startY) != Color.WHITE) {
+        if (image[startX, startY] != Color.WHITE) {
             return reg
         }
 
@@ -117,12 +116,12 @@ object PuzzleCutter {
             val y = point.y
 
             // Check current pixel color
-            if (image.getPixel(x, y) != Color.WHITE) {
+            if (image[x, y] != Color.WHITE) {
                 continue
             }
 
             // Fill current pixel with fill color
-            image.setPixel(x, y, Color.GREEN)
+            image[x, y] = Color.GREEN
             reg.points.add(Point(x, y))
 
             // Add neighboring pixels to queue
@@ -172,7 +171,7 @@ object PuzzleCutter {
             return y
         }
     }
-    internal class Region(points: MutableCollection<Point>, startX: Int, startY: Int) {
+    internal class Region(val points: MutableCollection<Point>) {
         private val maxX: Int
             get() = points.stream().map(Point::x).max { obj: Int, anotherInteger: Int? ->
                 obj.compareTo(
@@ -201,14 +200,5 @@ object PuzzleCutter {
             get() = maxX - minX
         val height: Int
             get() = maxY - minY
-        val points: MutableCollection<Point>
-        private val startX: Int
-        private val startY: Int
-
-        init {
-            this.points = points
-            this.startX = startX
-            this.startY = startY
-        }
     }
 }

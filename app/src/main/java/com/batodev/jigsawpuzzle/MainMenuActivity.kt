@@ -2,12 +2,11 @@ package com.batodev.jigsawpuzzle
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.view.Window
-import android.widget.Button
 import android.widget.Toast
+import androidx.core.net.toUri
 
 class MainMenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,6 +29,7 @@ class MainMenuActivity : Activity() {
         }
     }
     fun moreApps(view: View) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/dev?id=8228670503574649511")))
+        startActivity(Intent(Intent.ACTION_VIEW,
+            "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()))
     }
 }
