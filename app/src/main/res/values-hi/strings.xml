@@ -1,50 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-      
+        
 
     
+  
   
   <string name="main_menu_activity_unlocked_gallery">प्रकट चित्रों की गैलरी</string>
-      
+        
+  
   
   <string name="main_menu_activity_more_apps">इस तरह के और भी ऐप्स</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_to_uncover">पहले गेम खेलें</string>
-      
+        
 
     
 
     
+  
   
   <string name="hard">मुश्किल</string>
-      
+        
+  
   
   <string name="medium">मध्यम</string>
-      
+        
+  
   
   <string name="easy">आसान</string>
-      
+        
+  
   
   <string name="columns">कॉलम</string>
-      
+        
+  
   
   <string name="rows">पंक्तियों</string>
-      
+        
+  
   
   <string name="puzzle_activity_play_again">फिर से चालू करें</string>
-      
+        
+  
   
   <string name="image_added_to_gallery">गैलरी में नई छवि उपलब्ध है.</string>
-      
+        
+  
   
   <string name="show_image_as_background">पीछे छवि दिखाएँ</string>
-    
+      
+  
   
   <string name="how_many_puzzles">पहेली के कितने टुकड़े?</string>
-    
+      
+  
   <string name="show_puzzle_grid">पहेली आकृतियाँ दिखाएँ</string>
+    
   
   <string name="main_menu_activity_play_the_game">आइए खेलते हैं!</string>
+    
   <string name="start">खेल शुरू करो</string>
+  
+  <string name="play_sounds">आवाज़</string>
 </resources>

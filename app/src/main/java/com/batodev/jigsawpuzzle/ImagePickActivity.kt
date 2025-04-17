@@ -3,8 +3,6 @@ package com.batodev.jigsawpuzzle
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -95,6 +93,13 @@ class ImagePickActivity : AppCompatActivity() {
                 SettingsHelper.save(this, settings)
             }
         backGrid.isChecked = settings.showGridInBackgroundOfThePuzzle
+        val playSounds = popupView.findViewById<CheckBox>(R.id.play_sounds_checkbox)
+        playSounds
+            .setOnCheckedChangeListener { _, value ->
+                settings.playSounds = value
+                SettingsHelper.save(this, settings)
+            }
+        playSounds.isChecked = settings.playSounds
     }
 
     private fun setUpDiffSpinner(popupView: View, settings: Settings) {
@@ -212,7 +217,7 @@ class ImagePickActivity : AppCompatActivity() {
             this,
             applicationContext.packageName + ".fileprovider",
             File(directory, "temp.jpg")
-        );
+        )
     }
 
     private fun copyFileAndStartGame(it: Uri?) {
@@ -265,9 +270,5 @@ class ImagePickActivity : AppCompatActivity() {
         } else {
             pickImageFromGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         }
-    }
-
-    companion object {
-        const val EASY = "Easy"
     }
 }

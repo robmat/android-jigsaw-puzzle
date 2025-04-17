@@ -9,4 +9,5 @@ class Settings {
     var lastSetDifficultyCustomHeight = 5
     var lastSetDifficultyCustomWidth = 3
     var showImageInBackgroundOfThePuzzle = true
+    var playSounds = true
 }

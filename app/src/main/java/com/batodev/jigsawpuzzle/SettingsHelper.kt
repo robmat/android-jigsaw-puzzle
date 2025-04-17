@@ -14,6 +14,7 @@ private const val SHOW_GRID_IN_BACKGROUND_OF_THE_PUZZLE = "showGridInBackgroundO
 private const val LAST_SET_DIFFICULTY_CUSTOM_HEIGHT = "lastSetDifficultyCustomHeight"
 private const val LAST_SET_DIFFICULTY_CUSTOM_WIDTH = "lastSetDifficultyCustomWidth"
 private const val SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE = "showImageInBackgroundOfThePuzzle"
+private const val PLAY_SOUNDS = "playSounds"
 
 object SettingsHelper {
     fun save(context: Context, settings: Settings) {
@@ -26,6 +27,7 @@ object SettingsHelper {
             putInt(ADD_COUNTER, settings.addCounter)
             putInt(LAST_SEEN_PIC, settings.lastSeenPic)
             putBoolean(SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE, settings.showImageInBackgroundOfThePuzzle)
+            putBoolean(PLAY_SOUNDS, settings.playSounds)
             putString(UNCOVERED_PICS, settings.uncoveredPics.joinToString(SEPARATOR))
             apply()
             Log.d(SettingsHelper.javaClass.simpleName, "Saved: $settings")
@@ -42,6 +44,7 @@ object SettingsHelper {
         settings.addCounter = prefs.getInt(ADD_COUNTER, 0)
         settings.lastSeenPic = prefs.getInt(LAST_SEEN_PIC, 0)
         settings.showImageInBackgroundOfThePuzzle = prefs.getBoolean(SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE, true)
+        settings.playSounds = prefs.getBoolean(PLAY_SOUNDS, true)
         settings.uncoveredPics = prefs.getString(UNCOVERED_PICS, "")!!.split(SEPARATOR).toMutableList()
         settings.uncoveredPics.remove("")
         return settings

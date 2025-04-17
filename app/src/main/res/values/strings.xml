@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Show image in the back</string>
     <string name="how_many_puzzles">How many puzzle pieces?</string>
     <string name="show_puzzle_grid">Show puzzle shapes</string>
+    <string name="play_sounds">Sound</string>
 </resources>

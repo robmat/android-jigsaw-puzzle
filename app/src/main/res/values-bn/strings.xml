@@ -1,50 +1,67 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-      
+        
 
     
+  
   
   <string name="main_menu_activity_unlocked_gallery">প্রকাশিত ছবির গ্যালারি</string>
-      
+        
+  
   
   <string name="main_menu_activity_more_apps">এই ধরনের আরও অ্যাপ</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_to_uncover">প্রথমে গেমটি খেলুন</string>
-      
+        
 
     
 
     
+  
   
   <string name="hard">কঠিন</string>
-      
+        
+  
   
   <string name="medium">মধ্যম</string>
-      
+        
+  
   
   <string name="easy">সহজ</string>
-      
+        
+  
   
   <string name="columns">কলাম</string>
-      
+        
+  
   
   <string name="rows">সারি</string>
-      
+        
+  
   
   <string name="puzzle_activity_play_again">আবার খেলো</string>
-      
+        
+  
   
   <string name="image_added_to_gallery">গ্যালারিতে উপলব্ধ নতুন ছবি.</string>
-      
+        
+  
   
   <string name="show_image_as_background">পিছনে ছবি দেখান</string>
-    
+      
+  
   
   <string name="how_many_puzzles">কত ধাঁধা টুকরা?</string>
-    
+      
+  
   <string name="show_puzzle_grid">ধাঁধার আকার দেখান</string>
+    
   
   <string name="main_menu_activity_play_the_game">চল খেলি!</string>
+    
   <string name="start">খেলা শুরু কর</string>
+  
+  <string name="play_sounds">শব্দ</string>
 </resources>

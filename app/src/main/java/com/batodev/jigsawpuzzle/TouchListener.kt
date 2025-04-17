@@ -1,6 +1,5 @@
 package com.batodev.jigsawpuzzle
 
-import android.media.MediaPlayer
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
@@ -67,9 +66,7 @@ class TouchListener(private val activity: PuzzleActivity) : OnTouchListener {
                     piece.canMove = false
                     sendViewToBack(piece)
                     activity.checkGameOver()
-                    val mp = MediaPlayer.create(activity, okSoundsIds.random())
-                    mp.setOnCompletionListener { mp.release() }
-                    mp.start()
+                    SoundsPlayer.play(okSoundsIds.random(), activity)
                 }
                 view.performClick()
             }

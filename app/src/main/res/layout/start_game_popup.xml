@@ -36,6 +36,23 @@
         android:layout_alignBaseline="@id/background_grid_checkbox"
         android:text="@string/show_puzzle_grid" />
 
+    <CheckBox
+        android:id="@+id/play_sounds_checkbox"
+        android:layout_below="@id/background_grid_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="2dp"
+        android:textSize="20sp"
+        android:labelFor="@id/play_sounds_checkbox"
+        android:layout_toEndOf="@id/play_sounds_checkbox"
+        android:layout_alignBaseline="@id/play_sounds_checkbox"
+        android:text="@string/play_sounds" />
+
     <TextView
         android:id="@+id/how_many_puzzles"
         android:layout_width="wrap_content"
@@ -43,7 +60,7 @@
         android:padding="2dp"
         android:textSize="20sp"
         android:labelFor="@id/difficulty_spinner"
-        android:layout_below="@id/background_grid_checkbox"
+        android:layout_below="@id/play_sounds_checkbox"
         android:text="@string/how_many_puzzles" />
 
     <Spinner

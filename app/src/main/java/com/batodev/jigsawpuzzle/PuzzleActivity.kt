@@ -7,7 +7,6 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -25,7 +24,6 @@ import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.bumptech.glide.Glide
 import com.caverock.androidsvg.SVG
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
 import java.math.BigDecimal
 import java.math.RoundingMode
@@ -249,9 +247,7 @@ class PuzzleActivity : AppCompatActivity() {
                 SettingsHelper.save(this, settings)
                 Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
             }
-            val mp = MediaPlayer.create(this, winSoundIds.random())
-            mp.setOnCompletionListener { mp.release() }
-            mp.start()
+            SoundsPlayer.play(winSoundIds.random(), this)
             findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
             AdHelper.showAd(this)
         }
