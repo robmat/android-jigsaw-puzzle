@@ -33,7 +33,10 @@ import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 import androidx.core.graphics.scale
 import androidx.core.graphics.createBitmap
-
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
@@ -41,6 +44,7 @@ class PuzzleActivity : AppCompatActivity() {
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
     private var imageFileName: String? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
+    private val rateHelper: AppRatingHelper = AppRatingHelper(this)
     private val winSoundIds = listOf(
         R.raw.success_1,
         R.raw.success_2,
@@ -54,6 +58,15 @@ class PuzzleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
+
+        val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
+        windowInsetsController.let { controller ->
+            // Hide both bars
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            // Sticky behavior - bars stay hidden until user swipes
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val settings = SettingsHelper.load(this)
@@ -87,6 +100,8 @@ class PuzzleActivity : AppCompatActivity() {
                 piece.layoutParams = lParams
             }
         }
+
+        rateHelper.requestReview()
     }
 
     fun hideProgressSpinner() {

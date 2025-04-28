@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
     <uses-feature android:required="false" android:name="android.hardware.camera" />
     <application
         android:allowBackup="true"

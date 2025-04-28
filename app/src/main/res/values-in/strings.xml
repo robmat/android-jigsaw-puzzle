@@ -1,67 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-        
 
-    
-  
-  
+
+
+
+
+
   <string name="main_menu_activity_unlocked_gallery">Galeri gambar yang terungkap</string>
-        
-  
-  
+
+
+
+
   <string name="main_menu_activity_more_apps">Lebih banyak aplikasi seperti ini</string>
-        
-  
-  
+
+
+
+
   <string name="main_menu_activity_play_to_uncover">Mainkan gamenya terlebih dahulu</string>
-        
 
-    
 
-    
-  
-  
+
+
+
+
+
+
   <string name="hard">Keras</string>
-        
-  
-  
+
+
+
+
   <string name="medium">Sedang</string>
-        
-  
-  
+
+
+
+
   <string name="easy">Mudah</string>
-        
-  
-  
+
+
+
+
   <string name="columns">Kolom</string>
-        
-  
-  
+
+
+
+
   <string name="rows">Baris</string>
-        
-  
-  
+
+
+
+
   <string name="puzzle_activity_play_again">Main lagi</string>
-        
-  
-  
+
+
+
+
   <string name="image_added_to_gallery">Gambar baru tersedia di galeri.</string>
-        
-  
-  
+
+
+
+
   <string name="show_image_as_background">Tampilkan gambar di belakang</string>
-      
-  
-  
+
+
+
+
   <string name="how_many_puzzles">Berapa banyak potongan puzzle?</string>
-      
-  
+
+
+
   <string name="show_puzzle_grid">Tunjukkan bentuk teka-teki</string>
-    
-  
+
+
+
   <string name="main_menu_activity_play_the_game">Mari main!</string>
-    
+
+
   <string name="start">Memulai permainan</string>
-  
+
+
   <string name="play_sounds">Suara</string>
+
+  <string name="wallpaper_ok">Gambar telah ditetapkan sebagai wallpaper Anda</string>
 </resources>

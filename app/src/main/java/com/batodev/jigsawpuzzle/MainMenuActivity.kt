@@ -7,12 +7,25 @@ import android.view.View
 import android.view.Window
 import android.widget.Toast
 import androidx.core.net.toUri
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 class MainMenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.requestWindowFeature(Window.FEATURE_NO_TITLE)
         setContentView(R.layout.main_menu_activity)
+
+        val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
+        windowInsetsController.let { controller ->
+            // Hide both bars
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            // Sticky behavior - bars stay hidden until user swipes
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
     }

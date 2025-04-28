@@ -1,13 +1,20 @@
 package com.batodev.jigsawpuzzle
 
+import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
 import java.io.FileOutputStream
@@ -20,6 +27,15 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.gallery_activity)
+
+        val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
+        windowInsetsController.let { controller ->
+            // Hide both bars
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            // Sticky behavior - bars stay hidden until user swipes
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+
         val settings = SettingsHelper.load(this)
         this.images = settings.uncoveredPics
         index = settings.lastSeenPic
@@ -77,6 +93,30 @@ class GalleryActivity : AppCompatActivity() {
     }
 
     fun shareClicked(view: View) {
+        val fileShared = copyToTempFile()
+        val shareIntent = Intent(Intent.ACTION_SEND)
+        val applicationId = this.application.applicationContext.packageName
+        val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
+        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+        shareIntent.type = "image/*"
+        ContextCompat.startActivity(this, shareIntent, null)
+    }
+
+    fun wallpaperClicked(view: View) {
+        try {
+            val fileShared = copyToTempFile()
+            val wallpaperManager = WallpaperManager.getInstance(this)
+            val bitmap = BitmapFactory.decodeFile(fileShared.absolutePath)
+            wallpaperManager.setBitmap(bitmap)
+            Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            // Obsługa błędów
+            Log.e(GalleryActivity::class.java.simpleName, "Błąd podczas ustawiania tapety", e)
+            Toast.makeText(this, "Error: $e" , Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun copyToTempFile(): File {
         val stream = this.assets.open("img/${images[index]}")
         val dirShared = File(filesDir, "shared")
         if (!dirShared.exists()) {
@@ -95,11 +135,6 @@ class GalleryActivity : AppCompatActivity() {
             }
             it.flush()
         }
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        val applicationId = this.application.applicationContext.packageName
-        val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-        shareIntent.type = "image/*"
-        ContextCompat.startActivity(this, shareIntent, null)
+        return fileShared
     }
 }

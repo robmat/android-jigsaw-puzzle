@@ -59,4 +59,17 @@
         android:translationZ="999dp"
         app:layout_constraintBottom_toBottomOf="@id/gallery_activity_background"
         app:layout_constraintLeft_toRightOf="@id/gallery_back_btn" />
+
+    <ImageButton
+        android:id="@+id/gallery_wallpaper_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="40dp"
+        android:contentDescription="@string/app_name"
+        android:onClick="wallpaperClicked"
+        android:src="@drawable/ic_wallpaper_36dp"
+        android:textColor="@color/white"
+        android:translationZ="999dp"
+        app:layout_constraintBottom_toBottomOf="@id/gallery_activity_background"
+        app:layout_constraintLeft_toRightOf="@id/gallery_share_btn" />
 </androidx.constraintlayout.widget.ConstraintLayout>
