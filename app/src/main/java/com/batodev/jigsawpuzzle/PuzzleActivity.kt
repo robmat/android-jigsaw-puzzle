@@ -33,7 +33,6 @@ import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
 import androidx.core.graphics.scale
 import androidx.core.graphics.createBitmap
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
