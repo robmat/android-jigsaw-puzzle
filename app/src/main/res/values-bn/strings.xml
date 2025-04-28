@@ -19,37 +19,6 @@
   <string name="main_menu_activity_play_to_uncover">প্রথমে গেমটি খেলুন</string>
 
 
-
-
-
-
-
-
-  <string name="hard">কঠিন</string>
-
-
-
-
-  <string name="medium">মধ্যম</string>
-
-
-
-
-  <string name="easy">সহজ</string>
-
-
-
-
-  <string name="columns">কলাম</string>
-
-
-
-
-  <string name="rows">সারি</string>
-
-
-
-
   <string name="puzzle_activity_play_again">আবার খেলো</string>
 
 
@@ -74,9 +43,6 @@
 
 
   <string name="main_menu_activity_play_the_game">চল খেলি!</string>
-
-
-  <string name="start">খেলা শুরু কর</string>
 
 
   <string name="play_sounds">শব্দ</string>

@@ -19,37 +19,6 @@
   <string name="main_menu_activity_play_to_uncover">Сначала поиграй в игру</string>
 
 
-
-
-
-
-
-
-  <string name="hard">Жесткий</string>
-
-
-
-
-  <string name="medium">Середина</string>
-
-
-
-
-  <string name="easy">Легкий</string>
-
-
-
-
-  <string name="columns">Столбцы</string>
-
-
-
-
-  <string name="rows">Строки</string>
-
-
-
-
   <string name="puzzle_activity_play_again">Играй еще раз</string>
 
 
@@ -76,10 +45,7 @@
   <string name="main_menu_activity_play_the_game">Давайте играть!</string>
 
 
-  <string name="start">Начало игры</string>
-
-
-  <string name="play_sounds">Звук</string>
+    <string name="play_sounds">Звук</string>
 
   <string name="wallpaper_ok">Картинка установлена ​​в качестве обоев.</string>
 </resources>

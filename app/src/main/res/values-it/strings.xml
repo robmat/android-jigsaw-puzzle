@@ -19,37 +19,6 @@
   <string name="main_menu_activity_play_to_uncover">Prima gioca</string>
 
 
-
-
-
-
-
-
-  <string name="hard">Difficile</string>
-
-
-
-
-  <string name="medium">medio</string>
-
-
-
-
-  <string name="easy">Facile</string>
-
-
-
-
-  <string name="columns">Colonne</string>
-
-
-
-
-  <string name="rows">Righe</string>
-
-
-
-
   <string name="puzzle_activity_play_again">Gioca di nuovo</string>
 
 
@@ -76,10 +45,7 @@
   <string name="main_menu_activity_play_the_game">Giochiamo!</string>
 
 
-  <string name="start">Inizia il gioco</string>
-
-
-  <string name="play_sounds">Suono</string>
+    <string name="play_sounds">Suono</string>
 
   <string name="wallpaper_ok">L\'immagine è stata impostata come sfondo</string>
 </resources>

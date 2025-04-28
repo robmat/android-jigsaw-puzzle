@@ -19,37 +19,6 @@
   <string name="main_menu_activity_play_to_uncover">先玩游戏</string>
 
 
-
-
-
-
-
-
-  <string name="hard">难的</string>
-
-
-
-
-  <string name="medium">中等的</string>
-
-
-
-
-  <string name="easy">简单的</string>
-
-
-
-
-  <string name="columns">列</string>
-
-
-
-
-  <string name="rows">行数</string>
-
-
-
-
   <string name="puzzle_activity_play_again">再玩一次</string>
 
 
@@ -76,10 +45,7 @@
   <string name="main_menu_activity_play_the_game">让我们玩！</string>
 
 
-  <string name="start">开始游戏</string>
-
-
-  <string name="play_sounds">声音</string>
+    <string name="play_sounds">声音</string>
 
   <string name="wallpaper_ok">该图片已设置为您的壁纸</string>
 </resources>

@@ -4,12 +4,6 @@
     <string name="main_menu_activity_unlocked_gallery">Gallery of revealed pictures</string>
     <string name="main_menu_activity_more_apps">More apps like this</string>
     <string name="main_menu_activity_play_to_uncover">Play the game first</string>
-    <string name="start">Start the game</string>
-    <string name="hard">Hard</string>
-    <string name="medium">Medium</string>
-    <string name="easy">Easy</string>
-    <string name="columns">Columns</string>
-    <string name="rows">Rows</string>
     <string name="puzzle_activity_play_again">Play again</string>
     <string name="image_added_to_gallery">New image available in the gallery.</string>
     <string name="show_image_as_background">Show image in the back</string>

@@ -34,13 +34,14 @@ class AppRatingHelper(private val activity: Activity) {
                         }
                     } else {
                         // There was some problem, log or handle the error code.
-                        @ReviewErrorCode val reviewErrorCode = (task.getException() as ReviewException).errorCode
+                        @ReviewErrorCode val reviewErrorCode = (task.exception as ReviewException).errorCode
                         Log.w(AppRatingHelper::class.java.simpleName, "review ko: ${task.exception} $reviewErrorCode")
                     }
                 }
 
             } catch (e: Exception) {
                 // Handle error (e.g., log or fallback to browser)
+                Log.w(AppRatingHelper::class.java.simpleName, "Error requesting review: ${e.message}")
                 fallbackToPlayStore()
             }
         }
@@ -54,6 +55,7 @@ class AppRatingHelper(private val activity: Activity) {
                 Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
             )
         } catch (e: ActivityNotFoundException) {
+            Log.w(AppRatingHelper::class.java.simpleName, "Error requesting review: ${e.message}")
             activity.startActivity(
                 Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri())
             )

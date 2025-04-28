@@ -19,37 +19,6 @@
   <string name="main_menu_activity_play_to_uncover">پہلے گیم کھیلیں</string>
 
 
-
-
-
-
-
-
-  <string name="hard">سخت</string>
-
-
-
-
-  <string name="medium">درمیانہ</string>
-
-
-
-
-  <string name="easy">آسان</string>
-
-
-
-
-  <string name="columns">کالم</string>
-
-
-
-
-  <string name="rows">قطاریں</string>
-
-
-
-
   <string name="puzzle_activity_play_again">دوبارہ کھیلو</string>
 
 
@@ -76,10 +45,7 @@
   <string name="main_menu_activity_play_the_game">چلو کھیلتے ہیں!</string>
 
 
-  <string name="start">کھیل شروع کریں۔</string>
-
-
-  <string name="play_sounds">آواز</string>
+    <string name="play_sounds">آواز</string>
 
   <string name="wallpaper_ok">تصویر کو آپ کے وال پیپر کے طور پر سیٹ کر دیا گیا ہے۔</string>
 </resources>
