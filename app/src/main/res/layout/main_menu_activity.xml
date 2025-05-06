@@ -17,6 +17,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
+        android:paddingStart="50dp"
+        android:paddingEnd="50dp"
         android:orientation="vertical">
 
         <TextView
@@ -33,7 +35,7 @@
 
         <Button
             android:id="@+id/main_menu_activity_play_the_game"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="360dp"
             android:background="@drawable/orange_button_background"
@@ -44,7 +46,7 @@
 
         <Button
             android:id="@+id/main_menu_activity_unlocked_gallery"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/orange_button_background"
@@ -55,7 +57,7 @@
 
         <Button
             android:id="@+id/main_menu_activity_more_apps"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@drawable/orange_button_background"
@@ -63,10 +65,22 @@
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_more_apps"
             android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/main_menu_activity_play_part_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/orange_button_background"
+            android:onClick="playPart2"
+            android:soundEffectsEnabled="true"
+            android:text="@string/main_menu_activity_play_part_2"
+            android:textSize="20sp" />
+
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/umberfox_logo"
-            android:contentDescription="@string/app_name" />
+            android:contentDescription="@string/app_name"
+            android:src="@drawable/emberfox_logo" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

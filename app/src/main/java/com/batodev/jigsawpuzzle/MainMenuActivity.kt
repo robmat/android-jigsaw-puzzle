@@ -44,4 +44,9 @@ class MainMenuActivity : Activity() {
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()))
     }
+
+    fun playPart2(view: View) {
+        startActivity(Intent(Intent.ACTION_VIEW,
+            "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle2".toUri()))
+    }
 }

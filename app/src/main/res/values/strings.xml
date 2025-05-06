@@ -11,4 +11,5 @@
     <string name="show_puzzle_grid">Show puzzle shapes</string>
     <string name="play_sounds">Sound</string>
     <string name="wallpaper_ok">The picture has been set as your wallpaper</string>
+    <string name="main_menu_activity_play_part_2">Part 2</string>
 </resources>
