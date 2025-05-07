@@ -37,7 +37,7 @@
             android:id="@+id/main_menu_activity_play_the_game"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="360dp"
+            android:layout_marginTop="340dp"
             android:background="@drawable/orange_button_background"
             android:onClick="play"
             android:soundEffectsEnabled="true"

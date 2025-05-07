@@ -18,10 +18,10 @@
   <string name="show_puzzle_grid">パズルの形を表示する</string>
     
   <string name="main_menu_activity_play_the_game">遊ぼう！</string>
-      
+    
   <string name="play_sounds">音</string>
     
   <string name="wallpaper_ok">この写真は壁紙に設定されました</string>
   
-  <string name="main_menu_activity_play_part_2">パート2</string>
+  <string name="main_menu_activity_play_part_2">パズルガールズパート2をダウンロード</string>
 </resources>
