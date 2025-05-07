@@ -1,51 +1,27 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-
-
-
-
-
-
+    
   <string name="main_menu_activity_unlocked_gallery">Galerie de photos dévoilées</string>
-
-
-
-
+    
   <string name="main_menu_activity_more_apps">Plus d\'applications comme celle-ci</string>
-
-
-
-
+    
   <string name="main_menu_activity_play_to_uncover">Jouez d\'abord au jeu</string>
-
-
+    
   <string name="puzzle_activity_play_again">Rejouer</string>
-
-
-
-
+    
   <string name="image_added_to_gallery">Nouvelle image disponible dans la galerie.</string>
-
-
-
-
+    
   <string name="show_image_as_background">Afficher l\'image au dos</string>
-
-
-
-
+    
   <string name="how_many_puzzles">Combien de pièces de puzzle ?</string>
-
-
-
+    
   <string name="show_puzzle_grid">Afficher les formes de puzzle</string>
-
-
-
+    
   <string name="main_menu_activity_play_the_game">Jouons!</string>
-
-
-    <string name="play_sounds">Son</string>
-
+      
+  <string name="play_sounds">Son</string>
+    
   <string name="wallpaper_ok">L\'image a été définie comme fond d\'écran</string>
+  
+  <string name="main_menu_activity_play_part_2">Partie 2</string>
 </resources>
