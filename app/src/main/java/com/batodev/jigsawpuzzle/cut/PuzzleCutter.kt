@@ -17,6 +17,7 @@ import java.util.function.Consumer
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import androidx.core.graphics.set
+import java.util.concurrent.atomic.AtomicInteger
 
 object PuzzleCutter {
     private val numProcessors = Runtime.getRuntime().availableProcessors()
@@ -43,6 +44,7 @@ object PuzzleCutter {
         puzzleGridCanvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), whiteFill)
         svg.renderToCanvas(puzzleGridCanvas)
         val executor = Executors.newFixedThreadPool(numProcessors)
+        val progressCounter = AtomicInteger(0)
         val puzzlesCenterPoints = divideImage(puzzleGridBitmap, rows, cols)
         var puzzleIndex = 0
         for (rowIndex in 0 until rows) {
@@ -72,6 +74,10 @@ object PuzzleCutter {
                         piece.yCoord = regionMinY + imageView.top + 7
                     }
                     puzzleActivity.postToHandler(setPuzzleImageAndPositions)
+                    val progress = progressCounter.incrementAndGet()
+                    puzzleActivity.postToHandler {
+                        puzzleActivity.updateProgress(progress, rows * cols)
+                    }
                 }
                 executor.submit(puzzleCutJob)
                 println("Filling target took: " + (System.currentTimeMillis() - startTime) + "ms")
@@ -85,7 +91,7 @@ object PuzzleCutter {
             } catch (e: InterruptedException) {
                 throw RuntimeException(e)
             }
-            puzzleActivity.postToHandler { puzzleActivity.hideProgressSpinner() }
+            puzzleActivity.postToHandler { puzzleActivity.updateProgress(rows * cols, rows * cols) }
         }.start()
         return result
     }

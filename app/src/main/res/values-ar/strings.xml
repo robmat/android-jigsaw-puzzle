@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    
+      
+  
   <string name="main_menu_activity_unlocked_gallery">معرض الصور المكشوفة</string>
-    
+      
+  
   <string name="main_menu_activity_more_apps">المزيد من التطبيقات مثل هذا</string>
-    
+      
+  
   <string name="main_menu_activity_play_to_uncover">العب اللعبة أولاً</string>
-    
+      
+  
   <string name="puzzle_activity_play_again">العب مرة أخرى</string>
-    
+      
+  
   <string name="image_added_to_gallery">صورة جديدة متاحة في المعرض.</string>
-    
+      
+  
   <string name="show_image_as_background">إظهار الصورة في الخلف</string>
-    
+      
+  
   <string name="how_many_puzzles">كم عدد قطع اللغز؟</string>
-    
+      
+  
   <string name="show_puzzle_grid">عرض أشكال اللغز</string>
-    
+      
+  
   <string name="main_menu_activity_play_the_game">هيّا بنا لنلعب!</string>
-    
+      
+  
   <string name="play_sounds">صوت</string>
-    
+      
+  
   <string name="wallpaper_ok">لقد تم تعيين الصورة كخلفية لجهازك</string>
+    
   
   <string name="main_menu_activity_play_part_2">تنزيل Puzzled Girls الجزء الثاني</string>
+  
+  <string name="puzzle_activity_we_are_cutting">سأقطع ألغازك الآن... فقط أعطني بعض الوقت.</string>
 </resources>

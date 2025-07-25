@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.RelativeLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.exifinterface.media.ExifInterface
@@ -103,8 +104,16 @@ class PuzzleActivity : AppCompatActivity() {
         rateHelper.requestReview()
     }
 
-    fun hideProgressSpinner() {
-        handler.post { findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE }
+    fun updateProgress(progress: Int, max: Int) {
+        handler.post {
+            val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+            progressBar.max = max
+            progressBar.progress = progress
+            if (progress == max) {
+                progressBar.visibility = View.GONE
+                findViewById<TextView>(R.id.progressText).visibility = View.GONE
+            }
+        }
     }
 
     private fun setPicFromAsset(assetName: String, imageView: ImageView) {

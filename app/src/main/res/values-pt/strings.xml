@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    
+      
+  
   <string name="main_menu_activity_unlocked_gallery">Galeria de fotos reveladas</string>
-    
+      
+  
   <string name="main_menu_activity_more_apps">Mais aplicativos como este</string>
-    
+      
+  
   <string name="main_menu_activity_play_to_uncover">Jogue o jogo primeiro</string>
-    
+      
+  
   <string name="puzzle_activity_play_again">Jogar de novo</string>
-    
+      
+  
   <string name="image_added_to_gallery">Nova imagem disponível na galeria.</string>
-    
+      
+  
   <string name="show_image_as_background">Mostrar imagem atrás</string>
-    
+      
+  
   <string name="how_many_puzzles">Quantas peças do quebra-cabeça?</string>
-    
+      
+  
   <string name="show_puzzle_grid">Mostrar formas de quebra-cabeça</string>
-    
+      
+  
   <string name="main_menu_activity_play_the_game">Vamos jogar!</string>
-    
+      
+  
   <string name="play_sounds">Som</string>
-    
+      
+  
   <string name="wallpaper_ok">A imagem foi definida como seu papel de parede</string>
+    
   
   <string name="main_menu_activity_play_part_2">Baixe Puzzled Girls parte 2</string>
+  
+  <string name="puzzle_activity_we_are_cutting">Estou cortando seus quebra-cabeças agora... Só me dê um tempo.</string>
 </resources>

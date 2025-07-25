@@ -1,27 +1,41 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-    
+      
+  
   <string name="main_menu_activity_unlocked_gallery">公開された写真のギャラリー</string>
-    
+      
+  
   <string name="main_menu_activity_more_apps">このようなアプリをもっと見る</string>
-    
+      
+  
   <string name="main_menu_activity_play_to_uncover">まずはゲームをプレイしてみよう</string>
-    
+      
+  
   <string name="puzzle_activity_play_again">再びプレー</string>
-    
+      
+  
   <string name="image_added_to_gallery">新しい画像がギャラリーにあります。</string>
-    
+      
+  
   <string name="show_image_as_background">画像を後ろに表示</string>
-    
+      
+  
   <string name="how_many_puzzles">パズルのピースは何個ありますか？</string>
-    
+      
+  
   <string name="show_puzzle_grid">パズルの形を表示する</string>
-    
+      
+  
   <string name="main_menu_activity_play_the_game">遊ぼう！</string>
-    
+      
+  
   <string name="play_sounds">音</string>
-    
+      
+  
   <string name="wallpaper_ok">この写真は壁紙に設定されました</string>
+    
   
   <string name="main_menu_activity_play_part_2">パズルガールズパート2をダウンロード</string>
+  
+  <string name="puzzle_activity_we_are_cutting">今、パズルをカットしています...\n少々お待ちください。</string>
 </resources>
