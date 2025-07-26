@@ -47,6 +47,6 @@ class MainMenuActivity : Activity() {
 
     fun playPart2(view: View) {
         startActivity(Intent(Intent.ACTION_VIEW,
-            "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle2".toUri()))
+            "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
     }
 }
