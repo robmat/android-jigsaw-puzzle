@@ -8,9 +8,16 @@ import android.widget.RelativeLayout
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class TouchListener(private val activity: PuzzleActivity) : OnTouchListener {
+class TouchListener(
+    private val activity: PuzzleActivity, private val zoomableLayout: ZoomableLayout
+) : OnTouchListener {
     private var xDelta = 0f
     private var yDelta = 0f
+
+    // We need to track the start raw coordinates to calculate the total drag distance
+    private var rawXStart = 0f
+    private var rawYStart = 0f
+
     private val okSoundsIds = listOf(
         R.raw.ok_1,
         R.raw.ok_2,
@@ -31,31 +38,43 @@ class TouchListener(private val activity: PuzzleActivity) : OnTouchListener {
         R.raw.ok_17,
         R.raw.ok_18
     )
+
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
-        val x = motionEvent.rawX
-        val y = motionEvent.rawY
-        val tolerance = sqrt(
-            view.width.toDouble().pow(2.0) + view.height.toDouble().pow(2.0)
-        ) / 10
+        // We use rawX and rawY for screen coordinates, which are independent of zoom.
+        val rawX = motionEvent.rawX
+        val rawY = motionEvent.rawY
         val piece = view as PuzzlePiece
         if (!piece.canMove) {
             return true
         }
+
         val lParams = view.layoutParams as RelativeLayout.LayoutParams
         when (motionEvent.action and MotionEvent.ACTION_MASK) {
             MotionEvent.ACTION_DOWN -> {
-                xDelta = x - lParams.leftMargin
-                yDelta = y - lParams.topMargin
-                piece.bringToFront()
+                rawXStart = rawX
+                rawYStart = rawY
+
+                // xDelta and yDelta are the offsets from the view's top-left corner to the touch point.
+                xDelta = lParams.leftMargin.toFloat()
+                yDelta = lParams.topMargin.toFloat()
             }
 
             MotionEvent.ACTION_MOVE -> {
-                lParams.leftMargin = (x - xDelta).toInt()
-                lParams.topMargin = (y - yDelta).toInt()
-                view.setLayoutParams(lParams)
+                // Calculate the displacement on the screen
+                val dx = rawX - rawXStart
+                val dy = rawY - rawYStart
+
+                // Adjust the displacement by the current scale factor
+                // This makes the piece move correctly relative to the zoomed view.
+                val scale = zoomableLayout.getScaleFactor()
+                lParams.leftMargin = (xDelta + dx / scale).toInt()
+                lParams.topMargin = (yDelta + dy / scale).toInt()
+                view.layoutParams = lParams
             }
 
             MotionEvent.ACTION_UP -> {
+                val tolerance =
+                    sqrt(view.width.toDouble().pow(2.0) + view.height.toDouble().pow(2.0)) / 10
                 val xDiff = StrictMath.abs(piece.xCoord - lParams.leftMargin)
                 val yDiff = StrictMath.abs(piece.yCoord - lParams.topMargin)
                 if (xDiff <= tolerance && yDiff <= tolerance) {
@@ -70,6 +89,7 @@ class TouchListener(private val activity: PuzzleActivity) : OnTouchListener {
                 view.performClick()
             }
         }
+        piece.bringToFront()
         return true
     }
 

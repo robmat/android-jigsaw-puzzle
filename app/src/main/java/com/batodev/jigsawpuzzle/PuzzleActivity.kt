@@ -42,6 +42,7 @@ class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
     private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
+    private lateinit var zoomableLayout: ZoomableLayout
     private var imageFileName: String? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val rateHelper: AppRatingHelper = AppRatingHelper(this)
@@ -58,6 +59,7 @@ class PuzzleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
+        zoomableLayout = findViewById(R.id.zoomable_layout)
 
         val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
         windowInsetsController.let { controller ->
@@ -87,7 +89,7 @@ class PuzzleActivity : AppCompatActivity() {
                 Log.d(PuzzleActivity::class.java.simpleName, "setPicFromPath took: $time ms")
             }
             pieces = splitImage(settings)
-            val touchListener = TouchListener(this@PuzzleActivity)
+            val touchListener = TouchListener(this@PuzzleActivity, zoomableLayout)
             // shuffle pieces order
             pieces.shuffle()
             for (piece in pieces) {
@@ -123,23 +125,32 @@ class PuzzleActivity : AppCompatActivity() {
         val am = assets
         try {
             val inputStream = am.open("img/$assetName")
-            // Get the dimensions of the bitmap
-            val bmOptions = BitmapFactory.Options()
-            bmOptions.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(inputStream, Rect(-1, -1, -1, -1), bmOptions)
-            val photoW = bmOptions.outWidth
-            val photoH = bmOptions.outHeight
-
-            // Determine how much to scale down the image
-            val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
-            inputStream.reset()
-
-            // Decode the image file into a Bitmap sized to fill the View
-            bmOptions.inJustDecodeBounds = false
-            bmOptions.inSampleSize = scaleFactor
-            val bitmap = BitmapFactory.decodeStream(inputStream, Rect(-1, -1, -1, -1), bmOptions)
-            imageView.setImageBitmap(bitmap)
+            // Decode the image file into a Bitmap
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
+
+            // Crop the bitmap to match the aspect ratio of the target view
+            val origW = originalBitmap.width
+            val origH = originalBitmap.height
+            val targetRatio = targetW.toFloat() / targetH.toFloat()
+            val origRatio = origW.toFloat() / origH.toFloat()
+            var cropW = origW
+            var cropH = origH
+            var cropX = 0
+            var cropY = 0
+            if (origRatio > targetRatio) {
+                // Image is wider than target: crop width
+                cropW = (origH * targetRatio).toInt()
+                cropX = (origW - cropW) / 2
+            } else if (origRatio < targetRatio) {
+                // Image is taller than target: crop height
+                cropH = (origW / targetRatio).toInt()
+                cropY = (origH - cropH) / 2
+            }
+            val croppedBitmap = Bitmap.createBitmap(originalBitmap, cropX, cropY, cropW, cropH)
+            // Scale the cropped bitmap to fit the ImageView
+            val scaledBitmap = croppedBitmap.scale(targetW, targetH)
+            imageView.setImageBitmap(scaledBitmap)
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
@@ -288,6 +299,7 @@ class PuzzleActivity : AppCompatActivity() {
             return true
         }
 
+
     private fun setPicFromPath(imageView: ImageView) {
         val targetW = imageView.width
         val targetH = imageView.height
@@ -299,16 +311,42 @@ class PuzzleActivity : AppCompatActivity() {
         val photoH = bmOptions.outHeight
 
         // Determine how much to scale down the image
-        val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH)
+        val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH).coerceAtLeast(1)
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false
         bmOptions.inSampleSize = scaleFactor
         val bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions)
         val rotatedBitmap = uprightBitmap(bitmap, mCurrentPhotoPath)
-        val croppedBitmap = cropToAspectRatio(rotatedBitmap)
 
-        imageView.setImageBitmap(croppedBitmap)
+        // Crop the bitmap to match the aspect ratio of the target view
+        val origW = rotatedBitmap.width
+        val origH = rotatedBitmap.height
+        val targetRatio = targetW.toFloat() / targetH.toFloat()
+        val origRatio = origW.toFloat() / origH.toFloat()
+        var cropW = origW
+        var cropH = origH
+        var cropX = 0
+        var cropY = 0
+        if (origRatio > targetRatio) {
+            // Image is wider than target: crop width
+            cropW = (origH * targetRatio).toInt()
+            cropX = (origW - cropW) / 2
+        } else if (origRatio < targetRatio) {
+            // Image is taller than target: crop height
+            cropH = (origW / targetRatio).toInt()
+            cropY = (origH - cropH) / 2
+        }
+        // Ensure cropW and cropH are within bounds
+        cropW = cropW.coerceAtMost(origW)
+        cropH = cropH.coerceAtMost(origH)
+        cropX = cropX.coerceAtLeast(0)
+        cropY = cropY.coerceAtLeast(0)
+
+        val croppedBitmap = Bitmap.createBitmap(rotatedBitmap, cropX, cropY, cropW, cropH)
+        // Scale the cropped bitmap to fit the ImageView exactly
+        val scaledBitmap = croppedBitmap.scale(targetW, targetH)
+        imageView.setImageBitmap(scaledBitmap)
     }
 
     private fun uprightBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
@@ -326,34 +364,6 @@ class PuzzleActivity : AppCompatActivity() {
         }
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    }
-
-    private fun cropToAspectRatio(bitmap: Bitmap): Bitmap {
-        val aspectRatio: BigDecimal = BigDecimal(2).divide(BigDecimal(3), 5, RoundingMode.HALF_UP)
-        val width = BigDecimal(bitmap.width)
-        val height = BigDecimal(bitmap.height)
-
-        val targetWidth: Int
-        val targetHeight: Int
-
-        // Calculate the dimensions of the cropped region based on the aspect ratio
-        if (width / height > aspectRatio) {
-            targetWidth = (height * aspectRatio).toInt()
-            targetHeight = height.toInt()
-        } else {
-            targetWidth = width.toInt()
-            targetHeight = (width / aspectRatio).toInt()
-        }
-
-        // Calculate the coordinates of the top-left corner of the cropped region
-        val left = (width.toInt() - targetWidth) / 2
-        val top = (height.toInt() - targetHeight) / 2
-
-        // Create a Rect object representing the cropping region
-        val rect = Rect(left, top, left + targetWidth, top + targetHeight)
-
-        // Crop the bitmap to the specified region
-        return Bitmap.createBitmap(bitmap, rect.left, rect.top, rect.width(), rect.height())
     }
 
     fun playAgain(view: View) {
