@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.activity
 
 import android.app.WallpaperManager
 import android.content.Intent
@@ -14,6 +14,9 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
 import java.io.FileOutputStream

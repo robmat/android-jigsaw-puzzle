@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.activity
 
 import android.app.Activity
 import android.content.Intent
@@ -10,6 +10,9 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 
 class MainMenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

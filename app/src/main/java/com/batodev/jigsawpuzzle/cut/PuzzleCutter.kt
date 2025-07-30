@@ -5,8 +5,8 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.widget.ImageView
-import com.batodev.jigsawpuzzle.PuzzleActivity
-import com.batodev.jigsawpuzzle.PuzzlePiece
+import com.batodev.jigsawpuzzle.activity.PuzzleActivity
+import com.batodev.jigsawpuzzle.view.PuzzlePiece
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
 import java.util.ArrayDeque

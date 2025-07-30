@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.view
 
 import android.content.Context
 import androidx.appcompat.widget.AppCompatImageView

@@ -16,7 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainMenuActivity"
+            android:name=".activity.MainMenuActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
@@ -27,17 +27,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GalleryActivity"
+            android:name=".activity.GalleryActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
-            android:name=".ImagePickActivity"
+            android:name=".activity.ImagePickActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
-            android:name=".PuzzleActivity"
+            android:name=".activity.PuzzleActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />

@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.helpers
 
 import android.content.Context
 import android.util.Log

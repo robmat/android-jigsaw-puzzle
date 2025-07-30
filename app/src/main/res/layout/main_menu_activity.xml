@@ -4,7 +4,7 @@
     android:id="@+id/main_game_activity_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainMenuActivity">
+    tools:context=".activity.MainMenuActivity">
 
     <ImageView
         android:layout_width="match_parent"

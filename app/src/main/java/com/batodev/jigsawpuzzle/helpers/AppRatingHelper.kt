@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.helpers
 
 import android.app.Activity
 import android.content.ActivityNotFoundException
@@ -9,6 +9,7 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import com.google.android.play.core.review.ReviewException
+import java.util.Random
 
 class AppRatingHelper(private val activity: Activity) {
 
@@ -18,7 +19,7 @@ class AppRatingHelper(private val activity: Activity) {
     }
 
     fun requestReview() {
-        if (java.util.Random().nextInt(5) == 0) {
+        if (Random().nextInt(5) == 0) {
             try {
                 val request = manager.requestReviewFlow()
                 request.addOnCompleteListener { task ->

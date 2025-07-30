@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.batodev.jigsawpuzzle.ImagePickActivity"
+    tools:context="com.batodev.jigsawpuzzle.activity.ImagePickActivity"
     android:background="@drawable/table_background">
 
     <GridView

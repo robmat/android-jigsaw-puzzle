@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.helpers
 
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity

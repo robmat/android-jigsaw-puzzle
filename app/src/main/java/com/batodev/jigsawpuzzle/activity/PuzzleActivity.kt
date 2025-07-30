@@ -1,4 +1,4 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.activity
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -24,6 +24,15 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.exifinterface.media.ExifInterface
+import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
+import com.batodev.jigsawpuzzle.view.PuzzlePiece
+import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.Settings
+import com.batodev.jigsawpuzzle.helpers.SettingsHelper
+import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
+import com.batodev.jigsawpuzzle.view.TouchListener
+import com.batodev.jigsawpuzzle.view.ZoomableLayout
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.bumptech.glide.Glide

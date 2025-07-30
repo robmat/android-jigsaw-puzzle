@@ -1,10 +1,13 @@
-package com.batodev.jigsawpuzzle
+package com.batodev.jigsawpuzzle.view
 
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
+import com.batodev.jigsawpuzzle.activity.PuzzleActivity
 import kotlin.math.pow
 import kotlin.math.sqrt
 
