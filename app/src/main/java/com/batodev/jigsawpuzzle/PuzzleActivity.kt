@@ -99,7 +99,9 @@ class PuzzleActivity : AppCompatActivity() {
                 piece.layoutParams = lParams
             }
         }
-
+        findViewById<Button>(R.id.puzzle_activity_play_again).setOnClickListener {
+            finish()
+        }
         rateHelper.requestReview()
     }
 
@@ -361,10 +363,6 @@ class PuzzleActivity : AppCompatActivity() {
         }
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-    }
-
-    fun playAgain(view: View) {
-        finish()
     }
 
     fun postToHandler(r: Runnable) {

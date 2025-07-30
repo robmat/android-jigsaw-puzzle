@@ -95,7 +95,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="30dp"
         android:background="@drawable/orange_button_background"
-        android:onClick="playAgain"
         android:soundEffectsEnabled="true"
         android:text="@string/puzzle_activity_play_again"
         android:textSize="20sp"
