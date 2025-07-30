@@ -5,7 +5,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Matrix
 import android.graphics.Paint
-import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
@@ -19,6 +18,11 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.exifinterface.media.ExifInterface
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
@@ -26,17 +30,10 @@ import com.bumptech.glide.Glide
 import com.caverock.androidsvg.SVG
 import java.io.File
 import java.io.IOException
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.Random
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.system.measureTimeMillis
-import androidx.core.graphics.scale
-import androidx.core.graphics.createBitmap
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 
 class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
