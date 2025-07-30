@@ -1,5 +1,6 @@
 package com.batodev.jigsawpuzzle.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
@@ -12,7 +13,7 @@ import kotlin.math.min
 class ZoomableLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = 0,
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private var scaleFactor = 1.0f
@@ -20,22 +21,11 @@ class ZoomableLayout @JvmOverloads constructor(
 
     companion object {
         private const val MIN_ZOOM = 1.0f
-        private const val MAX_ZOOM = 4.0f
+        private const val MAX_ZOOM = 2.0f
     }
 
     init {
         gestureDetector = ScaleGestureDetector(context, ScaleListener())
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        super.onTouchEvent(event)
-        gestureDetector.onTouchEvent(event)
-        when (event.actionMasked) {
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                performClick()
-            }
-        }
-        return true
     }
 
     override fun performClick(): Boolean {
@@ -53,65 +43,61 @@ class ZoomableLayout @JvmOverloads constructor(
             scaleY = scaleFactor
 
             checkAndApplyTranslation()
+            Log.d(ZoomableLayout::class.simpleName, "onScale: scaleFactor=$scaleFactor")
             return true
         }
     }
 
-    // These variables track the touch gesture for panning
-    private var lastTouchX = 0f
-    private var lastTouchY = 0f
-    private var activePointerId = MotionEvent.INVALID_POINTER_ID
+    // For two-finger panning
+    private var lastPanX = 0f
+    private var lastPanY = 0f
+    private var isPanning = false
 
     override fun onInterceptTouchEvent(ev: MotionEvent): Boolean {
-        // Intercept touch events for panning when scaled
-        if (ev.actionMasked == MotionEvent.ACTION_DOWN) {
-            // Reset tracking
-            lastTouchX = ev.x
-            lastTouchY = ev.y
-            activePointerId = ev.getPointerId(0)
-        } else if (scaleFactor > MIN_ZOOM) {
-            // If zoomed in, intercept move events to handle panning
+        // Intercept only for two or more fingers (for zoom/pan)
+        if (ev.pointerCount > 1) {
             return true
         }
         return super.onInterceptTouchEvent(ev)
     }
 
-    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        super.dispatchTouchEvent(ev) // Ensure children receive touch events
-
-        val action = ev.actionMasked
-        val pointerIndex = ev.findPointerIndex(activePointerId)
-        if (pointerIndex < 0) return true
-
-        val currentX = ev.getX(pointerIndex)
-        val currentY = ev.getY(pointerIndex)
-
-        when (action) {
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        gestureDetector.onTouchEvent(event)
+        val isScaling = gestureDetector.isInProgress
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                isPanning = false
+            }
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (event.pointerCount == 2 && !isScaling) {
+                    // Start panning
+                    lastPanX = (event.getX(0) + event.getX(1)) / 2f
+                    lastPanY = (event.getY(0) + event.getY(1)) / 2f
+                    isPanning = true
+                }
+            }
             MotionEvent.ACTION_MOVE -> {
-                if (scaleFactor > MIN_ZOOM) { // Only pan if zoomed
-                    val dx = currentX - lastTouchX
-                    val dy = currentY - lastTouchY
+                if (isPanning && event.pointerCount == 2 && !isScaling) {
+                    val panX = (event.getX(0) + event.getX(1)) / 2f
+                    val panY = (event.getY(0) + event.getY(1)) / 2f
+                    val PAN_SPEED = 1.6f
+                    val dx = (panX - lastPanX) * PAN_SPEED
+                    val dy = (panY - lastPanY) * PAN_SPEED
                     translationX += dx
                     translationY += dy
                     checkAndApplyTranslation()
+                    lastPanX = panX
+                    lastPanY = panY
+                    Log.d(ZoomableLayout::class.simpleName, "onTouchEvent: Panning with dx=$dx, dy=$dy")
                 }
             }
-            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                activePointerId = MotionEvent.INVALID_POINTER_ID
-            }
-            MotionEvent.ACTION_POINTER_UP -> {
-                val upPointerIndex = ev.actionIndex
-                if (ev.getPointerId(upPointerIndex) == activePointerId) {
-                    val newPointerIndex = if (upPointerIndex == 0) 1 else 0
-                    lastTouchX = ev.getX(newPointerIndex)
-                    lastTouchY = ev.getY(newPointerIndex)
-                    activePointerId = ev.getPointerId(newPointerIndex)
+            MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                if (event.pointerCount <= 2) {
+                    isPanning = false
                 }
             }
         }
-        lastTouchX = currentX
-        lastTouchY = currentY
-        gestureDetector.onTouchEvent(ev) // Also feed events to scale detector
         return true
     }
 
