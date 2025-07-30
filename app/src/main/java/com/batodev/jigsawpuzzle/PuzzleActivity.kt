@@ -95,7 +95,14 @@ class PuzzleActivity : AppCompatActivity() {
                 // randomize position, on the bottom of the screen
                 val lParams = piece.layoutParams as RelativeLayout.LayoutParams
                 lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
-                lParams.topMargin = layout.height - piece.pieceHeight - Random().nextInt(300)
+                val imageViewBottom = imageView.bottom
+                val minTopMargin = imageViewBottom + 10
+                val maxTopMargin = layout.height - piece.pieceHeight
+                lParams.topMargin = if (maxTopMargin > minTopMargin) {
+                    minTopMargin + Random().nextInt(maxTopMargin - minTopMargin)
+                } else {
+                    minTopMargin
+                }
                 piece.layoutParams = lParams
             }
         }
