@@ -6,7 +6,7 @@ import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
@@ -14,8 +14,8 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
@@ -43,26 +43,31 @@ class GalleryActivity : AppCompatActivity() {
         index = settings.lastSeenPic
         setImage(index)
         checkIfImageLeftRightButtonsShouldBeVisible()
+        findViewById<ImageButton>(R.id.gallery_left).setOnClickListener { leftClicked() }
+        findViewById<ImageButton>(R.id.gallery_right).setOnClickListener { rightClicked() }
+        findViewById<ImageButton>(R.id.gallery_back_btn).setOnClickListener { backClicked() }
+        findViewById<ImageButton>(R.id.gallery_share_btn).setOnClickListener { shareClicked() }
+        findViewById<ImageButton>(R.id.gallery_wallpaper_btn).setOnClickListener { wallpaperClicked() }
     }
 
     private fun checkIfImageLeftRightButtonsShouldBeVisible() {
         if (index <= 0) {
-            findViewById<Button>(R.id.gallery_left).visibility = View.GONE
+            findViewById<ImageButton>(R.id.gallery_left).visibility = View.GONE
         } else {
-            findViewById<Button>(R.id.gallery_left).visibility = View.VISIBLE
+            findViewById<ImageButton>(R.id.gallery_left).visibility = View.VISIBLE
         }
         if (index >= images.size - 1) {
-            findViewById<Button>(R.id.gallery_right).visibility = View.GONE
+            findViewById<ImageButton>(R.id.gallery_right).visibility = View.GONE
         } else {
-            findViewById<Button>(R.id.gallery_right).visibility = View.VISIBLE
+            findViewById<ImageButton>(R.id.gallery_right).visibility = View.VISIBLE
         }
     }
 
-    fun backClicked(view: View) {
+    fun backClicked() {
         finish()
     }
 
-    fun leftClicked(view: View) {
+    fun leftClicked() {
         if (index != 0) index--
         setImage(index)
         val settings = SettingsHelper.load(this)
@@ -73,7 +78,7 @@ class GalleryActivity : AppCompatActivity() {
         checkIfImageLeftRightButtonsShouldBeVisible()
     }
 
-    fun rightClicked(view: View) {
+    fun rightClicked() {
         if (index < images.size) index++
         setImage(index)
         val settings = SettingsHelper.load(this)
@@ -94,7 +99,7 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
-    fun shareClicked(view: View) {
+    fun shareClicked() {
         val fileShared = copyToTempFile()
         val shareIntent = Intent(Intent.ACTION_SEND)
         val applicationId = this.application.applicationContext.packageName
@@ -104,7 +109,7 @@ class GalleryActivity : AppCompatActivity() {
         ContextCompat.startActivity(this, shareIntent, null)
     }
 
-    fun wallpaperClicked(view: View) {
+    fun wallpaperClicked() {
         try {
             val fileShared = copyToTempFile()
             val wallpaperManager = WallpaperManager.getInstance(this)

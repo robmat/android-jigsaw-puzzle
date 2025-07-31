@@ -12,24 +12,24 @@
         android:layout_height="match_parent"
         android:scaleType="centerCrop" />
 
-    <Button
+    <ImageButton
         android:id="@+id/gallery_left"
-        android:layout_width="wrap_content"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="@drawable/none"
-        android:onClick="leftClicked"
-        android:text="&lt;"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/baseline_chevron_left_60dp"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintLeft_toLeftOf="@id/gallery_activity_background" />
 
-    <Button
+    <ImageButton
         android:id="@+id/gallery_right"
-        android:layout_width="wrap_content"
+        android:layout_width="60dp"
         android:layout_height="match_parent"
         android:background="@drawable/none"
-        android:onClick="rightClicked"
-        android:text="&gt;"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/baseline_chevron_right_60dp"
         android:textColor="@color/white"
         android:textSize="30sp"
         app:layout_constraintRight_toRightOf="@id/gallery_activity_background" />
@@ -40,7 +40,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="40dp"
         android:contentDescription="@string/app_name"
-        android:onClick="backClicked"
         android:src="@drawable/ic_back_icon_36dp"
         android:textColor="@color/white"
         android:translationZ="999dp"
@@ -53,7 +52,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="40dp"
         android:contentDescription="@string/app_name"
-        android:onClick="shareClicked"
         android:src="@drawable/ic_share_36p"
         android:textColor="@color/white"
         android:translationZ="999dp"
@@ -66,7 +64,6 @@
         android:layout_height="wrap_content"
         android:layout_margin="40dp"
         android:contentDescription="@string/app_name"
-        android:onClick="wallpaperClicked"
         android:src="@drawable/ic_wallpaper_36dp"
         android:textColor="@color/white"
         android:translationZ="999dp"
