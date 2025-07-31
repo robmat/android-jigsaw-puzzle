@@ -39,7 +39,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="340dp"
             android:background="@drawable/orange_button_background"
-            android:onClick="play"
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_play_the_game"
             android:textSize="20sp" />
@@ -50,7 +49,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@drawable/orange_button_background"
-            android:onClick="gallery"
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_unlocked_gallery"
             android:textSize="20sp" />
@@ -61,7 +59,6 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@drawable/orange_button_background"
-            android:onClick="moreApps"
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_more_apps"
             android:textSize="20sp" />
@@ -72,12 +69,12 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@drawable/orange_button_background"
-            android:onClick="playPart2"
             android:soundEffectsEnabled="true"
             android:text="@string/main_menu_activity_play_part_2"
             android:textSize="20sp" />
 
         <ImageView
+            android:id="@+id/main_menu_activity_emberfox_logo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@string/app_name"

@@ -3,15 +3,16 @@ package com.batodev.jigsawpuzzle.activity
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.view.Window
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 
 class MainMenuActivity : Activity() {
@@ -30,12 +31,17 @@ class MainMenuActivity : Activity() {
 
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
+        findViewById<Button>(R.id.main_menu_activity_play_the_game).setOnClickListener { play() }
+        findViewById<Button>(R.id.main_menu_activity_unlocked_gallery).setOnClickListener { gallery() }
+        findViewById<Button>(R.id.main_menu_activity_more_apps).setOnClickListener { moreApps() }
+        findViewById<Button>(R.id.main_menu_activity_play_part_2).setOnClickListener { playPart2() }
+        findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo).setOnClickListener { moreApps() }
     }
 
-    fun play(view: View) {
+    fun play() {
         startActivity(Intent(this, ImagePickActivity::class.java))
     }
-    fun gallery(view: View) {
+    fun gallery() {
         SettingsHelper.load(this)
         if (!SettingsHelper.load(this).uncoveredPics.isEmpty()) {
             startActivity(Intent(this, GalleryActivity::class.java))
@@ -43,12 +49,12 @@ class MainMenuActivity : Activity() {
             Toast.makeText(this, R.string.main_menu_activity_play_to_uncover, Toast.LENGTH_SHORT).show()
         }
     }
-    fun moreApps(view: View) {
+    fun moreApps() {
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()))
     }
 
-    fun playPart2(view: View) {
+    fun playPart2() {
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
     }
