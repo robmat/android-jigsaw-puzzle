@@ -137,7 +137,7 @@ class GalleryActivity : AppCompatActivity() {
         FileOutputStream(fileShared).use {
             val buffer = ByteArray(10240)
             var bytesRead: Int
-            while (stream.read(buffer).also { bytesRead = it } != -1) {
+            while (stream.read(buffer).also { bytes -> bytesRead = bytes } != -1) {
                 it.write(buffer, 0, bytesRead)
             }
             it.flush()
