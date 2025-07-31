@@ -21,6 +21,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -67,6 +68,12 @@ class ImagePickActivity : AppCompatActivity() {
                 }
         } catch (e: IOException) {
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
+        }
+        findViewById<AppCompatImageButton>(R.id.cameraButton).setOnClickListener {
+            onImageFromCameraClick()
+        }
+        findViewById<AppCompatImageButton>(R.id.galleryButton).setOnClickListener {
+            onImageFromGalleryClick()
         }
     }
 
@@ -210,7 +217,7 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
-    fun onImageFromCameraClick(view: View?) {
+    fun onImageFromCameraClick() {
         if (checkSelfPermission(Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -244,8 +251,8 @@ class ImagePickActivity : AppCompatActivity() {
                     directory.mkdirs()
                 }
                 val pathToSave = File(directory, "temp.jpg")
-                parcelFileDescriptor?.fileDescriptor?.let {
-                    val inputStream = FileInputStream(it)
+                parcelFileDescriptor?.fileDescriptor?.let { fd ->
+                    val inputStream = FileInputStream(fd)
                     val outputStream = FileOutputStream(pathToSave)
                     inputStream.use { input ->
                         outputStream.use { output ->
@@ -260,13 +267,13 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
-    private var pickImageFromGallery = registerForActivityResult<PickVisualMediaRequest, Uri>(
+    private val pickImageFromGallery = registerForActivityResult<PickVisualMediaRequest, Uri>(
         ActivityResultContracts.PickVisualMedia()
     ) {
         copyFileAndStartGame(it)
     }
 
-    fun onImageFromGalleryClick(view: View?) {
+    fun onImageFromGalleryClick() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             askForReadExternalImagesPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
