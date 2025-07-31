@@ -7,15 +7,35 @@
     android:background="@drawable/table_background"
     tools:context="com.batodev.jigsawpuzzle.activity.PuzzleActivity">
 
-    <com.batodev.jigsawpuzzle.view.ZoomableLayout
-        android:id="@+id/zoomable_layout"
+    <com.otaliastudios.zoom.ZoomLayout
+        android:id="@+id/zoomableLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:clipChildren="false"
+        android:scrollbars="vertical|horizontal"
+        app:hasClickableChildren="true"
+        app:flingEnabled="false"
+        app:oneFingerScrollEnabled="false"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
+<!--        app:alignment="center"-->
+<!--        app:animationDuration="280"-->
+<!--        app:horizontalPanEnabled="true"-->
+<!--        app:maxZoom="2.5"-->
+<!--        app:maxZoomType="zoom"-->
+<!--        app:minZoom="1"-->
+<!--        app:minZoomType="zoom"-->
+<!--        app:overPinchable="true"-->
+<!--        app:overScrollHorizontal="true"-->
+<!--        app:overScrollVertical="true"-->
+<!--        app:scrollEnabled="true"-->
+<!--        app:threeFingersScrollEnabled="true"-->
+<!--        app:transformation="centerInside"-->
+<!--        app:transformationGravity="auto"-->
+<!--        app:twoFingersScrollEnabled="true"-->
+<!--        app:verticalPanEnabled="true"-->
+<!--        app:zoomEnabled="true">-->
 
         <RelativeLayout
             android:id="@+id/layout"
@@ -47,7 +67,7 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </RelativeLayout>
-    </com.batodev.jigsawpuzzle.view.ZoomableLayout>
+    </com.otaliastudios.zoom.ZoomLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

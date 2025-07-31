@@ -32,11 +32,11 @@ import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
 import com.batodev.jigsawpuzzle.view.TouchListener
-import com.batodev.jigsawpuzzle.view.ZoomableLayout
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.bumptech.glide.Glide
 import com.caverock.androidsvg.SVG
+import com.otaliastudios.zoom.ZoomLayout
 import java.io.File
 import java.io.IOException
 import java.util.Random
@@ -48,7 +48,6 @@ class PuzzleActivity : AppCompatActivity() {
     private var puzzlesHeight: Int = 4
     private var puzzlesWidth: Int = 3
     private var pieces: MutableList<PuzzlePiece> = mutableListOf()
-    private lateinit var zoomableLayout: ZoomableLayout
     private var imageFileName: String? = null
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val rateHelper: AppRatingHelper = AppRatingHelper(this)
@@ -65,7 +64,6 @@ class PuzzleActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
-        zoomableLayout = findViewById(R.id.zoomable_layout)
 
         val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
         windowInsetsController.let { controller ->
@@ -76,6 +74,18 @@ class PuzzleActivity : AppCompatActivity() {
         }
 
         val layout = findViewById<RelativeLayout>(R.id.layout)
+        val zoomableLayout = findViewById<ZoomLayout>(R.id.zoomableLayout)
+        val displayMetrics = resources.displayMetrics
+        val params = layout.layoutParams
+        // Manually set layout to screen size and top-left corner because XML match_parent does not work reliably
+        // when parent or children (like ConstraintLayout/ImageView) have insufficient constraints or 0dp sizes.
+        // This ensures the layout always fills the screen regardless of XML or parent measurement issues.
+        params.width = displayMetrics.widthPixels
+        params.height = displayMetrics.heightPixels
+        layout.layoutParams = params
+        layout.x = 0f
+        layout.y = 0f
+
         val imageView = findViewById<ImageView>(R.id.imageView)
         val settings = SettingsHelper.load(this)
         val intent = intent
@@ -86,6 +96,8 @@ class PuzzleActivity : AppCompatActivity() {
         // run image related code after the view was laid out
         // to have all dimensions calculated
         imageView.post {
+            Log.d(PuzzleActivity::class.java.simpleName, "ImageView dimensions: ${imageView.width} x ${imageView.height}")
+            Log.d(PuzzleActivity::class.java.simpleName, "RelativeLayout dimensions: ${layout.width} x ${layout.height}")
             if (imageFileName != null) {
                 setPicFromAsset(imageFileName!!, imageView)
             } else if (intent.getStringExtra("mCurrentPhotoPath") != null) {
