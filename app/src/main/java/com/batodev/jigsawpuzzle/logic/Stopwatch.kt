@@ -9,7 +9,7 @@ import java.util.Locale
  * A class for managing the stopwatch.
  */
 class Stopwatch(private val stopwatchText: TextView) {
-    private var elapsedTime: Int = 0
+    var elapsedTime: Int = 0
     private val stopwatchHandler = Handler(Looper.getMainLooper())
     private lateinit var stopwatchRunnable: Runnable
     private var stopWatchRunning = false

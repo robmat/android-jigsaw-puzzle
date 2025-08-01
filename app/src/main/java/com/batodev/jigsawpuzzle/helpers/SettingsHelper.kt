@@ -57,7 +57,7 @@ object SettingsHelper {
         settings.uncoveredPics = prefs.getString(UNCOVERED_PICS, "")!!.split(SEPARATOR).toMutableList()
         settings.uncoveredPics.remove("")
         val highscoresJson = prefs.getString(HIGHSCORES, "{}") ?: "{}"
-        val type = object : TypeToken<MutableMap<String, MutableList<Int>>>() {}.type
+        val type = object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
         settings.highscores = gson.fromJson(highscoresJson, type)
         return settings
     }
