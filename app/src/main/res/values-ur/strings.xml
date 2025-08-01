@@ -1,41 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-      
+        
+  
   
   <string name="main_menu_activity_unlocked_gallery">انکشاف شدہ تصاویر کی گیلری</string>
-      
+        
+  
   
   <string name="main_menu_activity_more_apps">اس طرح کی مزید ایپس</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_to_uncover">پہلے گیم کھیلیں</string>
-      
+        
+  
   
   <string name="puzzle_activity_play_again">دوبارہ کھیلو</string>
-      
+        
+  
   
   <string name="image_added_to_gallery">نئی تصویر گیلری میں دستیاب ہے۔</string>
-      
+        
+  
   
   <string name="show_image_as_background">پیچھے کی تصویر دکھائیں۔</string>
-      
+        
+  
   
   <string name="how_many_puzzles">کتنے پہیلی کے ٹکڑے ہیں؟</string>
-      
+        
+  
   
   <string name="show_puzzle_grid">پہیلی کی شکلیں دکھائیں۔</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_the_game">چلو کھیلتے ہیں!</string>
-      
+        
+  
   
   <string name="play_sounds">آواز</string>
-      
+        
+  
   
   <string name="wallpaper_ok">تصویر کو آپ کے وال پیپر کے طور پر سیٹ کر دیا گیا ہے۔</string>
-    
+      
+  
   
   <string name="main_menu_activity_play_part_2">پریشان لڑکیاں حصہ 2 ڈاؤن لوڈ کریں۔</string>
+    
   
   <string name="puzzle_activity_we_are_cutting">میں ابھی آپ کی پہیلیاں کاٹ رہا ہوں...\nبس مجھے تھوڑا وقت دیں۔</string>
+  
+  <string name="congratulations_top_10">مبارک ہو، آپ نے اسے تیز ترین حلوں میں سرفہرست 10 میں شامل کر لیا ہے!</string>
+  <string name="high_scores">اعلی اسکورز</string>
 </resources>

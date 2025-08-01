@@ -1,41 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-      
+        
+  
   
   <string name="main_menu_activity_unlocked_gallery">Galerie der enthüllten Bilder</string>
-      
+        
+  
   
   <string name="main_menu_activity_more_apps">Weitere Apps wie diese</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_to_uncover">Spielen Sie zuerst das Spiel</string>
-      
+        
+  
   
   <string name="puzzle_activity_play_again">Nochmal abspielen</string>
-      
+        
+  
   
   <string name="image_added_to_gallery">Neues Bild in der Galerie verfügbar.</string>
-      
+        
+  
   
   <string name="show_image_as_background">Bild hinten anzeigen</string>
-      
+        
+  
   
   <string name="how_many_puzzles">Wie viele Puzzleteile?</string>
-      
+        
+  
   
   <string name="show_puzzle_grid">Puzzleformen anzeigen</string>
-      
+        
+  
   
   <string name="main_menu_activity_play_the_game">Lass uns spielen!</string>
-      
+        
+  
   
   <string name="play_sounds">Klang</string>
-      
+        
+  
   
   <string name="wallpaper_ok">Das Bild wurde als Hintergrundbild festgelegt</string>
-    
+      
+  
   
   <string name="main_menu_activity_play_part_2">Download Puzzled Girls Teil 2</string>
+    
   
   <string name="puzzle_activity_we_are_cutting">Ich schneide jetzt deine Puzzles …\nGib mir einfach etwas Zeit.</string>
+  
+  <string name="congratulations_top_10">Herzlichen Glückwunsch, Sie haben es in die Top 10 der schnellsten Lösungen geschafft!</string>
+  <string name="high_scores">Highscores</string>
 </resources>
