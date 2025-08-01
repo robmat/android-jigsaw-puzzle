@@ -39,6 +39,7 @@ import com.caverock.androidsvg.SVG
 import com.otaliastudios.zoom.ZoomLayout
 import java.io.File
 import java.io.IOException
+import java.util.Locale
 import java.util.Random
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -60,6 +61,11 @@ class PuzzleActivity : AppCompatActivity() {
         R.raw.success_6
     )
 
+    private var elapsedTime: Int = 0
+    private val stopwatchHandler = Handler(Looper.getMainLooper())
+    private lateinit var stopwatchRunnable: Runnable
+    private var stopWatchRunning = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -72,7 +78,8 @@ class PuzzleActivity : AppCompatActivity() {
             // Sticky behavior - bars stay hidden until user swipes
             controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-
+        val stopWatchText = findViewById<TextView>(R.id.stopwatchText)
+        stopWatchText.bringToFront()
         val layout = findViewById<RelativeLayout>(R.id.layout)
         val zoomableLayout = findViewById<ZoomLayout>(R.id.zoomableLayout)
         val displayMetrics = resources.displayMetrics
@@ -141,6 +148,7 @@ class PuzzleActivity : AppCompatActivity() {
             if (progress == max) {
                 progressBar.visibility = View.GONE
                 findViewById<TextView>(R.id.progressText).visibility = View.GONE
+                startStopwatch()
             }
         }
     }
@@ -310,6 +318,7 @@ class PuzzleActivity : AppCompatActivity() {
                 SettingsHelper.save(this, settings)
                 Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
             }
+            stopStopwatch()
             SoundsPlayer.play(winSoundIds.random(), this)
             findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
             AdHelper.showAd(this)
@@ -395,5 +404,25 @@ class PuzzleActivity : AppCompatActivity() {
 
     fun postToHandler(r: Runnable) {
         handler.post(r)
+    }
+
+    private fun startStopwatch() {
+        if (!stopWatchRunning) {
+            stopWatchRunning = true
+            val stopwatchText = findViewById<TextView>(R.id.stopwatchText)
+            stopwatchRunnable = Runnable {
+                elapsedTime++
+                val minutes = (elapsedTime % 3600) / 60
+                val seconds = elapsedTime % 60
+                stopwatchText.text = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
+                stopwatchHandler.postDelayed(stopwatchRunnable, 1000) // Update every second
+            }
+            stopwatchHandler.post(stopwatchRunnable)
+        }
+    }
+
+    private fun stopStopwatch() {
+        stopwatchHandler.removeCallbacks(stopwatchRunnable)
+        stopWatchRunning = false
     }
 }

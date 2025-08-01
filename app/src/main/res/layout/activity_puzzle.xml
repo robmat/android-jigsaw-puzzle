@@ -7,35 +7,52 @@
     android:background="@drawable/table_background"
     tools:context="com.batodev.jigsawpuzzle.activity.PuzzleActivity">
 
+    <TextView
+        android:id="@+id/stopwatchText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="40dp"
+        android:background="#80000000"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:padding="2dp"
+        android:text="00:00"
+        android:textColor="@android:color/white"
+        android:textSize="8sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:ignore="HardcodedText,SmallSp" />
+
     <com.otaliastudios.zoom.ZoomLayout
         android:id="@+id/zoomableLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scrollbars="vertical|horizontal"
-        app:hasClickableChildren="true"
         app:flingEnabled="false"
-        app:oneFingerScrollEnabled="false"
-        app:layout_constraintTop_toTopOf="parent"
+        app:hasClickableChildren="true"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-<!--        app:alignment="center"-->
-<!--        app:animationDuration="280"-->
-<!--        app:horizontalPanEnabled="true"-->
-<!--        app:maxZoom="2.5"-->
-<!--        app:maxZoomType="zoom"-->
-<!--        app:minZoom="1"-->
-<!--        app:minZoomType="zoom"-->
-<!--        app:overPinchable="true"-->
-<!--        app:overScrollHorizontal="true"-->
-<!--        app:overScrollVertical="true"-->
-<!--        app:scrollEnabled="true"-->
-<!--        app:threeFingersScrollEnabled="true"-->
-<!--        app:transformation="centerInside"-->
-<!--        app:transformationGravity="auto"-->
-<!--        app:twoFingersScrollEnabled="true"-->
-<!--        app:verticalPanEnabled="true"-->
-<!--        app:zoomEnabled="true">-->
+        app:layout_constraintTop_toTopOf="parent"
+        app:oneFingerScrollEnabled="false">
+        <!--        app:alignment="center"-->
+        <!--        app:animationDuration="280"-->
+        <!--        app:horizontalPanEnabled="true"-->
+        <!--        app:maxZoom="2.5"-->
+        <!--        app:maxZoomType="zoom"-->
+        <!--        app:minZoom="1"-->
+        <!--        app:minZoomType="zoom"-->
+        <!--        app:overPinchable="true"-->
+        <!--        app:overScrollHorizontal="true"-->
+        <!--        app:overScrollVertical="true"-->
+        <!--        app:scrollEnabled="true"-->
+        <!--        app:threeFingersScrollEnabled="true"-->
+        <!--        app:transformation="centerInside"-->
+        <!--        app:transformationGravity="auto"-->
+        <!--        app:twoFingersScrollEnabled="true"-->
+        <!--        app:verticalPanEnabled="true"-->
+        <!--        app:zoomEnabled="true">-->
 
         <RelativeLayout
             android:id="@+id/layout"
