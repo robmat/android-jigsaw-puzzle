@@ -96,8 +96,8 @@ class PuzzleActivity : AppCompatActivity() {
         // run image related code after the view was laid out
         // to have all dimensions calculated
         imageView.post {
-            Log.d(PuzzleActivity::class.java.simpleName, "ImageView dimensions: ${imageView.width} x ${imageView.height}")
-            Log.d(PuzzleActivity::class.java.simpleName, "RelativeLayout dimensions: ${layout.width} x ${layout.height}")
+            Log.v(PuzzleActivity::class.java.simpleName, "ImageView dimensions: ${imageView.width} x ${imageView.height}")
+            Log.v(PuzzleActivity::class.java.simpleName, "RelativeLayout dimensions: ${layout.width} x ${layout.height}")
             if (imageFileName != null) {
                 setPicFromAsset(imageFileName!!, imageView)
             } else if (intent.getStringExtra("mCurrentPhotoPath") != null) {
