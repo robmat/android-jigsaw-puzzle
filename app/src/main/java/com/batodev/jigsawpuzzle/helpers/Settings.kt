@@ -10,4 +10,5 @@ class Settings {
     var lastSetDifficultyCustomWidth = 3
     var showImageInBackgroundOfThePuzzle = true
     var playSounds = true
+    var highscores: MutableMap<String, MutableList<Int>> = mutableMapOf()
 }
