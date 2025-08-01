@@ -25,6 +25,11 @@ private const val HIGHSCORES = "highscores"
 object SettingsHelper {
     private val gson = Gson()
 
+    /**
+     * Saves the provided {@link Settings} object to shared preferences.
+     * @param context The {@link Context} used to access shared preferences.
+     * @param settings The {@link Settings} object to be saved.
+     */
     fun save(context: Context, settings: Settings) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         prefs.edit {
@@ -43,6 +48,12 @@ object SettingsHelper {
         }
     }
 
+    /**
+     * Loads the application settings from shared preferences.
+     * If no settings are found, default values are used.
+     * @param context The {@link Context} used to access shared preferences.
+     * @return The loaded {@link Settings} object.
+     */
     fun load(context: Context): Settings {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         val settings = Settings()

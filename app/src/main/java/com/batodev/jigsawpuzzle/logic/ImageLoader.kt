@@ -12,6 +12,13 @@ import androidx.exifinterface.media.ExifInterface
  */
 class ImageLoader(private val imageView: ImageView) {
 
+    /**
+     * Loads a bitmap from the application's assets and scales it to fit the ImageView.
+     * @param assetName The name of the asset file (e.g., "image.png").
+     * @param assets The AssetManager instance to access application assets.
+     * @return The scaled and processed {@link Bitmap}.
+     * @throws java.io.IOException if the asset file cannot be opened or read.
+     */
     fun setPicFromAsset(assetName: String, assets: android.content.res.AssetManager): Bitmap {
         val targetW = imageView.width
         val targetH = imageView.height
@@ -21,6 +28,13 @@ class ImageLoader(private val imageView: ImageView) {
         return processBitmap(originalBitmap, targetW, targetH)
     }
 
+    /**
+     * Loads a bitmap from a given file path and scales it to fit the ImageView.
+     * Corrects the orientation of the bitmap based on EXIF data.
+     * @param path The absolute path to the image file.
+     * @return The scaled and processed {@link Bitmap}.
+     * @throws java.io.IOException if the file cannot be opened or read.
+     */
     fun setPicFromPath(path: String): Bitmap {
         val targetW = imageView.width
         val targetH = imageView.height
@@ -37,6 +51,14 @@ class ImageLoader(private val imageView: ImageView) {
         return processBitmap(rotatedBitmap, targetW, targetH)
     }
 
+    /**
+     * Processes a bitmap by cropping and scaling it to fit the target dimensions.
+     * Maintains the aspect ratio by cropping either width or height.
+     * @param bitmap The original {@link Bitmap} to process.
+     * @param targetW The target width for the bitmap.
+     * @param targetH The target height for the bitmap.
+     * @return The cropped and scaled {@link Bitmap}.
+     */
     private fun processBitmap(bitmap: Bitmap, targetW: Int, targetH: Int): Bitmap {
         val origW = bitmap.width
         val origH = bitmap.height
@@ -62,6 +84,12 @@ class ImageLoader(private val imageView: ImageView) {
         return croppedBitmap.scale(targetW, targetH)
     }
 
+    /**
+     * Corrects the orientation of a bitmap based on its EXIF orientation tag.
+     * @param bitmap The {@link Bitmap} to correct.
+     * @param imagePath The path to the image file, used to read EXIF data.
+     * @return The upright {@link Bitmap}.
+     */
     private fun uprightBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
         val exifInterface = ExifInterface(imagePath)
         val orientation = exifInterface.getAttributeInt(

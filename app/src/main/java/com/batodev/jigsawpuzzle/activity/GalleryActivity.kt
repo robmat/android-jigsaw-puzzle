@@ -28,6 +28,13 @@ class GalleryActivity : AppCompatActivity() {
     private var images: MutableList<String> = mutableListOf()
     private var index: Int = 0
 
+    /**
+     * Called when the activity is first created.
+     * Initializes the UI, loads settings, and sets up event listeners.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -53,6 +60,9 @@ class GalleryActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.gallery_wallpaper_btn).setOnClickListener { wallpaperClicked() }
     }
 
+    /**
+     * Checks if the left and right image navigation buttons should be visible based on the current image index.
+     */
     private fun checkIfImageLeftRightButtonsShouldBeVisible() {
         if (index <= 0) {
             findViewById<ImageButton>(R.id.gallery_left).visibility = View.GONE
@@ -66,10 +76,20 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handles the click event for the back button, finishing the activity.
+     */
     fun backClicked() {
         finish()
     }
 
+    /**
+     * Handles the click event for the left navigation button.
+     * Decrements the image index, updates the displayed image, and saves settings.
+     * Shows an ad if applicable.
+     * @see SettingsHelper
+     * @see AdHelper
+     */
     fun leftClicked() {
         if (index != 0) index--
         setImage(index)
@@ -81,6 +101,13 @@ class GalleryActivity : AppCompatActivity() {
         checkIfImageLeftRightButtonsShouldBeVisible()
     }
 
+    /**
+     * Handles the click event for the right navigation button.
+     * Increments the image index, updates the displayed image, and saves settings.
+     * Shows an ad if applicable.
+     * @see SettingsHelper
+     * @see AdHelper
+     */
     fun rightClicked() {
         if (index < images.size) index++
         setImage(index)
@@ -92,6 +119,10 @@ class GalleryActivity : AppCompatActivity() {
         checkIfImageLeftRightButtonsShouldBeVisible()
     }
 
+    /**
+     * Sets the image displayed in the gallery.
+     * @param index The index of the image to display from the {@link #images} list.
+     */
     private fun setImage(index: Int) {
         if (index >= 0 && index < images.size) {
             findViewById<PhotoView>(R.id.gallery_activity_background)
@@ -102,6 +133,11 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handles the click event for the share button.
+     * Copies the current image to a temporary file and shares it using an Intent.
+     * @see FileProvider
+     */
     fun shareClicked() {
         val fileShared = copyToTempFile()
         val shareIntent = Intent(Intent.ACTION_SEND)
@@ -112,6 +148,11 @@ class GalleryActivity : AppCompatActivity() {
         ContextCompat.startActivity(this, shareIntent, null)
     }
 
+    /**
+     * Handles the click event for the wallpaper button.
+     * Sets the current image as the device's wallpaper.
+     * @throws Exception if there is an error setting the wallpaper.
+     */
     fun wallpaperClicked() {
         try {
             val fileShared = copyToTempFile()
@@ -126,6 +167,11 @@ class GalleryActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Copies the currently displayed image to a temporary file.
+     * @return The temporary File object.
+     * @throws java.io.IOException if an I/O error occurs during file operations.
+     */
     private fun copyToTempFile(): File {
         val stream = this.assets.open("img/${images[index]}")
         val dirShared = File(filesDir, "shared")

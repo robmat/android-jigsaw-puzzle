@@ -13,6 +13,9 @@ import kotlin.math.sqrt
 
 /**
  * A touch listener for puzzle pieces.
+ * Handles touch events to allow users to drag and drop puzzle pieces.
+ * @param puzzleGameManager The {@link PuzzleGameManager} instance to interact with game logic.
+ * @param zoomableLayout The {@link ZoomLayout} that contains the puzzle pieces, used for coordinate transformation.
  */
 class TouchListener(
     private val puzzleGameManager: PuzzleGameManager,
@@ -21,6 +24,15 @@ class TouchListener(
     private var xDelta = 0f
     private var yDelta = 0f
 
+    /**
+     * Called when a touch event is dispatched to a view.
+     * Handles dragging of puzzle pieces and checks for game over conditions when a piece is placed.
+     * @param view The {@link View} (puzzle piece) that received the touch event.
+     * @param motionEvent The {@link MotionEvent} object containing full information about the event.
+     * @return True if the listener has consumed the event, false otherwise.
+     * @see PuzzlePiece
+     * @see PuzzleGameManager#checkGameOver()
+     */
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         val x = motionEvent.rawX / zoomableLayout.zoom
         val y = motionEvent.rawY / zoomableLayout.zoom
@@ -72,6 +84,11 @@ class TouchListener(
         return true
     }
 
+    /**
+     * Sends a specified view to the back of its parent's view hierarchy.
+     * This is used to ensure correctly placed puzzle pieces are visually behind movable pieces.
+     * @param child The {@link View} to send to the back.
+     */
     private fun sendViewToBack(child: View) {
         val parent = child.parent as ViewGroup
         parent.removeView(child)

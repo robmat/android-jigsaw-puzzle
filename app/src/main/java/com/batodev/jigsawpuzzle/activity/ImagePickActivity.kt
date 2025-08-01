@@ -47,6 +47,13 @@ private const val DIFF_SPLIT = "X"
 class ImagePickActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private var files: Array<String> = arrayOf()
+    /**
+     * Called when the activity is first created.
+     * Initializes the UI, sets up image selection grid, and configures camera and gallery buttons.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_pick_activity)
@@ -80,6 +87,11 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Displays a popup dialog to configure game settings before starting the puzzle.
+     * @param itemClickedIndex The index of the clicked image in the grid, or null if from camera/gallery.
+     * @param mCurrentPhotoPath The file path of the selected image from camera/gallery, or null if from assets.
+     */
     private fun showStartGamePopup(itemClickedIndex: Int?, mCurrentPhotoPath: String?) {
         val settings = SettingsHelper.load(this)
         val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
@@ -105,6 +117,13 @@ class ImagePickActivity : AppCompatActivity() {
 
     }
 
+    /**
+     * Sets up the checkboxes in the game start popup for various game settings.
+     * @param popupView The inflated view of the game start popup.
+     * @param settings The current {@link Settings} object to bind and save changes to.
+     * @see Settings
+     * @see SettingsHelper
+     */
     private fun setUpCheckboxes(popupView: View, settings: Settings) {
         val backImage = popupView.findViewById<CheckBox>(R.id.background_image_checkbox)
         backImage.setOnCheckedChangeListener { _, value ->
@@ -128,6 +147,13 @@ class ImagePickActivity : AppCompatActivity() {
         playSounds.isChecked = settings.playSounds
     }
 
+    /**
+     * Sets up the difficulty spinner in the game start popup.
+     * @param popupView The inflated view of the game start popup.
+     * @param settings The current {@link Settings} object to retrieve and save difficulty settings.
+     * @see Settings
+     * @see SettingsHelper
+     */
     private fun setUpDiffSpinner(popupView: View, settings: Settings) {
         val dimensionsList = mutableListOf<String>()
         for (i in 3..11) {
@@ -160,6 +186,14 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handles the selection of a difficulty level from the spinner.
+     * Updates the puzzle dimensions in {@link Settings}.
+     * @param difficultyItemClicked The string representation of the selected difficulty.
+     * @param settings The current {@link Settings} object to update.
+     * @see Settings
+     * @see SettingsHelper
+     */
     private fun diffClicked(difficultyItemClicked: String, settings: Settings) {
         val split = difficultyItemClicked.substring(
             difficultyItemClicked.indexOf("(") + 1,
@@ -170,6 +204,13 @@ class ImagePickActivity : AppCompatActivity() {
         SettingsHelper.save(this, settings)
     }
 
+    /**
+     * Starts the {@link PuzzleActivity} with the selected image and dismisses the dialog.
+     * @param itemClickedIndex The index of the clicked image in the grid, or null.
+     * @param mCurrentPhotoPath The file path of the selected image from camera/gallery, or null.
+     * @param alertDialog The AlertDialog to be dismissed after starting the game.
+     * @see PuzzleActivity
+     */
     private fun startTheGame(
         itemClickedIndex: Int?,
         mCurrentPhotoPath: String?,
@@ -187,6 +228,10 @@ class ImagePickActivity : AppCompatActivity() {
         finish()
     }
 
+    /**
+     * Activity result launcher for capturing an image using the camera.
+     * Handles the result of the camera capture and proceeds to show the game start popup.
+     */
     private val cameraActivityResultLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { ar ->
@@ -197,6 +242,15 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Callback for the result of requesting permissions.
+     * Handles camera and external storage permission requests.
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     */
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
@@ -220,6 +274,10 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Initiates the process of capturing an image from the camera.
+     * Requests camera permission if not already granted.
+     */
     fun onImageFromCameraClick() {
         if (checkSelfPermission(Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
@@ -234,6 +292,10 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Sets the URI for the image captured by the camera.
+     * Creates a directory for camera images if it doesn't exist.
+     */
     private fun setImageUri() {
         val directory = File(filesDir, "camera_images")
         if (!directory.exists()) {
@@ -246,6 +308,11 @@ class ImagePickActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Copies the selected image from the gallery to a temporary file and starts the game.
+     * @param it The URI of the selected image.
+     * @throws IOException if an I/O error occurs during file copying.
+     */
     private fun copyFileAndStartGame(it: Uri?) {
         it?.let {
             contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
@@ -270,12 +337,20 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Activity result launcher for picking an image from the gallery.
+     * Handles the result of the gallery selection and proceeds to copy the file and show the game start popup.
+     */
     private val pickImageFromGallery = registerForActivityResult<PickVisualMediaRequest, Uri>(
         ActivityResultContracts.PickVisualMedia()
     ) {
         copyFileAndStartGame(it)
     }
 
+    /**
+     * Initiates the process of picking an image from the gallery.
+     * Requests appropriate external storage permissions based on Android version.
+     */
     fun onImageFromGalleryClick() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             askForReadExternalImagesPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -284,6 +359,10 @@ class ImagePickActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Requests the specified external storage permission.
+     * @param readExternalStorage The permission string to request (e.g., {@link Manifest.permission#READ_EXTERNAL_STORAGE}).
+     */
     private fun askForReadExternalImagesPermission(readExternalStorage: String) {
         if (checkSelfPermission(
                 readExternalStorage

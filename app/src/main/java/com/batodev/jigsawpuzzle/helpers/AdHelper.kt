@@ -15,6 +15,13 @@ const val AD_ID = "ca-app-pub-9667420067790140/7403183964"
 object AdHelper {
     private var ad: InterstitialAd? = null
 
+    /**
+     * Shows an interstitial ad if the ad counter reaches the display threshold.
+     * The ad counter is reset after showing the ad.
+     * @param activity The {@link Activity} context used to show the ad.
+     * @see SettingsHelper
+     * @see #showAd(Activity)
+     */
     fun showAdIfNeeded(activity: Activity) {
         val settings = SettingsHelper.load(activity)
         if (settings.addCounter >= settings.displayAddEveryXPicView) {
@@ -24,11 +31,20 @@ object AdHelper {
         }
     }
 
+    /**
+     * Displays the loaded interstitial ad and then reloads a new ad.
+     * @param activity The {@link Activity} context used to show the ad.
+     * @see #loadAd(Activity)
+     */
     fun showAd(activity: Activity) {
         ad?.show(activity)
         loadAd(activity)
     }
 
+    /**
+     * Loads an interstitial ad. The loaded ad is stored in a private variable.
+     * @param activity The {@link Activity} context used to load the ad.
+     */
     fun loadAd(activity: Activity) {
         val adRequest: AdRequest = AdRequest.Builder().build()
 

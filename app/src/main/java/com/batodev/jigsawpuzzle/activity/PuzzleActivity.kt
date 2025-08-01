@@ -45,6 +45,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     private lateinit var stopwatch: Stopwatch
     private lateinit var puzzleGameManager: PuzzleGameManager
 
+    /**
+     * Called when the activity is first created.
+     * Initializes the UI, loads settings, and sets up event listeners.
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -99,6 +106,12 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         rateHelper.requestReview()
     }
 
+    /**
+     * Callback for puzzle cutting progress updates.
+     * Updates the progress bar and hides it when cutting is complete, then starts the stopwatch.
+     * @param progress The current progress value.
+     * @param max The maximum progress value.
+     */
     override fun onProgressUpdate(progress: Int, max: Int) {
         handler.post {
             val progressBar = findViewById<ProgressBar>(R.id.progressBar)
@@ -112,10 +125,24 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
     }
 
+    /**
+     * Callback indicating that the puzzle cutting process has finished.
+     * Triggers the scattering of puzzle pieces on the game board.
+     */
     override fun onCuttingFinished() {
         puzzleGameManager.scatterPieces()
     }
 
+    /**
+     * Handles the game over state.
+     * Displays confetti, adds the uncovered image to the gallery, stops the stopwatch,
+     * plays a win sound, shows the play again button, and displays an ad.
+     * Also updates and shows high scores.
+     * @see AdHelper
+     * @see SettingsHelper
+     * @see Stopwatch
+     * @see PuzzleGameManager
+     */
     fun onGameOver() {
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
@@ -137,6 +164,15 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         updateAndShowHighScores(elapsedTime, difficultyKey, settings)
     }
 
+    /**
+     * Updates the high scores for a given difficulty and displays the high score popup.
+     * If the new score is among the top 10, a congratulatory toast is shown.
+     * @param newTime The elapsed time for the current puzzle solution in seconds.
+     * @param difficultyKey A string representing the puzzle difficulty (e.g., "3x5").
+     * @param settings The current {@link Settings} object containing high scores.
+     * @see Settings
+     * @see SettingsHelper
+     */
     private fun updateAndShowHighScores(newTime: Int, difficultyKey: String, settings: Settings) {
         val highScores = settings.highscores.getOrPut(difficultyKey) { mutableListOf() }
 
@@ -172,6 +208,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
     }
 
+    /**
+     * Displays the high score popup with the top 10 scores for a given difficulty.
+     * The new score, if it made it into the top 10, is highlighted in bold.
+     * @param difficultyKey A string representing the puzzle difficulty (e.g., "3x5").
+     * @param highScores The list of high score strings to display.
+     * @param newScoreIndex The index of the newly achieved score in the highScores list, or -1 if not in top 10.
+     */
     @SuppressLint("SetTextI18n")
     private fun showHighScorePopup(
         difficultyKey: String,
@@ -211,6 +254,11 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
     }
 
+    /**
+     * Posts a {@link Runnable} to the main thread's handler.
+     * This is used for UI updates that need to be performed on the main thread.
+     * @param r The {@link Runnable} to be executed.
+     */
     override fun postToHandler(r: Runnable) {
         handler.post(r)
     }

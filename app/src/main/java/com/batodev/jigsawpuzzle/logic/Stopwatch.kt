@@ -7,6 +7,7 @@ import java.util.Locale
 
 /**
  * A class for managing the stopwatch.
+ * @param stopwatchText The {@link TextView} to display the elapsed time.
  */
 class Stopwatch(private val stopwatchText: TextView) {
     var elapsedTime: Int = 0
@@ -14,6 +15,9 @@ class Stopwatch(private val stopwatchText: TextView) {
     private lateinit var stopwatchRunnable: Runnable
     private var stopWatchRunning = false
 
+    /**
+     * Starts the stopwatch. The elapsed time will be updated every second.
+     */
     fun start() {
         if (!stopWatchRunning) {
             stopWatchRunning = true
@@ -28,6 +32,9 @@ class Stopwatch(private val stopwatchText: TextView) {
         }
     }
 
+    /**
+     * Stops the stopwatch. The elapsed time will no longer be updated.
+     */
     fun stop() {
         stopwatchHandler.removeCallbacks(stopwatchRunnable)
         stopWatchRunning = false

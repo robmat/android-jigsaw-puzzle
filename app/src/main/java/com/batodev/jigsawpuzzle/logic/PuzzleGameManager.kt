@@ -41,6 +41,16 @@ class PuzzleGameManager(
         R.raw.ok_16, R.raw.ok_17, R.raw.ok_18
     )
 
+    /**
+     * Creates the puzzle pieces from the given bitmap and initializes their positions.
+     * It also draws the puzzle grid and/or background image on the ImageView based on settings.
+     * @param bitmap The source {@link Bitmap} to create puzzle pieces from.
+     * @param puzzlesWidth The desired number of puzzle pieces horizontally.
+     * @param puzzlesHeight The desired number of puzzle pieces vertically.
+     * @see PuzzleCurvesGenerator
+     * @see PuzzleCutter
+     * @see PuzzlePiece
+     */
     fun createPuzzle(bitmap: Bitmap, puzzlesWidth: Int, puzzlesHeight: Int) {
         val puzzleCurvesGenerator = PuzzleCurvesGenerator()
         puzzleCurvesGenerator.width = bitmap.width.toDouble()
@@ -91,6 +101,12 @@ class PuzzleGameManager(
         PuzzleCutter.cut(bitmap, puzzlesHeight, puzzlesWidth, svgString, imageView, puzzleProgressListener, pieces)
     }
 
+    /**
+     * Randomly scatters the puzzle pieces on the game layout.
+     * Each piece is assigned a random position within the layout boundaries.
+     * @see TouchListener
+     * @see PuzzlePiece
+     */
     fun scatterPieces() {
         val touchListener = TouchListener(this, zoomableLayout)
         pieces.shuffle()
@@ -111,6 +127,13 @@ class PuzzleGameManager(
         }
     }
 
+    /**
+     * Checks if the game is over (all puzzle pieces are in their correct positions).
+     * If the game is over, it triggers the {@link PuzzleActivity#onGameOver()} method.
+     * Otherwise, it plays a random "ok" sound.
+     * @see PuzzleActivity#onGameOver()
+     * @see SoundsPlayer
+     */
     fun checkGameOver() {
         if (isGameOver()) {
             (activity as PuzzleActivity).onGameOver()
@@ -119,6 +142,11 @@ class PuzzleGameManager(
         }
     }
 
+    /**
+     * Determines if all puzzle pieces are in their final, unmovable positions.
+     * @return True if the game is over, false otherwise.
+     * @see PuzzlePiece#canMove
+     */
     private fun isGameOver(): Boolean {
         for (piece in pieces) {
             if (piece.canMove) {
@@ -128,6 +156,10 @@ class PuzzleGameManager(
         return true
     }
 
+    /**
+     * Plays a random win sound from the predefined list of win sound IDs.
+     * @see SoundsPlayer
+     */
     fun playWinSound() {
         SoundsPlayer.play(winSoundIds.random(), activity)
     }

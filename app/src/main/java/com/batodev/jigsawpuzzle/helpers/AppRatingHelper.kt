@@ -21,6 +21,10 @@ class AppRatingHelper(private val activity: Activity) {
         return@lazy ReviewManagerFactory.create(activity)
     }
 
+    /**
+     * Requests an in-app review from the user. The review dialog is shown randomly.
+     * If the in-app review fails, it falls back to opening the app's page in the Play Store.
+     */
     fun requestReview() {
         if (Random().nextInt(5) == 0) {
             try {
@@ -51,6 +55,10 @@ class AppRatingHelper(private val activity: Activity) {
         }
     }
 
+    /**
+     * Falls back to opening the app's page in the Google Play Store.
+     * This method is called if the in-app review flow encounters an error.
+     */
     private fun fallbackToPlayStore() {
         // Fallback to opening Play Store if in-app review fails
         val packageName = activity.packageName
