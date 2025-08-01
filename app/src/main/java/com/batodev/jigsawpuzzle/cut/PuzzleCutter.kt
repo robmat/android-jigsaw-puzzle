@@ -5,7 +5,10 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.widget.ImageView
-import com.batodev.jigsawpuzzle.activity.PuzzleActivity
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.get
+import androidx.core.graphics.set
+import com.batodev.jigsawpuzzle.logic.PuzzleProgressListener
 import com.batodev.jigsawpuzzle.view.PuzzlePiece
 import com.caverock.androidsvg.SVG
 import com.caverock.androidsvg.SVGParseException
@@ -13,11 +16,8 @@ import java.util.ArrayDeque
 import java.util.Queue
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
-import androidx.core.graphics.createBitmap
-import androidx.core.graphics.get
-import androidx.core.graphics.set
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Consumer
 
 object PuzzleCutter {
     private val numProcessors = Runtime.getRuntime().availableProcessors()
@@ -28,7 +28,7 @@ object PuzzleCutter {
         cols: Int,
         svgString: String?,
         imageView: ImageView,
-        puzzleActivity: PuzzleActivity,
+        puzzleProgressListener: PuzzleProgressListener,
         pieces: List<PuzzlePiece>,
     ): List<Bitmap> {
         val result: MutableList<Bitmap> = ArrayList()
@@ -73,10 +73,10 @@ object PuzzleCutter {
                         piece.xCoord = regionMinX + imageView.left + 4
                         piece.yCoord = regionMinY + imageView.top + 7
                     }
-                    puzzleActivity.postToHandler(setPuzzleImageAndPositions)
+                    puzzleProgressListener.postToHandler(setPuzzleImageAndPositions)
                     val progress = progressCounter.incrementAndGet()
-                    puzzleActivity.postToHandler {
-                        puzzleActivity.updateProgress(progress, rows * cols)
+                    puzzleProgressListener.postToHandler {
+                        puzzleProgressListener.onProgressUpdate(progress, rows * cols)
                     }
                 }
                 executor.submit(puzzleCutJob)
@@ -91,7 +91,7 @@ object PuzzleCutter {
             } catch (e: InterruptedException) {
                 throw RuntimeException(e)
             }
-            puzzleActivity.postToHandler { puzzleActivity.updateProgress(rows * cols, rows * cols) }
+            puzzleProgressListener.postToHandler { puzzleProgressListener.onCuttingFinished() }
         }.start()
         return result
     }

@@ -5,10 +5,10 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.util.Log
 import androidx.core.net.toUri
+import com.google.android.play.core.review.ReviewException
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
-import com.google.android.play.core.review.ReviewException
 import java.util.Random
 
 class AppRatingHelper(private val activity: Activity) {

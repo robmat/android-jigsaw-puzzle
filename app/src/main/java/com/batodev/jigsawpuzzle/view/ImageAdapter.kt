@@ -16,10 +16,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
-import com.batodev.jigsawpuzzle.helpers.SettingsHelper.load
-import java.io.IOException
 import androidx.core.graphics.createBitmap
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.SettingsHelper.load
+import java.io.IOException
 
 class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     private val am: AssetManager = mContext.assets

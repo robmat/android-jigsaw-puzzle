@@ -6,40 +6,17 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.RelativeLayout
-import com.batodev.jigsawpuzzle.R
-import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
-import com.batodev.jigsawpuzzle.activity.PuzzleActivity
+import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
 import com.otaliastudios.zoom.ZoomLayout
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 class TouchListener(
-    private val activity: PuzzleActivity,
+    private val puzzleGameManager: PuzzleGameManager,
     private val zoomableLayout: ZoomLayout
 ) : OnTouchListener {
     private var xDelta = 0f
     private var yDelta = 0f
-
-    private val okSoundsIds = listOf(
-        R.raw.ok_1,
-        R.raw.ok_2,
-        R.raw.ok_3,
-        R.raw.ok_4,
-        R.raw.ok_5,
-        R.raw.ok_6,
-        R.raw.ok_7,
-        R.raw.ok_8,
-        R.raw.ok_9,
-        R.raw.ok_10,
-        R.raw.ok_11,
-        R.raw.ok_12,
-        R.raw.ok_13,
-        R.raw.ok_14,
-        R.raw.ok_15,
-        R.raw.ok_16,
-        R.raw.ok_17,
-        R.raw.ok_18
-    )
 
     override fun onTouch(view: View, motionEvent: MotionEvent): Boolean {
         val x = motionEvent.rawX / zoomableLayout.zoom
@@ -83,8 +60,7 @@ class TouchListener(
                     piece.layoutParams = lParams
                     piece.canMove = false
                     sendViewToBack(piece)
-                    activity.checkGameOver()
-                    SoundsPlayer.play(okSoundsIds.random(), activity)
+                    puzzleGameManager.checkGameOver()
                 }
                 view.performClick()
             }

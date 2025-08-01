@@ -26,10 +26,10 @@ import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.batodev.jigsawpuzzle.view.ImageAdapter
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
+import com.batodev.jigsawpuzzle.view.ImageAdapter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
