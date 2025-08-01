@@ -41,6 +41,9 @@ private const val EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 2
 
 private const val DIFF_SPLIT = "X"
 
+/**
+ * An activity for picking an image from the gallery or camera to use in the puzzle.
+ */
 class ImagePickActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private var files: Array<String> = arrayOf()

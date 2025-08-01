@@ -9,6 +9,9 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback
 
 const val AD_ID = "ca-app-pub-9667420067790140/7403183964"
 
+/**
+ * A helper object for displaying ads.
+ */
 object AdHelper {
     private var ad: InterstitialAd? = null
 

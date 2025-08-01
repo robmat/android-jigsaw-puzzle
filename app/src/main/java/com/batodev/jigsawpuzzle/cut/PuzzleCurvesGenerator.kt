@@ -4,6 +4,9 @@ import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+/**
+ * A class for generating the SVG curves for the puzzle pieces.
+ */
 class PuzzleCurvesGenerator {
     fun generateSvg(): String {
         var data = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\" "

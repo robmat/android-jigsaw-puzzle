@@ -21,6 +21,9 @@ import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
 import java.io.FileOutputStream
 
+/**
+ * An activity for displaying a gallery of unlocked images.
+ */
 class GalleryActivity : AppCompatActivity() {
     private var images: MutableList<String> = mutableListOf()
     private var index: Int = 0

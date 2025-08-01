@@ -19,6 +19,9 @@ private const val SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE = "showImageInBackgroun
 private const val PLAY_SOUNDS = "playSounds"
 private const val HIGHSCORES = "highscores"
 
+/**
+ * A helper object for saving and loading application settings.
+ */
 object SettingsHelper {
     private val gson = Gson()
 

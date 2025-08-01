@@ -7,6 +7,9 @@ import android.widget.ImageView
 import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
 
+/**
+ * A class for loading and processing images for the puzzle.
+ */
 class ImageLoader(private val imageView: ImageView) {
 
     fun setPicFromAsset(assetName: String, assets: android.content.res.AssetManager): Bitmap {

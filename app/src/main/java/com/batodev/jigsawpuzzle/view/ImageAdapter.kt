@@ -21,6 +21,9 @@ import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper.load
 import java.io.IOException
 
+/**
+ * An adapter for displaying images in a grid view.
+ */
 class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     private val am: AssetManager = mContext.assets
     private var files: Array<String>? = null

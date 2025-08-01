@@ -1,5 +1,8 @@
 package com.batodev.jigsawpuzzle.helpers
 
+/**
+ * A data class for storing the application settings.
+ */
 class Settings {
     var uncoveredPics: MutableList<String> = ArrayList()
     var lastSeenPic = 0

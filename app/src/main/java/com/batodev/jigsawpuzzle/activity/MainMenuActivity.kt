@@ -15,6 +15,9 @@ import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 
+/**
+ * The main menu activity of the application.
+ */
 class MainMenuActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -11,6 +11,9 @@ import com.otaliastudios.zoom.ZoomLayout
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+/**
+ * A touch listener for puzzle pieces.
+ */
 class TouchListener(
     private val puzzleGameManager: PuzzleGameManager,
     private val zoomableLayout: ZoomLayout

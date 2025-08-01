@@ -19,6 +19,9 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
 
+/**
+ * An object for cutting the puzzle pieces from the source image.
+ */
 object PuzzleCutter {
     private val numProcessors = Runtime.getRuntime().availableProcessors()
     @Throws(SVGParseException::class)

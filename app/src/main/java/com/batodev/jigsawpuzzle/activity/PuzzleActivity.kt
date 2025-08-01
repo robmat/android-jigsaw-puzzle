@@ -26,6 +26,9 @@ import com.bumptech.glide.Glide
 import com.otaliastudios.zoom.ZoomLayout
 import java.io.File
 
+/**
+ * The main activity for the puzzle game.
+ */
 class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     private var imageFileName: String? = null
     private val handler: Handler = Handler(Looper.getMainLooper())

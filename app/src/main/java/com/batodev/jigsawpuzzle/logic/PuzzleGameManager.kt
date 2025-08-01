@@ -19,6 +19,9 @@ import com.caverock.androidsvg.SVG
 import com.otaliastudios.zoom.ZoomLayout
 import java.util.Random
 
+/**
+ * A class for managing the puzzle game logic.
+ */
 class PuzzleGameManager(
     private val activity: AppCompatActivity,
     private val layout: RelativeLayout,

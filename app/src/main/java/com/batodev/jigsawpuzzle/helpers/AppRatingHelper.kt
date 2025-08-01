@@ -11,6 +11,9 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import com.google.android.play.core.review.model.ReviewErrorCode
 import java.util.Random
 
+/**
+ * A helper class for requesting app ratings.
+ */
 class AppRatingHelper(private val activity: Activity) {
 
     private val manager: ReviewManager by lazy {

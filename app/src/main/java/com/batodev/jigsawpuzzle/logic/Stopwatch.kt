@@ -5,6 +5,9 @@ import android.os.Looper
 import android.widget.TextView
 import java.util.Locale
 
+/**
+ * A class for managing the stopwatch.
+ */
 class Stopwatch(private val stopwatchText: TextView) {
     private var elapsedTime: Int = 0
     private val stopwatchHandler = Handler(Looper.getMainLooper())
