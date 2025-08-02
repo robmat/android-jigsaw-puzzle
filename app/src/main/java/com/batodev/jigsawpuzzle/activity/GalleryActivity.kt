@@ -161,8 +161,7 @@ class GalleryActivity : AppCompatActivity() {
             wallpaperManager.setBitmap(bitmap)
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            // Obsługa błędów
-            Log.e(GalleryActivity::class.java.simpleName, "Błąd podczas ustawiania tapety", e)
+            Log.e(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
             Toast.makeText(this, "Error: $e" , Toast.LENGTH_SHORT).show()
         }
     }
