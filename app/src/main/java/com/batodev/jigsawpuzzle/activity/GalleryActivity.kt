@@ -1,11 +1,16 @@
 package com.batodev.jigsawpuzzle.activity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -27,6 +32,7 @@ import java.io.FileOutputStream
 class GalleryActivity : AppCompatActivity() {
     private var images: MutableList<String> = mutableListOf()
     private var index: Int = 0
+    private var isAnimating: Boolean = false
 
     /**
      * Called when the activity is first created.
@@ -64,16 +70,8 @@ class GalleryActivity : AppCompatActivity() {
      * Checks if the left and right image navigation buttons should be visible based on the current image index.
      */
     private fun checkIfImageLeftRightButtonsShouldBeVisible() {
-        if (index <= 0) {
-            findViewById<ImageButton>(R.id.gallery_left).visibility = View.GONE
-        } else {
-            findViewById<ImageButton>(R.id.gallery_left).visibility = View.VISIBLE
-        }
-        if (index >= images.size - 1) {
-            findViewById<ImageButton>(R.id.gallery_right).visibility = View.GONE
-        } else {
-            findViewById<ImageButton>(R.id.gallery_right).visibility = View.VISIBLE
-        }
+        findViewById<ImageButton>(R.id.gallery_left).visibility = if (index <= 0) View.GONE else View.VISIBLE
+        findViewById<ImageButton>(R.id.gallery_right).visibility = if (index >= images.size - 1) View.GONE else View.VISIBLE
     }
 
     /**
@@ -91,14 +89,14 @@ class GalleryActivity : AppCompatActivity() {
      * @see AdHelper
      */
     fun leftClicked() {
-        if (index != 0) index--
-        setImage(index)
-        val settings = SettingsHelper.load(this)
-        settings.lastSeenPic = index
-        settings.addCounter++
-        SettingsHelper.save(this, settings)
-        AdHelper.showAdIfNeeded(this)
-        checkIfImageLeftRightButtonsShouldBeVisible()
+        if (index > 0 && !isAnimating) {
+            animateImageChange(-1)
+            val settings = SettingsHelper.load(this)
+            settings.lastSeenPic = index - 1
+            settings.addCounter++
+            SettingsHelper.save(this, settings)
+            AdHelper.showAdIfNeeded(this)
+        }
     }
 
     /**
@@ -109,14 +107,68 @@ class GalleryActivity : AppCompatActivity() {
      * @see AdHelper
      */
     fun rightClicked() {
-        if (index < images.size) index++
-        setImage(index)
-        val settings = SettingsHelper.load(this)
-        settings.lastSeenPic = index
-        settings.addCounter++
-        SettingsHelper.save(this, settings)
-        AdHelper.showAdIfNeeded(this)
-        checkIfImageLeftRightButtonsShouldBeVisible()
+        if (index < images.size - 1 && !isAnimating) {
+            animateImageChange(1)
+            val settings = SettingsHelper.load(this)
+            settings.lastSeenPic = index + 1
+            settings.addCounter++
+            SettingsHelper.save(this, settings)
+            AdHelper.showAdIfNeeded(this)
+        }
+    }
+
+    private fun animateImageChange(direction: Int) {
+        isAnimating = true
+        val photoView = findViewById<PhotoView>(R.id.gallery_activity_background)
+        val duration = 200L
+
+        val (pivotXOut, pivotXIn) = if (direction == 1) {
+            Pair(0f, photoView.width.toFloat()) // Shrink to left, grow from right
+        } else {
+            Pair(photoView.width.toFloat(), 0f) // Shrink to right, grow from left
+        }
+
+        photoView.pivotX = pivotXOut
+        photoView.pivotY = photoView.height / 2f
+
+        val outSet = AnimatorSet().apply {
+            playTogether(
+                ObjectAnimator.ofFloat(photoView, "scaleX", 1f, 0f),
+                ObjectAnimator.ofFloat(photoView, "scaleY", 1f, 0f)
+            )
+            this.duration = duration
+            interpolator = AccelerateDecelerateInterpolator()
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    if (direction == 1) {
+                        index++
+                    } else {
+                        index--
+                    }
+                    setImage(index)
+                    checkIfImageLeftRightButtonsShouldBeVisible()
+
+                    photoView.pivotX = pivotXIn
+                    photoView.pivotY = photoView.height / 2f
+
+                    AnimatorSet().apply {
+                        playTogether(
+                            ObjectAnimator.ofFloat(photoView, "scaleX", 0f, 1f),
+                            ObjectAnimator.ofFloat(photoView, "scaleY", 0f, 1f)
+                        )
+                        this.duration = duration
+                        interpolator = AccelerateDecelerateInterpolator()
+                        addListener(object: AnimatorListenerAdapter() {
+                            override fun onAnimationEnd(animation: Animator) {
+                                isAnimating = false
+                            }
+                        })
+                        start()
+                    }
+                }
+            })
+        }
+        outSet.start()
     }
 
     /**
@@ -128,8 +180,6 @@ class GalleryActivity : AppCompatActivity() {
             findViewById<PhotoView>(R.id.gallery_activity_background)
                 .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("img/${images[index]}")))
             this.index = index
-        } else {
-            setImage(index - 1)
         }
     }
 
