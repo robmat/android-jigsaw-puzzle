@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_unlocked_gallery">प्रकट चित्रों की गैलरी</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_more_apps">इस तरह के और भी ऐप्स</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_play_to_uncover">पहले गेम खेलें</string>
-        
-  
-  
+
+
+
   <string name="puzzle_activity_play_again">फिर से चालू करें</string>
-        
-  
-  
+
+
+
   <string name="image_added_to_gallery">गैलरी में नई छवि उपलब्ध है.</string>
-        
-  
-  
+
+
+
   <string name="show_image_as_background">पीछे छवि दिखाएँ</string>
-        
-  
-  
+
+
+
   <string name="how_many_puzzles">पहेली के कितने टुकड़े?</string>
-        
-  
-  
+
+
+
   <string name="show_puzzle_grid">पहेली आकृतियाँ दिखाएँ</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_play_the_game">आइए खेलते हैं!</string>
-        
-  
-  
+
+
+
   <string name="play_sounds">आवाज़</string>
-        
-  
-  
+
+
+
   <string name="wallpaper_ok">चित्र को आपके वॉलपेपर के रूप में सेट कर दिया गया है</string>
-      
-  
-  
+
+
+
   <string name="main_menu_activity_play_part_2">डाउनलोड करें Puzzled Girls भाग 2</string>
-    
-  
-  <string name="puzzle_activity_we_are_cutting">मैं अभी आपकी पहेलियाँ सुलझा रहा हूँ... बस मुझे थोड़ा समय दो।</string>
-  
+
+
+  <string name="puzzle_activity_we_are_cutting">मैं अभी आपकी पहेलियाँ सुलझा रहा हूँ… बस मुझे थोड़ा समय दो।</string>
+
   <string name="congratulations_top_10">बधाई हो, आप सबसे तेज़ समाधानों में शीर्ष 10 में शामिल हो गए हैं!</string>
   <string name="high_scores">उच्च अंक</string>
 </resources>

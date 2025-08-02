@@ -1,57 +1,57 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_unlocked_gallery">Галерея раскрытых фотографий</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_more_apps">Больше подобных приложений</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_play_to_uncover">Сначала поиграй в игру</string>
-        
-  
-  
+
+
+
   <string name="puzzle_activity_play_again">Играй еще раз</string>
-        
-  
-  
+
+
+
   <string name="image_added_to_gallery">Новое изображение доступно в галерее.</string>
-        
-  
-  
+
+
+
   <string name="show_image_as_background">Показать изображение сзади</string>
-        
-  
-  
+
+
+
   <string name="how_many_puzzles">Сколько частей головоломки?</string>
-        
-  
-  
+
+
+
   <string name="show_puzzle_grid">Показать формы головоломки</string>
-        
-  
-  
+
+
+
   <string name="main_menu_activity_play_the_game">Давайте играть!</string>
-        
-  
-  
+
+
+
   <string name="play_sounds">Звук</string>
-        
-  
-  
+
+
+
   <string name="wallpaper_ok">Картинка установлена ​​в качестве обоев.</string>
-      
-  
-  
+
+
+
   <string name="main_menu_activity_play_part_2">Скачать Puzzled Girls часть 2</string>
-    
-  
-  <string name="puzzle_activity_we_are_cutting">Я сейчас режу твои пазлы...\nДай мне немного времени.</string>
-  
+
+
+  <string name="puzzle_activity_we_are_cutting">Я сейчас режу твои пазлы…\nДай мне немного времени.</string>
+
   <string name="congratulations_top_10">Поздравляем, вы попали в десятку самых быстрых решений!</string>
   <string name="high_scores">Высокие баллы</string>
 </resources>
