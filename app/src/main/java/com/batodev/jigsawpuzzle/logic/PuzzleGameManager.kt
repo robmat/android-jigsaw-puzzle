@@ -1,8 +1,11 @@
 package com.batodev.jigsawpuzzle.logic
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
@@ -113,6 +116,11 @@ class PuzzleGameManager(
         for (piece in pieces) {
             piece.setOnTouchListener(touchListener)
             layout.addView(piece)
+
+            // Initial state for animation
+            piece.scaleX = 0f
+            piece.scaleY = 0f
+
             val lParams = piece.layoutParams as RelativeLayout.LayoutParams
             lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
             val imageViewBottom = imageView.bottom
@@ -124,6 +132,16 @@ class PuzzleGameManager(
                 minTopMargin
             }
             piece.layoutParams = lParams
+
+            // Animate the piece
+            val scaleXAnimator = ObjectAnimator.ofFloat(piece, "scaleX", 0f, 1f)
+            val scaleYAnimator = ObjectAnimator.ofFloat(piece, "scaleY", 0f, 1f)
+            val animatorSet = AnimatorSet()
+            animatorSet.playTogether(scaleXAnimator, scaleYAnimator)
+            animatorSet.duration = 500 // milliseconds
+            animatorSet.startDelay = Random().nextInt(1501).toLong() // Random delay between 0 and 1500 ms
+            animatorSet.interpolator = AccelerateDecelerateInterpolator()
+            animatorSet.start()
         }
     }
 
