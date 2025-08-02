@@ -86,8 +86,8 @@ object PuzzleCutter {
                         piece.setImageBitmap(puzzleBitmap)
                         piece.pieceWidth = regionWidth
                         piece.pieceHeight = regionHeight
-                        piece.xCoord = regionMinX + imageView.left + 4
-                        piece.yCoord = regionMinY + imageView.top + 7
+                        piece.xCoord = regionMinX + imageView.left
+                        piece.yCoord = regionMinY + imageView.top
                     }
                     puzzleProgressListener.postToHandler(setPuzzleImageAndPositions)
                     val progress = progressCounter.incrementAndGet()
