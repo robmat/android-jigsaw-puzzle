@@ -1,9 +1,15 @@
 package com.batodev.jigsawpuzzle.activity
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler // Added import
+import android.os.Looper // Added import
+import android.view.View
 import android.view.Window
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
@@ -41,11 +47,53 @@ class MainMenuActivity : Activity() {
 
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
-        findViewById<Button>(R.id.main_menu_activity_play_the_game).setOnClickListener { play() }
-        findViewById<Button>(R.id.main_menu_activity_unlocked_gallery).setOnClickListener { gallery() }
-        findViewById<Button>(R.id.main_menu_activity_more_apps).setOnClickListener { moreApps() }
-        findViewById<Button>(R.id.main_menu_activity_play_part_2).setOnClickListener { playPart2() }
-        findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo).setOnClickListener { moreApps() }
+        val playButton = findViewById<Button>(R.id.main_menu_activity_play_the_game)
+        val galleryButton = findViewById<Button>(R.id.main_menu_activity_unlocked_gallery)
+        val moreAppsButton = findViewById<Button>(R.id.main_menu_activity_more_apps)
+        val playPart2Button = findViewById<Button>(R.id.main_menu_activity_play_part_2)
+        val emberfoxLogo = findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo)
+
+        // Set initial visibility to INVISIBLE
+        playButton.visibility = View.INVISIBLE
+        galleryButton.visibility = View.INVISIBLE
+        moreAppsButton.visibility = View.INVISIBLE
+        playPart2Button.visibility = View.INVISIBLE
+        emberfoxLogo.visibility = View.INVISIBLE
+
+        playButton.setOnClickListener { play() }
+        galleryButton.setOnClickListener { gallery() }
+        moreAppsButton.setOnClickListener { moreApps() }
+        playPart2Button.setOnClickListener { playPart2() }
+        emberfoxLogo.setOnClickListener { moreApps() }
+
+
+        // Delay the menu button animations
+        Handler(Looper.getMainLooper()).postDelayed({
+            animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
+        }, 500) // Corrected to 9.5 seconds delay
+    }
+
+    private fun animateMenuButtons(vararg views: View) {
+        for ((index, view) in views.withIndex()) {
+            // Make view visible just before animation starts
+            view.visibility = View.VISIBLE
+
+            view.alpha = 0f
+            view.scaleX = 0.5f
+            view.scaleY = 0.5f
+
+            val animator = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(view, "alpha", 0f, 1f),
+                    ObjectAnimator.ofFloat(view, "scaleX", 0.5f, 1f),
+                    ObjectAnimator.ofFloat(view, "scaleY", 0.5f, 1f)
+                )
+                duration = 500
+                interpolator = AccelerateDecelerateInterpolator()
+                startDelay = (index * 200).toLong()
+            }
+            animator.start()
+        }
     }
 
     /**
