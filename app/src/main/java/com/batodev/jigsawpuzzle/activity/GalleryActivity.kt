@@ -4,11 +4,13 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.app.WallpaperManager
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageButton
@@ -25,6 +27,7 @@ import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.math.abs
 
 /**
  * An activity for displaying a gallery of unlocked images.
@@ -41,6 +44,7 @@ class GalleryActivity : AppCompatActivity() {
      *     previously being shut down then this Bundle contains the data it most
      *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
      */
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -64,6 +68,40 @@ class GalleryActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.gallery_back_btn).setOnClickListener { backClicked() }
         findViewById<ImageButton>(R.id.gallery_share_btn).setOnClickListener { shareClicked() }
         findViewById<ImageButton>(R.id.gallery_wallpaper_btn).setOnClickListener { wallpaperClicked() }
+
+        val photoView = findViewById<PhotoView>(R.id.gallery_activity_background)
+        photoView.setOnSingleFlingListener { e1, e2, velocityX, velocityY ->
+            flingHandling(e1, e2, velocityX, velocityY)
+        }
+    }
+
+    private fun flingHandling(
+        e1: MotionEvent,
+        e2: MotionEvent,
+        velocityX: Float,
+        velocityY: Float,
+    ): Boolean {
+        Log.d(
+            "GalleryActivity",
+            "onFling: e1=$e1, e2=$e2, velocityX=$velocityX, velocityY=$velocityY"
+        )
+        val swipeThreshold = 200
+        val swipeVelocityThreshold = 300
+        val diffX = e2.x - e1.x
+        return if (abs(diffX) > abs(e2.y - e1.y)) {
+            if (abs(diffX) > swipeThreshold && abs(velocityX) > swipeVelocityThreshold) {
+                if (diffX > 0) {
+                    leftClicked()
+                } else {
+                    rightClicked()
+                }
+                true
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     /**
