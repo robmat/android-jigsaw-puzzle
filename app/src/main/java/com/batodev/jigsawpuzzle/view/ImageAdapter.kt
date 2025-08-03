@@ -15,6 +15,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import com.batodev.jigsawpuzzle.R
@@ -32,6 +35,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     private val am: AssetManager = mContext.assets
     private var files: Array<String>? = null
     private val handler = Handler(Looper.getMainLooper())
+    private var lastPosition = -1
 
     init {
         /**
@@ -94,7 +98,20 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
             convertViewVar = layoutInflater.inflate(R.layout.grid_element, null)
         }
         val imageView = convertViewVar!!.findViewById<ImageView>(R.id.gridImageview)
-        imageView.setImageBitmap(null)
+
+        if (position > lastPosition) {
+            val animation = ScaleAnimation(
+                0.0f, 1.0f, 0.0f, 1.0f,
+                ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
+                ScaleAnimation.RELATIVE_TO_SELF, 0.5f
+            )
+            animation.duration = 300
+            val set = AnimationSet(true)
+            set.addAnimation(animation)
+            set.interpolator = AccelerateDecelerateInterpolator()
+            imageView.startAnimation(set)
+            lastPosition = position
+        }
         // run image related code after the view was laid out
         imageView.post {
             handler.post {
