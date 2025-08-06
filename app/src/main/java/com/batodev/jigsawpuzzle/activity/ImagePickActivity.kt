@@ -1,8 +1,10 @@
 package com.batodev.jigsawpuzzle.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,7 +14,6 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.CheckBox
 import android.widget.GridView
 import android.widget.Spinner
@@ -27,13 +28,16 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.batodev.jigsawpuzzle.view.ImageAdapter
+import com.smb.glowbutton.NeonButton
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
+import androidx.core.graphics.drawable.toDrawable
 
 
 private const val CAMERA_PERMISSION_REQUEST_CODE = 1
@@ -92,10 +96,12 @@ class ImagePickActivity : AppCompatActivity() {
      * @param itemClickedIndex The index of the clicked image in the grid, or null if from camera/gallery.
      * @param mCurrentPhotoPath The file path of the selected image from camera/gallery, or null if from assets.
      */
+    @SuppressLint("ClickableViewAccessibility")
     private fun showStartGamePopup(itemClickedIndex: Int?, mCurrentPhotoPath: String?) {
         val settings = SettingsHelper.load(this)
         val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popupView: View = inflater.inflate(R.layout.start_game_popup, null)
+
 
         setUpDiffSpinner(popupView, settings)
         setUpCheckboxes(popupView, settings)
@@ -105,8 +111,9 @@ class ImagePickActivity : AppCompatActivity() {
         builder.setCancelable(true)
 
         val alertDialog = builder.create()
+        alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog.show()
-        val startButton = popupView.findViewById<Button>(R.id.startButton)
+        val startButton = popupView.findViewById<NeonButton>(R.id.startButton)
         startButton.setOnClickListener { // Handle start button click
             startTheGame(
                 itemClickedIndex,
@@ -114,7 +121,10 @@ class ImagePickActivity : AppCompatActivity() {
                 alertDialog
             )
         }
-
+        startButton.setOnTouchListener { view, event ->
+            NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(view, event, this@ImagePickActivity)
+            true
+        }
     }
 
     /**
@@ -161,11 +171,18 @@ class ImagePickActivity : AppCompatActivity() {
                 "${i * (i + 2)} (${i}$DIFF_SPLIT${i + 2})" // Generate the dimension string
             dimensionsList.add(dimension) // Add it to the list
         }
+        // Use the custom layout R.layout.custom_spinner_item
         val adapter: ArrayAdapter<String> = ArrayAdapter<String>(
             this,
-            android.R.layout.simple_spinner_item,
+            R.layout.custom_spinner_item, // Changed from android.R.layout.simple_spinner_item
             dimensionsList
         )
+        // You might also want a custom layout for the dropdown view if the default
+        // android.R.layout.simple_spinner_dropdown_item doesn't look right with white text.
+        // If so, create another layout file (e.g., custom_spinner_dropdown_item.xml)
+        // and set its text color to white, then use:
+        // adapter.setDropDownViewResource(R.layout.custom_spinner_dropdown_item)
+        // For now, we'll keep the default dropdown item layout.
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         val spinner = popupView.findViewById<Spinner>(R.id.difficulty_spinner)
         val selectionFromSettings = "${settings.lastSetDifficultyCustomWidth * settings.lastSetDifficultyCustomHeight} (${settings.lastSetDifficultyCustomWidth}$DIFF_SPLIT${settings.lastSetDifficultyCustomHeight})"
@@ -174,14 +191,16 @@ class ImagePickActivity : AppCompatActivity() {
         spinner.setSelection(indexOfSelection)
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                difficultyItemClickedIndex: Int,
-                id: Long
+                parent: AdapterView<*>?, // The AdapterView where the selection happened
+                view: View?, // The view within the AdapterView that was clicked
+                difficultyItemClickedIndex: Int, // The position of the view in the adapter
+                id: Long // The row id of the item that is selected
             ) {
                 diffClicked(dimensionsList[difficultyItemClickedIndex], settings)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {
+                // Another interface callback
             }
         }
     }

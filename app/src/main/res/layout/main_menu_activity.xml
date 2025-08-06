@@ -5,12 +5,14 @@
     android:id="@+id/main_game_activity_main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".activity.MainMenuActivity">
 
     <ImageView
         android:id="@+id/main_menu_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:alpha="0.4"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
         android:src="@drawable/main_menu_background" />
@@ -33,59 +35,98 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- try glow button instead of text view once you get colors right
+    <com.smb.glowbutton.GlowButton
+        android:id="@+id/main_menu_activity_game_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:gb_backgroundColor="@color/colorPrimaryDark"
+        app:gb_cornerRadius="5dp"
+        app:gb_text="@string/app_name"
+        app:gb_textColor="@color/white"
+        app:gb_textSize="36dp"
+        app:gb_textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    -->
+
     <LinearLayout
         android:id="@+id/buttons_container"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
         android:layout_marginBottom="20dp"
-        app:layout_constraintTop_toBottomOf="@id/main_menu_activity_game_title"
+        android:orientation="vertical"
         app:layout_constraintBottom_toTopOf="@id/main_menu_activity_emberfox_logo"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_menu_activity_game_title"
         app:layout_constraintVertical_bias="1.0"> <!-- This pushes the LinearLayout towards the logo -->
 
-        <Button
+        <com.smb.glowbutton.NeonButton
             android:id="@+id/main_menu_activity_play_the_game"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/orange_button_background"
-            android:soundEffectsEnabled="true"
-            android:text="@string/main_menu_activity_play_the_game"
-            android:textSize="20sp" />
+            app:nb_cornerRadius="30dp"
+            app:nb_disabledStateColor="@android:color/darker_gray"
+            app:nb_drawableEnd="@drawable/ic_gamepad_36dp"
+            app:nb_drawablePadding="10dp"
+            app:nb_drawableStart="@drawable/ic_gamepad_36dp"
+            app:nb_gradientEnd="@color/colorAccent"
+            app:nb_gradientStart="@color/colorPrimary"
+            app:nb_text="@string/main_menu_activity_play_the_game"
+            app:nb_textColor="@color/colorAccent"
+            app:nb_textSize="18dp"
+            app:nb_textStyle="normal" />
 
-        <Button
+        <com.smb.glowbutton.NeonButton
             android:id="@+id/main_menu_activity_unlocked_gallery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/orange_button_background"
-            android:soundEffectsEnabled="true"
-            android:text="@string/main_menu_activity_unlocked_gallery"
-            android:textSize="20sp" />
+            app:nb_cornerRadius="30dp"
+            app:nb_disabledStateColor="@android:color/darker_gray"
+            app:nb_drawableEnd="@drawable/ic_gallery_36dp"
+            app:nb_drawablePadding="10dp"
+            app:nb_drawableStart="@drawable/ic_gallery_36dp"
+            app:nb_gradientEnd="@color/colorAccent"
+            app:nb_gradientStart="@color/colorPrimary"
+            app:nb_text="@string/main_menu_activity_unlocked_gallery"
+            app:nb_textColor="@color/colorAccent"
+            app:nb_textSize="18dp"
+            app:nb_textStyle="normal" />
 
-        <Button
+        <com.smb.glowbutton.NeonButton
             android:id="@+id/main_menu_activity_more_apps"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/orange_button_background"
-            android:soundEffectsEnabled="true"
-            android:text="@string/main_menu_activity_more_apps"
-            android:textSize="20sp" />
+            app:nb_cornerRadius="30dp"
+            app:nb_drawableEnd="@drawable/ic_menu_36dp"
+            app:nb_drawablePadding="10dp"
+            app:nb_drawableStart="@drawable/ic_menu_36dp"
+            app:nb_gradientEnd="@color/colorAccent"
+            app:nb_gradientStart="@color/colorPrimary"
+            app:nb_text="@string/main_menu_activity_more_apps"
+            app:nb_textColor="@color/colorAccent"
+            app:nb_textSize="18dp"
+            app:nb_textStyle="normal" />
 
-        <Button
+        <com.smb.glowbutton.NeonButton
             android:id="@+id/main_menu_activity_play_part_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/orange_button_background"
-            android:soundEffectsEnabled="true"
-            android:text="@string/main_menu_activity_play_part_2"
-            android:textSize="20sp" />
+            app:nb_cornerRadius="30dp"
+            app:nb_drawableEnd="@drawable/ic_more_apps_36dp"
+            app:nb_drawablePadding="10dp"
+            app:nb_drawableStart="@drawable/ic_more_apps_36dp"
+            app:nb_gradientEnd="@color/colorAccent"
+            app:nb_gradientStart="@color/colorPrimary"
+            app:nb_text="@string/main_menu_activity_play_part_2"
+            app:nb_textColor="@color/colorAccent"
+            app:nb_textSize="18dp"
+            app:nb_textStyle="normal" />
     </LinearLayout>
 
     <ImageView

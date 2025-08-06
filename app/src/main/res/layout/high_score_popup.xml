@@ -1,7 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@drawable/gradient_accent_black_background"
     android:padding="16dp">
 
     <TextView
@@ -11,6 +13,7 @@
         android:layout_centerHorizontal="true"
         android:textSize="24sp"
         android:textStyle="bold"
+        android:textColor="@color/white"
         android:text="@string/high_scores" />
 
     <TextView
@@ -20,7 +23,8 @@
         android:layout_below="@id/highScoreTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="8dp"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:textColor="@color/white" />
 
     <LinearLayout
         android:id="@+id/highScoreListContainer"
@@ -28,22 +32,25 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/highScoreDifficulty"
         android:layout_marginTop="16dp"
-        android:orientation="vertical">
+        android:orientation="vertical" />
 
-        <!-- High scores will be added here programmatically -->
-
-    </LinearLayout>
-
-    <Button
+    <com.smb.glowbutton.NeonButton
         android:id="@+id/highScoreOkButton"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/highScoreListContainer"
-        android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:background="@drawable/orange_button_background"
-        android:text="OK"
-        tools:ignore="HardcodedText"
+        app:nb_cornerRadius="30dp"
+        app:nb_disabledStateColor="@android:color/darker_gray"
+        app:nb_drawableEnd="@drawable/ic_gamepad_36dp"
+        app:nb_drawablePadding="10dp"
+        app:nb_drawableStart="@drawable/ic_gamepad_36dp"
+        app:nb_gradientEnd="@color/colorAccent"
+        app:nb_gradientStart="@color/colorPrimary"
+        app:nb_text="OK"
+        app:nb_textColor="@color/colorAccent"
+        app:nb_textSize="18dp"
+        app:nb_textStyle="normal"
         android:textSize="20sp" />
 
 </RelativeLayout>

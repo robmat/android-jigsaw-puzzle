@@ -1,13 +1,13 @@
 package com.batodev.jigsawpuzzle.activity
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -16,12 +16,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
+import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.batodev.jigsawpuzzle.logic.ImageLoader
@@ -30,6 +32,7 @@ import com.batodev.jigsawpuzzle.logic.PuzzleProgressListener
 import com.batodev.jigsawpuzzle.logic.Stopwatch
 import com.bumptech.glide.Glide
 import com.otaliastudios.zoom.ZoomLayout
+import com.smb.glowbutton.NeonButton
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -52,6 +55,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      *     previously being shut down then this Bundle contains the data it most
      *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
      */
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -100,8 +104,19 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
         }
 
-        findViewById<Button>(R.id.puzzle_activity_play_again).setOnClickListener {
-            finish()
+        findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
+            it.setOnClickListener {
+                finish()
+            }
+            it.visibility = View.GONE
+            it.setOnTouchListener { view, event ->
+                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(
+                    view,
+                    event,
+                    this@PuzzleActivity
+                )
+                true
+            }
         }
         rateHelper.requestReview()
     }
@@ -143,6 +158,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      * @see Stopwatch
      * @see PuzzleGameManager
      */
+    @SuppressLint("ClickableViewAccessibility")
     fun onGameOver() {
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
@@ -155,7 +171,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
         stopwatch.stop()
         puzzleGameManager.playWinSound()
-        findViewById<Button>(R.id.puzzle_activity_play_again).visibility = View.VISIBLE
+        findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
+            it.visibility = View.VISIBLE
+            it.setOnTouchListener { view, event ->
+                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(view, event, this@PuzzleActivity)
+                true
+            }
+        }
         AdHelper.showAd(this)
 
         val elapsedTime = stopwatch.elapsedTime
@@ -215,7 +237,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      * @param highScores The list of high score strings to display.
      * @param newScoreIndex The index of the newly achieved score in the highScores list, or -1 if not in top 10.
      */
-    @SuppressLint("SetTextI18n")
+    @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
     private fun showHighScorePopup(
         difficultyKey: String,
         highScores: MutableList<String>,
@@ -227,13 +249,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val highScoreDifficulty = popupView.findViewById<TextView>(R.id.highScoreDifficulty)
         val highScoreListContainer =
             popupView.findViewById<LinearLayout>(R.id.highScoreListContainer)
-        val highScoreOkButton = popupView.findViewById<Button>(R.id.highScoreOkButton)
 
         highScoreDifficulty.text = difficultyKey
 
         // Populate high scores
         for ((index, scoreString) in highScores.withIndex()) {
             val scoreTextView = TextView(this)
+            scoreTextView.setTextColor(resources.getColor(R.color.white, null))
             scoreTextView.text = "${index + 1}. $scoreString"
             scoreTextView.textSize = 16f // Use 16f for sp
             if (index == newScoreIndex) {
@@ -247,10 +269,17 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         builder.setCancelable(false)
 
         val alertDialog = builder.create()
+        alertDialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
         alertDialog.show()
 
-        highScoreOkButton.setOnClickListener {
-            alertDialog.dismiss()
+        popupView.findViewById<NeonButton>(R.id.highScoreOkButton).let {
+            it.setOnClickListener {
+                alertDialog.dismiss()
+            }
+            it.setOnTouchListener { view, event ->
+                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(view, event, this@PuzzleActivity)
+                true
+            }
         }
     }
 

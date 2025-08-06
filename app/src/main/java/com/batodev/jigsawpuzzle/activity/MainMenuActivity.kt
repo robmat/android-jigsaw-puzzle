@@ -2,29 +2,28 @@ package com.batodev.jigsawpuzzle.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.app.Activity
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler // Added import
-import android.os.Looper // Added import
+import android.os.Handler
+import android.os.Looper
 import android.view.View
-import android.view.Window
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
+import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
+import com.smb.glowbutton.NeonButton
 
 /**
  * The main menu activity of the application.
  */
-class MainMenuActivity : Activity() {
+class MainMenuActivity : AppCompatActivity() {
     /**
      * Called when the activity is first created.
      * Initializes the UI, loads settings, and sets up event listeners for menu buttons.
@@ -34,26 +33,18 @@ class MainMenuActivity : Activity() {
      */
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE)
+
         setContentView(R.layout.main_menu_activity)
-
-        val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
-        windowInsetsController.let { controller ->
-            // Hide both bars
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            // Sticky behavior - bars stay hidden until user swipes
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
-
+        RemoveBars.removeTopBottomAndActionBars(this)
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
-        val playButton = findViewById<Button>(R.id.main_menu_activity_play_the_game)
-        val galleryButton = findViewById<Button>(R.id.main_menu_activity_unlocked_gallery)
-        val moreAppsButton = findViewById<Button>(R.id.main_menu_activity_more_apps)
-        val playPart2Button = findViewById<Button>(R.id.main_menu_activity_play_part_2)
+
+        val playButton = findViewById<NeonButton>(R.id.main_menu_activity_play_the_game)
+        val galleryButton = findViewById<NeonButton>(R.id.main_menu_activity_unlocked_gallery)
+        val moreAppsButton = findViewById<NeonButton>(R.id.main_menu_activity_more_apps)
+        val playPart2Button = findViewById<NeonButton>(R.id.main_menu_activity_play_part_2)
         val emberfoxLogo = findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo)
 
-        // Set initial visibility to INVISIBLE
         playButton.visibility = View.INVISIBLE
         galleryButton.visibility = View.INVISIBLE
         moreAppsButton.visibility = View.INVISIBLE
@@ -66,12 +57,15 @@ class MainMenuActivity : Activity() {
         playPart2Button.setOnClickListener { playPart2() }
         emberfoxLogo.setOnClickListener { moreApps() }
 
+        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(this, playButton, galleryButton, moreAppsButton, playPart2Button)
 
         // Delay the menu button animations
         Handler(Looper.getMainLooper()).postDelayed({
             animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
         }, 500) // Corrected to 9.5 seconds delay
+
     }
+
 
     private fun animateMenuButtons(vararg views: View) {
         for ((index, view) in views.withIndex()) {

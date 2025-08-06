@@ -126,18 +126,26 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
+    <com.smb.glowbutton.NeonButton
         android:id="@+id/puzzle_activity_play_again"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:layout_margin="30dp"
-        android:background="@drawable/orange_button_background"
-        android:soundEffectsEnabled="true"
         android:text="@string/puzzle_activity_play_again"
         android:textSize="20sp"
-        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:nb_cornerRadius="30dp"
+        app:nb_disabledStateColor="@android:color/darker_gray"
+        app:nb_drawableEnd="@drawable/ic_gamepad_36dp"
+        app:nb_drawablePadding="10dp"
+        app:nb_drawableStart="@drawable/ic_gamepad_36dp"
+        app:nb_gradientEnd="@color/colorAccent"
+        app:nb_gradientStart="@color/colorPrimary"
+        app:nb_text="@string/puzzle_activity_play_again"
+        app:nb_textColor="@color/colorAccent"
+        app:nb_textSize="18dp"
+        app:nb_textStyle="normal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

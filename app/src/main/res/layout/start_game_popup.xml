@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    android:background="@drawable/gradient_accent_black_background"
     android:padding="16dp">
 
     <CheckBox
         android:id="@+id/background_image_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:buttonTint="@color/colorPrimary"
         android:checked="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:padding="2dp"
         android:textSize="20sp"
         android:labelFor="@id/background_image_checkbox"
@@ -24,11 +28,13 @@
         android:layout_below="@id/background_image_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:buttonTint="@color/colorPrimary"
         android:checked="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:padding="2dp"
         android:textSize="20sp"
         android:labelFor="@id/background_grid_checkbox"
@@ -41,11 +47,13 @@
         android:layout_below="@id/background_grid_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:buttonTint="@color/colorPrimary"
         android:checked="true" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:padding="2dp"
         android:textSize="20sp"
         android:labelFor="@id/play_sounds_checkbox"
@@ -57,6 +65,7 @@
         android:id="@+id/how_many_puzzles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textColor="@color/white"
         android:padding="2dp"
         android:textSize="20sp"
         android:labelFor="@id/difficulty_spinner"
@@ -65,17 +74,28 @@
 
     <Spinner
         android:id="@+id/difficulty_spinner"
+        android:padding="8dp"
         android:layout_below="@id/how_many_puzzles"
+        android:background="@drawable/rounded_spinner_background"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <Button
+    <com.smb.glowbutton.NeonButton
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/difficulty_spinner"
         android:layout_marginTop="16dp"
-        android:background="@drawable/orange_button_background"
-        android:text="@string/main_menu_activity_play_the_game"
+        app:nb_cornerRadius="30dp"
+        app:nb_disabledStateColor="@android:color/darker_gray"
+        app:nb_drawableEnd="@drawable/ic_gamepad_36dp"
+        app:nb_drawablePadding="10dp"
+        app:nb_drawableStart="@drawable/ic_gamepad_36dp"
+        app:nb_gradientEnd="@color/colorAccent"
+        app:nb_gradientStart="@color/colorPrimary"
+        app:nb_text="@string/main_menu_activity_play_the_game"
+        app:nb_textColor="@color/colorAccent"
+        app:nb_textSize="18dp"
+        app:nb_textStyle="normal"
         android:textSize="20sp" />
 </RelativeLayout>
