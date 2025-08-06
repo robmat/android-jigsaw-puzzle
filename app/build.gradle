@@ -26,6 +26,12 @@ android {
         }
     }
     namespace 'com.batodev.jigsawpuzzle'
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
 }
 
 dependencies {
@@ -43,4 +49,11 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:34.0.0')
     implementation 'com.google.firebase:firebase-analytics'
     ksp 'com.github.bumptech.glide:ksp:4.16.0'
+
+    testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.0-M2"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:6.0.0-M2"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.0-M2"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:6.0.0-M2"
+
+    testImplementation "org.hamcrest:hamcrest:3.0"
 }

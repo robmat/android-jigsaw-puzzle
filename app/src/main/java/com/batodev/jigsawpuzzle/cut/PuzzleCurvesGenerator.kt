@@ -3,11 +3,23 @@ package com.batodev.jigsawpuzzle.cut
 import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import java.util.concurrent.atomic.AtomicLong // Import for AtomicLong
 
 /**
  * A class for generating the SVG curves for the puzzle pieces.
  */
 class PuzzleCurvesGenerator {
+
+    companion object {
+        // Using AtomicLong for a thread-safe incrementing seed component
+        private val seedOffset = AtomicLong(0L)
+
+        // Function to generate an initial seed, more robust than just System.nanoTime()
+        private fun initializeSeed(): Double {
+            return System.nanoTime().toDouble() + seedOffset.incrementAndGet()
+        }
+    }
+
     /**
      * Generates the SVG string representing the puzzle piece outlines.
      * The SVG includes horizontal and vertical curves, and a border.
@@ -29,7 +41,8 @@ class PuzzleCurvesGenerator {
         return data
     }
 
-    private var seed = 2.0
+    // Initialize seed using the new method
+    private var seed = initializeSeed()
     private var a = 0.0
     private var b = 0.0
     private var c = 0.0
@@ -55,7 +68,7 @@ class PuzzleCurvesGenerator {
      */
     private fun random(): Double {
         val x = sin(seed) * 10000
-        seed += 1.0
+        seed += 1.0 // Incrementing seed here is part of the existing pseudo-random generation
         return x - floor(x)
     }
 
