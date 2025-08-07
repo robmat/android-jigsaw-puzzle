@@ -50,18 +50,20 @@ class GalleryActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setContentView(R.layout.gallery_activity)
 
-        val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
+        val windowInsetsController =
+            WindowCompat.getInsetsController(this.window, this.window.decorView)
         windowInsetsController.let { controller ->
             // Hide both bars
             controller.hide(WindowInsetsCompat.Type.systemBars())
             // Sticky behavior - bars stay hidden until user swipes
-            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
 
         val settings = SettingsHelper.load(this)
         this.images = settings.uncoveredPics
         index = settings.lastSeenPic
-        setImage(index)
+        setImage(images[index])
         checkIfImageLeftRightButtonsShouldBeVisible()
         findViewById<ImageButton>(R.id.gallery_left).setOnClickListener { leftClicked() }
         findViewById<ImageButton>(R.id.gallery_right).setOnClickListener { rightClicked() }
@@ -108,8 +110,10 @@ class GalleryActivity : AppCompatActivity() {
      * Checks if the left and right image navigation buttons should be visible based on the current image index.
      */
     private fun checkIfImageLeftRightButtonsShouldBeVisible() {
-        findViewById<ImageButton>(R.id.gallery_left).visibility = if (index <= 0) View.GONE else View.VISIBLE
-        findViewById<ImageButton>(R.id.gallery_right).visibility = if (index >= images.size - 1) View.GONE else View.VISIBLE
+        findViewById<ImageButton>(R.id.gallery_left).visibility =
+            if (index <= 0) View.GONE else View.VISIBLE
+        findViewById<ImageButton>(R.id.gallery_right).visibility =
+            if (index >= images.size - 1) View.GONE else View.VISIBLE
     }
 
     /**
@@ -183,7 +187,7 @@ class GalleryActivity : AppCompatActivity() {
                     } else {
                         index--
                     }
-                    setImage(index)
+                    setImage(images[index])
                     checkIfImageLeftRightButtonsShouldBeVisible()
 
                     photoView.pivotX = pivotXIn
@@ -196,7 +200,7 @@ class GalleryActivity : AppCompatActivity() {
                         )
                         this.duration = duration
                         interpolator = AccelerateDecelerateInterpolator()
-                        addListener(object: AnimatorListenerAdapter() {
+                        addListener(object : AnimatorListenerAdapter() {
                             override fun onAnimationEnd(animation: Animator) {
                                 isAnimating = false
                             }
@@ -213,11 +217,21 @@ class GalleryActivity : AppCompatActivity() {
      * Sets the image displayed in the gallery.
      * @param index The index of the image to display from the {@link #images} list.
      */
-    private fun setImage(index: Int) {
+    private fun setImage(imageName: String) {
         if (index >= 0 && index < images.size) {
-            findViewById<PhotoView>(R.id.gallery_activity_background)
-                .setImageBitmap(BitmapFactory.decodeStream(this.assets.open("img/${images[index]}")))
-            this.index = index
+            try {
+                this.assets.open("img/$imageName").use { inputStream -> // .use will auto-close the stream
+                    val bitmap = BitmapFactory.decodeStream(inputStream)
+                    if (bitmap != null) {
+                        findViewById<PhotoView>(R.id.gallery_activity_background)
+                            .setImageBitmap(bitmap)
+                    } else {
+                        Log.w("GalleryActivity", "Failed to decode bitmap for image: img/${images[index]}")
+                    }
+                }
+            } catch (e: java.io.IOException) {
+                Log.w("GalleryActivity", "Error opening image: img/${images[index]}", e)
+            }
         }
     }
 
@@ -250,7 +264,7 @@ class GalleryActivity : AppCompatActivity() {
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             Log.e(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
-            Toast.makeText(this, "Error: $e" , Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
         }
     }
 
