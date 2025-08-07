@@ -220,15 +220,19 @@ class GalleryActivity : AppCompatActivity() {
     private fun setImage(imageName: String) {
         if (index >= 0 && index < images.size) {
             try {
-                this.assets.open("img/$imageName").use { inputStream -> // .use will auto-close the stream
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    if (bitmap != null) {
-                        findViewById<PhotoView>(R.id.gallery_activity_background)
-                            .setImageBitmap(bitmap)
-                    } else {
-                        Log.w("GalleryActivity", "Failed to decode bitmap for image: img/${images[index]}")
+                this.assets.open("img/$imageName")
+                    .use { inputStream -> // .use will auto-close the stream
+                        val bitmap = BitmapFactory.decodeStream(inputStream)
+                        if (bitmap != null) {
+                            findViewById<PhotoView>(R.id.gallery_activity_background)
+                                .setImageBitmap(bitmap)
+                        } else {
+                            Log.w(
+                                "GalleryActivity",
+                                "Failed to decode bitmap for image: img/${images[index]}"
+                            )
+                        }
                     }
-                }
             } catch (e: java.io.IOException) {
                 Log.w("GalleryActivity", "Error opening image: img/${images[index]}", e)
             }
@@ -241,13 +245,18 @@ class GalleryActivity : AppCompatActivity() {
      * @see FileProvider
      */
     fun shareClicked() {
-        val fileShared = copyToTempFile()
-        val shareIntent = Intent(Intent.ACTION_SEND)
-        val applicationId = this.application.applicationContext.packageName
-        val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
-        shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-        shareIntent.type = "image/*"
-        ContextCompat.startActivity(this, shareIntent, null)
+        try {
+            val fileShared = copyToTempFile()
+            val shareIntent = Intent(Intent.ACTION_SEND)
+            val applicationId = this.application.applicationContext.packageName
+            val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.type = "image/*"
+            ContextCompat.startActivity(this, shareIntent, null)
+        } catch (e: Exception) {
+            Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
+            Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
+        }
     }
 
     /**
@@ -263,7 +272,7 @@ class GalleryActivity : AppCompatActivity() {
             wallpaperManager.setBitmap(bitmap)
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
-            Log.e(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
+            Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
             Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
         }
     }
