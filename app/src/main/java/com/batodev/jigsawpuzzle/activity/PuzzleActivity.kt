@@ -165,7 +165,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         konfetti.visibility = View.VISIBLE
         val settings = SettingsHelper.load(this)
         imageFileName?.let {
-            settings.uncoveredPics.add(it)
+            if (!settings.uncoveredPics.contains(it)) {
+                settings.uncoveredPics.add(it)
+            }
             SettingsHelper.save(this, settings)
             Toast.makeText(this, R.string.image_added_to_gallery, Toast.LENGTH_SHORT).show()
         }
