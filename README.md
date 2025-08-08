@@ -4,6 +4,8 @@ A simple yet feature-rich jigsaw puzzle game for Android.
 
 Based on: [How to Build a Jigsaw Puzzle Android Game](https://dragosholban.com/2018/03/09/how-to-build-a-jigsaw-puzzle-android-game/)
 
+Play store link: [Puzzled Girls](https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle)
+
 ## Features
 
 *   **Custom Images:** Play with a variety of bundled images, or use your own pictures from your phone's gallery or by taking a new photo with the camera.
