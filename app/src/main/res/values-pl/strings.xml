@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-
-
-
-  <string name="main_menu_activity_unlocked_gallery">Galeria odblokowanych zdjęć</string>
-  <string name="main_menu_activity_more_apps">Więcej aplikacji takich jak ta</string>
-  <string name="main_menu_activity_play_to_uncover">Najpierw zagraj w grę</string>
-  <string name="puzzle_activity_play_again">Zagraj ponownie</string>
-  <string name="image_added_to_gallery">Nowe zdjęcie dostępne w galerii.</string>
-  <string name="show_image_as_background">Pokaż obraz w tle</string>
-  <string name="how_many_puzzles">Ile elementów układanki?</string>
-  <string name="show_puzzle_grid">Pokaż kształty puzzli</string>
-  <string name="main_menu_activity_play_the_game">Zagrajmy!</string>
-  <string name="play_sounds">Dźwięk</string>
-  <string name="wallpaper_ok">Obraz został ustawiony jako tapeta</string>
-  <string name="main_menu_activity_play_part_2">Pobierz Puzzled Girls część 2</string>
-  <string name="puzzle_activity_we_are_cutting">Właśnie wycinam twoje puzzle…\nDaj mi chwilę.</string>
-  <string name="congratulations_top_10">Gratulacje, jesteś w pierwszej dziesiątce najszybszych rozwiązań!</string>
-  <string name="high_scores">Najlepsze wyniki</string>
+    <string name="congratulations_top_10">Gratulacje, jesteś w pierwszej dziesiątce najszybszych rozwiązań!</string>
+    <string name="high_scores">Najlepsze wyniki</string>
+    <string name="how_many_puzzles">Ile elementów układanki?</string>
+    <string name="image_added_to_gallery">Nowe zdjęcie dostępne w galerii.</string>
+    <string name="main_menu_activity_more_apps">Więcej aplikacji takich jak ta</string>
+    <string name="main_menu_activity_play_part_2">Pobierz Puzzled Girls część 2</string>
+    <string name="main_menu_activity_play_the_game">Zagrajmy!</string>
+    <string name="main_menu_activity_play_to_uncover">Najpierw zagraj w grę</string>
+    <string name="main_menu_activity_unlocked_gallery">Galeria odblokowanych zdjęć</string>
+    <string name="play_sounds">Dźwięk</string>
+    <string name="puzzle_activity_play_again">Zagraj ponownie</string>
+    <string name="puzzle_activity_we_are_cutting">Właśnie wycinam twoje puzzle…\nDaj mi chwilę.</string>
+    <string name="show_image_as_background">Pokaż obraz w tle</string>
+    <string name="show_puzzle_grid">Pokaż kształty puzzli</string>
+    <string name="wallpaper_ok">Obraz został ustawiony jako tapeta</string>
 </resources>

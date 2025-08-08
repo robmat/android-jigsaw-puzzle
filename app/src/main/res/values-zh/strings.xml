@@ -1,21 +1,18 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
-
-
-
-  <string name="main_menu_activity_unlocked_gallery">已解锁图片的图库</string>
-  <string name="main_menu_activity_more_apps">更多类似的应用</string>
-  <string name="main_menu_activity_play_to_uncover">先玩游戏</string>
-  <string name="puzzle_activity_play_again">再玩一次</string>
-  <string name="image_added_to_gallery">图库中有新图片可用。</string>
-  <string name="show_image_as_background">在背景中显示图片</string>
-  <string name="how_many_puzzles">有多少块拼图？</string>
-  <string name="show_puzzle_grid">显示拼图形状</string>
-  <string name="main_menu_activity_play_the_game">我们来玩吧！</string>
-  <string name="play_sounds">声音</string>
-  <string name="wallpaper_ok">图片已设置为您的壁纸</string>
-  <string name="main_menu_activity_play_part_2">下载《Puzzled Girls》第 2 部分</string>
-  <string name="puzzle_activity_we_are_cutting">我正在为你切拼图…\n请稍等片刻。</string>
-  <string name="congratulations_top_10">恭喜，您已进入最快解决方案的前 10 名！</string>
-  <string name="high_scores">高分</string>
+    <string name="congratulations_top_10">恭喜，您已进入最快解决方案的前 10 名！</string>
+    <string name="high_scores">高分</string>
+    <string name="how_many_puzzles">有多少块拼图？</string>
+    <string name="image_added_to_gallery">图库中有新图片可用。</string>
+    <string name="main_menu_activity_more_apps">更多类似的应用</string>
+    <string name="main_menu_activity_play_part_2">下载《Puzzled Girls》第 2 部分</string>
+    <string name="main_menu_activity_play_the_game">我们来玩吧！</string>
+    <string name="main_menu_activity_play_to_uncover">先玩游戏</string>
+    <string name="main_menu_activity_unlocked_gallery">已解锁图片的图库</string>
+    <string name="play_sounds">声音</string>
+    <string name="puzzle_activity_play_again">再玩一次</string>
+    <string name="puzzle_activity_we_are_cutting">我正在为你切拼图…\n请稍等片刻。</string>
+    <string name="show_image_as_background">在背景中显示图片</string>
+    <string name="show_puzzle_grid">显示拼图形状</string>
+    <string name="wallpaper_ok">图片已设置为您的壁纸</string>
 </resources>
