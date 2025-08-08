@@ -15,8 +15,7 @@
   <string name="play_sounds">Son</string>
   <string name="wallpaper_ok">L\'image a été définie comme fond d\'écran</string>
   <string name="main_menu_activity_play_part_2">Télécharger Puzzled Girls partie 2</string>
-  <string name="puzzle_activity_we_are_cutting">Je découpe vos puzzles maintenant…
-Donnez-moi juste un instant.</string>
+  <string name="puzzle_activity_we_are_cutting">Je découpe vos puzzles maintenant…\nDonnez-moi juste un instant.</string>
   <string name="congratulations_top_10">Félicitations, vous êtes dans le top 10 des solutions les plus rapides !</string>
   <string name="high_scores">Meilleurs scores</string>
 </resources>

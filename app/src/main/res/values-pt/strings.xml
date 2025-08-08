@@ -15,8 +15,7 @@
   <string name="play_sounds">Som</string>
   <string name="wallpaper_ok">A imagem foi definida como seu papel de parede</string>
   <string name="main_menu_activity_play_part_2">Baixar Puzzled Girls parte 2</string>
-  <string name="puzzle_activity_we_are_cutting">Estou cortando seus quebra-cabeças agora…
-Só me dê um momento.</string>
+  <string name="puzzle_activity_we_are_cutting">Estou cortando seus quebra-cabeças agora…\nSó me dê um momento.</string>
   <string name="congratulations_top_10">Parabéns, você entrou no top 10 das soluções mais rápidas!</string>
   <string name="high_scores">Pontuações mais altas</string>
 </resources>

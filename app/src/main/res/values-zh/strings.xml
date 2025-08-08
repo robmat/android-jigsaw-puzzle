@@ -15,8 +15,7 @@
   <string name="play_sounds">声音</string>
   <string name="wallpaper_ok">图片已设置为您的壁纸</string>
   <string name="main_menu_activity_play_part_2">下载《Puzzled Girls》第 2 部分</string>
-  <string name="puzzle_activity_we_are_cutting">我正在为你切拼图…
-请稍等片刻。</string>
+  <string name="puzzle_activity_we_are_cutting">我正在为你切拼图…\n请稍等片刻。</string>
   <string name="congratulations_top_10">恭喜，您已进入最快解决方案的前 10 名！</string>
   <string name="high_scores">高分</string>
 </resources>

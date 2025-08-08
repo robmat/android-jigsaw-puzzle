@@ -15,8 +15,7 @@
   <string name="play_sounds">Звук</string>
   <string name="wallpaper_ok">Изображение установлено в качестве обоев</string>
   <string name="main_menu_activity_play_part_2">Скачать Puzzled Girls часть 2</string>
-  <string name="puzzle_activity_we_are_cutting">Я вырезаю ваши пазлы сейчас…
-Просто дайте мне немного времени.</string>
+  <string name="puzzle_activity_we_are_cutting">Я вырезаю ваши пазлы сейчас…\nПросто дайте мне немного времени.</string>
   <string name="congratulations_top_10">Поздравляем, вы вошли в топ-10 самых быстрых решений!</string>
   <string name="high_scores">Лучшие результаты</string>
 </resources>

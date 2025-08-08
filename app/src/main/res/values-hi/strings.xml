@@ -50,7 +50,7 @@
   <string name="main_menu_activity_play_part_2">डाउनलोड करें Puzzled Girls भाग 2</string>
 
 
-  <string name="puzzle_activity_we_are_cutting">मैं अभी आपकी पहेलियाँ सुलझा रहा हूँ… बस मुझे थोड़ा समय दो।</string>
+  <string name="puzzle_activity_we_are_cutting">मैं अभी आपकी पहेलियाँ काट रहा हूँ…\nबस मुझे थोड़ा समय दो।</string>
 
   <string name="congratulations_top_10">बधाई हो, आप सबसे तेज़ समाधानों में शीर्ष 10 में शामिल हो गए हैं!</string>
   <string name="high_scores">उच्च अंक</string>

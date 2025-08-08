@@ -13,8 +13,7 @@
   <string name="play_sounds">Suono</string>
   <string name="wallpaper_ok">L\'immagine è stata impostata come sfondo</string>
   <string name="main_menu_activity_play_part_2">Scarica Puzzled Girls parte 2</string>
-  <string name="puzzle_activity_we_are_cutting">Sto tagliando i tuoi puzzle ora…
-Dammi solo un momento.</string>
+  <string name="puzzle_activity_we_are_cutting">Sto tagliando i tuoi puzzle ora…\nDammi solo un momento.</string>
   <string name="congratulations_top_10">Congratulazioni, sei entrato nella top 10 delle soluzioni più veloci!</string>
   <string name="high_scores">Punteggi più alti</string>
 </resources>

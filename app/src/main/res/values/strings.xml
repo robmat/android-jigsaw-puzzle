@@ -12,7 +12,7 @@
     <string name="play_sounds">Sound</string>
     <string name="wallpaper_ok">The picture has been set as your wallpaper</string>
     <string name="main_menu_activity_play_part_2">Download Puzzled Girls part 2</string>
-    <string name="puzzle_activity_we_are_cutting">I\'m cutting your puzzles now…\nJust give me a while.</string>
+    <string name="puzzle_activity_we_are_cutting">I\'m cutting out your puzzles now…\nJust give me a while.</string>
     <string name="congratulations_top_10">Congratulations, you made it into the top 10 of the fastest solutions!</string>
     <string name="high_scores">High Scores</string>
 </resources>

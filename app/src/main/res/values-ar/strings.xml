@@ -50,7 +50,7 @@
   <string name="main_menu_activity_play_part_2">تنزيل Puzzled Girls الجزء الثاني</string>
 
 
-  <string name="puzzle_activity_we_are_cutting">سأقطع ألغازك الآن… فقط أعطني بعض الوقت.</string>
+  <string name="puzzle_activity_we_are_cutting">سأقطع ألغازك الآن…\nفقط أعطني بعض الوقت.</string>
 
   <string name="congratulations_top_10">مبروك، لقد وصلت إلى قائمة العشرة الأسرع في الحلول!</string>
   <string name="high_scores">أعلى الدرجات</string>
