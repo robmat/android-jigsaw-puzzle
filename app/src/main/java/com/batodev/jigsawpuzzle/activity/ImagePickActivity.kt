@@ -171,7 +171,7 @@ class ImagePickActivity : AppCompatActivity() {
      */
     private fun setUpDiffSpinner(popupView: View, settings: Settings) {
         val dimensionsList = mutableListOf<String>()
-        for (i in 3..11) {
+        for (i in 2..11) {
             val dimension = "${i * (i + 2)} (${i}$DIFF_SPLIT${i + 2})" // Generate the dimension string
             dimensionsList.add(dimension) // Add it to the list
         }
