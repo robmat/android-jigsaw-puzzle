@@ -56,7 +56,6 @@ class MainMenuActivity : AppCompatActivity() {
         galleryButton.setOnClickListener { gallery() }
         moreAppsButton.setOnClickListener { moreApps() }
         playPart2Button.setOnClickListener { playPart2() }
-        emberfoxLogo.setOnClickListener { moreApps() }
 
         NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(this, playButton, galleryButton, moreAppsButton, playPart2Button)
 
