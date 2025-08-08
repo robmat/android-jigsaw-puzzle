@@ -9,7 +9,7 @@ android {
     defaultConfig {
         applicationId "com.batodev.jigsawpuzzle"
         minSdkVersion 24
-        compileSdk 36
+        compileSdk = 36
         targetSdkVersion 36
         versionCode 17
         versionName "3.0"
