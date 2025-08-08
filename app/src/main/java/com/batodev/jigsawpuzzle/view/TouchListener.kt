@@ -1,10 +1,15 @@
 package com.batodev.jigsawpuzzle.view
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
@@ -73,12 +78,30 @@ class TouchListener(
                 )
                 if (xDiff <= tolerance && yDiff <= tolerance) {
                     FirebaseHelper.logEvent(view.context, "piece_placed_correctly")
-                    lParams.leftMargin = piece.xCoord
-                    lParams.topMargin = piece.yCoord
-                    piece.layoutParams = lParams
-                    piece.canMove = false
+                    piece.canMove = false // Prevent further interaction during animation
                     sendViewToBack(piece)
-                    puzzleGameManager.checkGameOver()
+                    val animatorSet = AnimatorSet()
+                    animatorSet.playTogether(
+                        ObjectAnimator.ofFloat(view, View.X, piece.xCoord.toFloat()),
+                        ObjectAnimator.ofFloat(view, View.Y, piece.yCoord.toFloat())
+                    )
+                    animatorSet.interpolator = AccelerateDecelerateInterpolator()
+                    animatorSet.duration = 250 // A quick snap
+                    animatorSet.addListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            // Update layout params to finalize position
+                            lParams.leftMargin = piece.xCoord
+                            lParams.topMargin = piece.yCoord
+                            view.layoutParams = lParams
+
+                            // Reset translation properties modified by the animator
+                            view.translationX = 0f
+                            view.translationY = 0f
+
+                            puzzleGameManager.checkGameOver()
+                        }
+                    })
+                    animatorSet.start()
                 } else {
                     FirebaseHelper.logEvent(view.context, "piece_placed_incorrectly")
                 }
