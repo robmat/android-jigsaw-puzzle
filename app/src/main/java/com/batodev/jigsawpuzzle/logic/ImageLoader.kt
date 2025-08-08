@@ -6,6 +6,7 @@ import android.graphics.Matrix
 import android.widget.ImageView
 import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 
 /**
  * A class for loading and processing images for the puzzle.
@@ -20,12 +21,17 @@ class ImageLoader(private val imageView: ImageView) {
      * @throws java.io.IOException if the asset file cannot be opened or read.
      */
     fun setPicFromAsset(assetName: String, assets: android.content.res.AssetManager): Bitmap {
-        val targetW = imageView.width
-        val targetH = imageView.height
-        val inputStream = assets.open("img/$assetName")
-        val originalBitmap = BitmapFactory.decodeStream(inputStream)
-        inputStream.close()
-        return processBitmap(originalBitmap, targetW, targetH)
+        return try {
+            val targetW = imageView.width
+            val targetH = imageView.height
+            val inputStream = assets.open("img/$assetName")
+            val originalBitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream.close()
+            processBitmap(originalBitmap, targetW, targetH)
+        } catch (e: Exception) {
+            FirebaseHelper.logException(imageView.context, "setPicFromAsset", e.message)
+            throw e
+        }
     }
 
     /**
@@ -36,19 +42,24 @@ class ImageLoader(private val imageView: ImageView) {
      * @throws java.io.IOException if the file cannot be opened or read.
      */
     fun setPicFromPath(path: String): Bitmap {
-        val targetW = imageView.width
-        val targetH = imageView.height
-        val bmOptions = BitmapFactory.Options()
-        bmOptions.inJustDecodeBounds = true
-        BitmapFactory.decodeFile(path, bmOptions)
-        val photoW = bmOptions.outWidth
-        val photoH = bmOptions.outHeight
-        val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH).coerceAtLeast(1)
-        bmOptions.inJustDecodeBounds = false
-        bmOptions.inSampleSize = scaleFactor
-        val bitmap = BitmapFactory.decodeFile(path, bmOptions)
-        val rotatedBitmap = uprightBitmap(bitmap, path)
-        return processBitmap(rotatedBitmap, targetW, targetH)
+        return try {
+            val targetW = imageView.width
+            val targetH = imageView.height
+            val bmOptions = BitmapFactory.Options()
+            bmOptions.inJustDecodeBounds = true
+            BitmapFactory.decodeFile(path, bmOptions)
+            val photoW = bmOptions.outWidth
+            val photoH = bmOptions.outHeight
+            val scaleFactor = (photoW / targetW).coerceAtMost(photoH / targetH).coerceAtLeast(1)
+            bmOptions.inJustDecodeBounds = false
+            bmOptions.inSampleSize = scaleFactor
+            val bitmap = BitmapFactory.decodeFile(path, bmOptions)
+            val rotatedBitmap = uprightBitmap(bitmap, path)
+            processBitmap(rotatedBitmap, targetW, targetH)
+        } catch (e: Exception) {
+            FirebaseHelper.logException(imageView.context, "setPicFromPath", e.message)
+            throw e
+        }
     }
 
     /**

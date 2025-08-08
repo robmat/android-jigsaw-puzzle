@@ -6,6 +6,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.RelativeLayout
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
 import com.otaliastudios.zoom.ZoomLayout
 import kotlin.math.pow
@@ -49,6 +50,7 @@ class TouchListener(
                 xDelta = x - lParams.leftMargin
                 yDelta = y - lParams.topMargin
                 Log.v(TouchListener::class.simpleName, "ACTION_DOWN: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta")
+                FirebaseHelper.logEvent(view.context, "piece_touch_down")
                 piece.bringToFront()
             }
 
@@ -70,12 +72,15 @@ class TouchListener(
                     "ACTION_UP: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, xDiff=$xDiff, yDiff=$yDiff, tolerance=$tolerance"
                 )
                 if (xDiff <= tolerance && yDiff <= tolerance) {
+                    FirebaseHelper.logEvent(view.context, "piece_placed_correctly")
                     lParams.leftMargin = piece.xCoord
                     lParams.topMargin = piece.yCoord
                     piece.layoutParams = lParams
                     piece.canMove = false
                     sendViewToBack(piece)
                     puzzleGameManager.checkGameOver()
+                } else {
+                    FirebaseHelper.logEvent(view.context, "piece_placed_incorrectly")
                 }
                 view.performClick()
             }

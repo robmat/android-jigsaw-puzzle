@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
@@ -60,6 +61,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
+        FirebaseHelper.logScreenView(this, "PuzzleActivity")
 
         val windowInsetsController =
             WindowCompat.getInsetsController(this.window, this.window.decorView)
@@ -106,6 +108,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
 
         findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
             it.setOnClickListener {
+                FirebaseHelper.logButtonClick(this, "play_again")
                 finish()
             }
             it.visibility = View.GONE
@@ -160,6 +163,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      */
     @SuppressLint("ClickableViewAccessibility")
     fun onGameOver() {
+        FirebaseHelper.logEvent(this, "game_over")
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
         konfetti.visibility = View.VISIBLE
@@ -227,6 +231,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         showHighScorePopup(difficultyKey, highScores, highScores.indexOf(newScoreString))
 
         if (highScores.indexOf(newScoreString) <= 10 && highScores.indexOf(newScoreString) != -1) {
+            FirebaseHelper.logEvent(this, "new_highscore")
             Toast.makeText(this, getString(R.string.congratulations_top_10), Toast.LENGTH_LONG)
                 .show()
         }
@@ -276,6 +281,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
 
         popupView.findViewById<NeonButton>(R.id.highScoreOkButton).let {
             it.setOnClickListener {
+                FirebaseHelper.logButtonClick(this, "highscore_ok")
                 alertDialog.dismiss()
             }
             it.setOnTouchListener { view, event ->

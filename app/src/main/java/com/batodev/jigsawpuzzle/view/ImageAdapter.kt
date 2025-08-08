@@ -14,13 +14,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.AnimationSet
 import android.view.animation.ScaleAnimation
+import android.widget.BaseAdapter
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper.load
 import java.io.IOException
 
@@ -45,6 +46,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
         try {
             files = am.list("img")
         } catch (e: IOException) {
+            FirebaseHelper.logException(mContext, "ImageAdapter.init", e.message)
             e.printStackTrace()
         }
     }
@@ -127,6 +129,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
                     canvas.drawBitmap(picFromAsset, 0f, 0f, alphaPaint)
                     imageView.setImageBitmap(mutableBitmap)
                 } catch (e: IOException) {
+                    FirebaseHelper.logException(mContext, "ImageAdapter.getView", e.message)
                     Log.w(ImageAdapter::class.java.simpleName, e.localizedMessage!!)
                     throw RuntimeException(e)
                 }

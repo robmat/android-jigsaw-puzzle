@@ -2,7 +2,6 @@ package com.batodev.jigsawpuzzle.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
@@ -35,6 +35,7 @@ class MainMenuActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.main_menu_activity)
+        FirebaseHelper.logScreenView(this, "MainMenuActivity")
         RemoveBars.removeTopBottomAndActionBars(this)
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
@@ -95,6 +96,7 @@ class MainMenuActivity : AppCompatActivity() {
      * @see ImagePickActivity
      */
     fun play() {
+        FirebaseHelper.logButtonClick(this, "play")
         startActivity(Intent(this, ImagePickActivity::class.java))
     }
 
@@ -104,6 +106,7 @@ class MainMenuActivity : AppCompatActivity() {
      * @see SettingsHelper
      */
     fun gallery() {
+        FirebaseHelper.logButtonClick(this, "gallery")
         SettingsHelper.load(this)
         if (!SettingsHelper.load(this).uncoveredPics.isEmpty()) {
             startActivity(Intent(this, GalleryActivity::class.java))
@@ -116,6 +119,7 @@ class MainMenuActivity : AppCompatActivity() {
      * Opens the Google Play Store to show more applications from the developer.
      */
     fun moreApps() {
+        FirebaseHelper.logButtonClick(this, "more_apps")
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()))
     }
@@ -124,6 +128,7 @@ class MainMenuActivity : AppCompatActivity() {
      * Opens the Google Play Store to navigate to the second part of the game.
      */
     fun playPart2() {
+        FirebaseHelper.logButtonClick(this, "play_part_2")
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
     }

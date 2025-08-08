@@ -8,6 +8,7 @@ import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
 import androidx.core.graphics.set
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleProgressListener
 import com.batodev.jigsawpuzzle.view.PuzzlePiece
 import com.caverock.androidsvg.SVG
@@ -105,6 +106,7 @@ object PuzzleCutter {
                 val terminated = executor.awaitTermination(1, TimeUnit.HOURS)
                 println(terminated)
             } catch (e: InterruptedException) {
+                FirebaseHelper.logException(imageView.context, "PuzzleCutter.cut", e.message)
                 throw RuntimeException(e)
             }
             puzzleProgressListener.postToHandler { puzzleProgressListener.onCuttingFinished() }

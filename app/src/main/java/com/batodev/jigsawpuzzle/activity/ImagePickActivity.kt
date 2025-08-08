@@ -24,10 +24,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
@@ -37,7 +39,6 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
-import androidx.core.graphics.drawable.toDrawable
 
 
 private const val CAMERA_PERMISSION_REQUEST_CODE = 1
@@ -51,6 +52,7 @@ private const val DIFF_SPLIT = "X"
 class ImagePickActivity : AppCompatActivity() {
     private var photoUri: Uri? = null
     private var files: Array<String> = arrayOf()
+
     /**
      * Called when the activity is first created.
      * Initializes the UI, sets up image selection grid, and configures camera and gallery buttons.
@@ -61,6 +63,7 @@ class ImagePickActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.image_pick_activity)
+        FirebaseHelper.logScreenView(this, "ImagePickActivity")
 
         val windowInsetsController = WindowCompat.getInsetsController(this.window, this.window.decorView)
         windowInsetsController.let { controller ->
@@ -76,11 +79,12 @@ class ImagePickActivity : AppCompatActivity() {
             files = am.list("img") ?: arrayOf()
             val grid = findViewById<GridView>(R.id.grid)
             grid.adapter = ImageAdapter(this)
-            grid.onItemClickListener =
-                OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
-                    showStartGamePopup(itemClickedIndex, null)
-                }
+            grid.onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
+                FirebaseHelper.logEvent(this, "image_picked_from_grid")
+                showStartGamePopup(itemClickedIndex, null)
+            }
         } catch (e: IOException) {
+            FirebaseHelper.logException(this, "onCreate", e.message)
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
         }
         findViewById<AppCompatImageButton>(R.id.cameraButton).setOnClickListener {
@@ -137,23 +141,24 @@ class ImagePickActivity : AppCompatActivity() {
     private fun setUpCheckboxes(popupView: View, settings: Settings) {
         val backImage = popupView.findViewById<CheckBox>(R.id.background_image_checkbox)
         backImage.setOnCheckedChangeListener { _, value ->
-                settings.showImageInBackgroundOfThePuzzle = value
-                SettingsHelper.save(this, settings)
-            }
+            FirebaseHelper.logEvent(this, "checkbox_background_image", Bundle().apply { putBoolean("checked", value) })
+            settings.showImageInBackgroundOfThePuzzle = value
+            SettingsHelper.save(this, settings)
+        }
         backImage.isChecked = settings.showImageInBackgroundOfThePuzzle
         val backGrid = popupView.findViewById<CheckBox>(R.id.background_grid_checkbox)
-        backGrid
-            .setOnCheckedChangeListener { _, value ->
-                settings.showGridInBackgroundOfThePuzzle = value
-                SettingsHelper.save(this, settings)
-            }
+        backGrid.setOnCheckedChangeListener { _, value ->
+            FirebaseHelper.logEvent(this, "checkbox_background_grid", Bundle().apply { putBoolean("checked", value) })
+            settings.showGridInBackgroundOfThePuzzle = value
+            SettingsHelper.save(this, settings)
+        }
         backGrid.isChecked = settings.showGridInBackgroundOfThePuzzle
         val playSounds = popupView.findViewById<CheckBox>(R.id.play_sounds_checkbox)
-        playSounds
-            .setOnCheckedChangeListener { _, value ->
-                settings.playSounds = value
-                SettingsHelper.save(this, settings)
-            }
+        playSounds.setOnCheckedChangeListener { _, value ->
+            FirebaseHelper.logEvent(this, "checkbox_play_sounds", Bundle().apply { putBoolean("checked", value) })
+            settings.playSounds = value
+            SettingsHelper.save(this, settings)
+        }
         playSounds.isChecked = settings.playSounds
     }
 
@@ -167,8 +172,7 @@ class ImagePickActivity : AppCompatActivity() {
     private fun setUpDiffSpinner(popupView: View, settings: Settings) {
         val dimensionsList = mutableListOf<String>()
         for (i in 3..11) {
-            val dimension =
-                "${i * (i + 2)} (${i}$DIFF_SPLIT${i + 2})" // Generate the dimension string
+            val dimension = "${i * (i + 2)} (${i}$DIFF_SPLIT${i + 2})" // Generate the dimension string
             dimensionsList.add(dimension) // Add it to the list
         }
         // Use the custom layout R.layout.custom_spinner_item
@@ -214,6 +218,7 @@ class ImagePickActivity : AppCompatActivity() {
      * @see SettingsHelper
      */
     private fun diffClicked(difficultyItemClicked: String, settings: Settings) {
+        FirebaseHelper.logEvent(this, "difficulty_changed", Bundle().apply { putString("difficulty", difficultyItemClicked) })
         val split = difficultyItemClicked.substring(
             difficultyItemClicked.indexOf("(") + 1,
             difficultyItemClicked.indexOf(")")
@@ -235,6 +240,7 @@ class ImagePickActivity : AppCompatActivity() {
         mCurrentPhotoPath: String?,
         alertDialog: AlertDialog
     ) {
+        FirebaseHelper.logButtonClick(this, "start_game")
         val intent = Intent(applicationContext, PuzzleActivity::class.java)
         itemClickedIndex?.let {
             intent.putExtra("assetName", files[itemClickedIndex % files.size])
@@ -256,8 +262,11 @@ class ImagePickActivity : AppCompatActivity() {
     ) { ar ->
         if (ar) {
             photoUri?.let {
+                FirebaseHelper.logEvent(this, "image_from_camera_success")
                 showStartGamePopup(null, photoUri.toString())
             }
+        } else {
+            FirebaseHelper.logEvent(this, "image_from_camera_canceled")
         }
     }
 
@@ -278,16 +287,20 @@ class ImagePickActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                FirebaseHelper.logEvent(this, "camera_permission_granted")
                 setImageUri()
                 cameraActivityResultLauncher.launch(photoUri)
             } else {
+                FirebaseHelper.logEvent(this, "camera_permission_denied")
                 Toast.makeText(this, "Camera permission denied.", Toast.LENGTH_SHORT).show()
             }
         }
         if (requestCode == EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                FirebaseHelper.logEvent(this, "storage_permission_granted")
                 pickImageFromGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
             } else {
+                FirebaseHelper.logEvent(this, "storage_permission_denied")
                 Toast.makeText(this, "Exetrnal storage permission denied.", Toast.LENGTH_SHORT).show()
             }
         }
@@ -298,6 +311,7 @@ class ImagePickActivity : AppCompatActivity() {
      * Requests camera permission if not already granted.
      */
     fun onImageFromCameraClick() {
+        FirebaseHelper.logButtonClick(this, "image_from_camera")
         if (checkSelfPermission(Manifest.permission.CAMERA)
             != PackageManager.PERMISSION_GRANTED
         ) {
@@ -334,24 +348,29 @@ class ImagePickActivity : AppCompatActivity() {
      */
     private fun copyFileAndStartGame(it: Uri?) {
         it?.let {
-            contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
-                val directory = File(filesDir, "camera_images")
-                if (!directory.exists()) {
-                    directory.mkdirs()
-                }
-                val pathToSave = File(directory, "temp.jpg")
-                parcelFileDescriptor?.fileDescriptor?.let { fd ->
-                    val inputStream = FileInputStream(fd)
-                    val outputStream = FileOutputStream(pathToSave)
-                    inputStream.use { input ->
-                        outputStream.use { output ->
-                            input.copyTo(output)
-                        }
+            try {
+                contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
+                    val directory = File(filesDir, "camera_images")
+                    if (!directory.exists()) {
+                        directory.mkdirs()
                     }
-                    outputStream.close()
-                    inputStream.close()
-                    showStartGamePopup(null, pathToSave.toString())
+                    val pathToSave = File(directory, "temp.jpg")
+                    parcelFileDescriptor?.fileDescriptor?.let { fd ->
+                        val inputStream = FileInputStream(fd)
+                        val outputStream = FileOutputStream(pathToSave)
+                        inputStream.use { input ->
+                            outputStream.use { output ->
+                                input.copyTo(output)
+                            }
+                        }
+                        outputStream.close()
+                        inputStream.close()
+                        showStartGamePopup(null, pathToSave.toString())
+                    }
                 }
+            } catch (e: IOException) {
+                FirebaseHelper.logException(this, "copyFileAndStartGame", e.message)
+                Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -363,7 +382,12 @@ class ImagePickActivity : AppCompatActivity() {
     private val pickImageFromGallery = registerForActivityResult<PickVisualMediaRequest, Uri>(
         ActivityResultContracts.PickVisualMedia()
     ) {
-        copyFileAndStartGame(it)
+        if (it != null) {
+            FirebaseHelper.logEvent(this, "image_from_gallery_success")
+            copyFileAndStartGame(it)
+        } else {
+            FirebaseHelper.logEvent(this, "image_from_gallery_canceled")
+        }
     }
 
     /**
@@ -371,6 +395,7 @@ class ImagePickActivity : AppCompatActivity() {
      * Requests appropriate external storage permissions based on Android version.
      */
     fun onImageFromGalleryClick() {
+        FirebaseHelper.logButtonClick(this, "image_from_gallery")
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             askForReadExternalImagesPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {

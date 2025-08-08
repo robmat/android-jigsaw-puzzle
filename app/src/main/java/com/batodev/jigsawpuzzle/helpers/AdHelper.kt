@@ -37,6 +37,7 @@ object AdHelper {
      * @see #loadAd(Activity)
      */
     fun showAd(activity: Activity) {
+        FirebaseHelper.logEvent(activity, "show_ad_attempt")
         ad?.show(activity)
         loadAd(activity)
     }
@@ -53,12 +54,14 @@ object AdHelper {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     // The mInterstitialAd reference will be null until
                     // an ad is loaded.
+                    FirebaseHelper.logEvent(activity, "ad_loaded")
                     Log.i(AdHelper::class.simpleName, "onAdLoaded: $interstitialAd")
                     ad = interstitialAd
                 }
 
                 override fun onAdFailedToLoad(loadAdError: LoadAdError) {
                     // Handle the error
+                    FirebaseHelper.logException(activity, "ad_failed_to_load", loadAdError.message)
                     Log.w(AdHelper::class.simpleName, "onAdFailedToLoad: $loadAdError")
                 }
             })

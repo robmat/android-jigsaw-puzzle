@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
+import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
@@ -49,6 +50,7 @@ class GalleryActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
         setContentView(R.layout.gallery_activity)
+        FirebaseHelper.logScreenView(this, "GalleryActivity")
 
         val windowInsetsController =
             WindowCompat.getInsetsController(this.window, this.window.decorView)
@@ -87,6 +89,7 @@ class GalleryActivity : AppCompatActivity() {
             "GalleryActivity",
             "onFling: e1=$e1, e2=$e2, velocityX=$velocityX, velocityY=$velocityY"
         )
+        FirebaseHelper.logEvent(this, "gallery_fling")
         val swipeThreshold = 200
         val swipeVelocityThreshold = 300
         val diffX = e2.x - e1.x
@@ -120,6 +123,7 @@ class GalleryActivity : AppCompatActivity() {
      * Handles the click event for the back button, finishing the activity.
      */
     fun backClicked() {
+        FirebaseHelper.logButtonClick(this, "gallery_back")
         finish()
     }
 
@@ -131,6 +135,7 @@ class GalleryActivity : AppCompatActivity() {
      * @see AdHelper
      */
     fun leftClicked() {
+        FirebaseHelper.logButtonClick(this, "gallery_left")
         if (index > 0 && !isAnimating) {
             animateImageChange(-1)
             val settings = SettingsHelper.load(this)
@@ -149,6 +154,7 @@ class GalleryActivity : AppCompatActivity() {
      * @see AdHelper
      */
     fun rightClicked() {
+        FirebaseHelper.logButtonClick(this, "gallery_right")
         if (index < images.size - 1 && !isAnimating) {
             animateImageChange(1)
             val settings = SettingsHelper.load(this)
@@ -234,6 +240,7 @@ class GalleryActivity : AppCompatActivity() {
                         }
                     }
             } catch (e: java.io.IOException) {
+                FirebaseHelper.logException(this, "setImage", e.message)
                 Log.w("GalleryActivity", "Error opening image: img/${images[index]}", e)
             }
         }
@@ -245,6 +252,7 @@ class GalleryActivity : AppCompatActivity() {
      * @see FileProvider
      */
     fun shareClicked() {
+        FirebaseHelper.logButtonClick(this, "gallery_share")
         try {
             val fileShared = copyToTempFile()
             val shareIntent = Intent(Intent.ACTION_SEND)
@@ -254,6 +262,7 @@ class GalleryActivity : AppCompatActivity() {
             shareIntent.type = "image/*"
             ContextCompat.startActivity(this, shareIntent, null)
         } catch (e: Exception) {
+            FirebaseHelper.logException(this, "shareClicked", e.message)
             Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
             Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
         }
@@ -265,6 +274,7 @@ class GalleryActivity : AppCompatActivity() {
      * @throws Exception if there is an error setting the wallpaper.
      */
     fun wallpaperClicked() {
+        FirebaseHelper.logButtonClick(this, "gallery_wallpaper")
         try {
             val fileShared = copyToTempFile()
             val wallpaperManager = WallpaperManager.getInstance(this)
@@ -272,6 +282,7 @@ class GalleryActivity : AppCompatActivity() {
             wallpaperManager.setBitmap(bitmap)
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
+            FirebaseHelper.logException(this, "wallpaperClicked", e.message)
             Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
             Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
         }
