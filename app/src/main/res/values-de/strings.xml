@@ -3,55 +3,20 @@
         
   
   
-  <string name="main_menu_activity_unlocked_gallery">Galerie der enthüllten Bilder</string>
-        
-  
-  
-  <string name="main_menu_activity_more_apps">Weitere Apps wie diese</string>
-        
-  
-  
-  <string name="main_menu_activity_play_to_uncover">Spielen Sie zuerst das Spiel</string>
-        
-  
-  
-  <string name="puzzle_activity_play_again">Nochmal abspielen</string>
-        
-  
-  
+  <string name="main_menu_activity_unlocked_gallery">Galerie der freigeschalteten Bilder</string>
+  <string name="main_menu_activity_more_apps">Mehr Apps wie diese</string>
+  <string name="main_menu_activity_play_to_uncover">Spiele zuerst das Spiel</string>
+  <string name="puzzle_activity_play_again">Nochmal spielen</string>
   <string name="image_added_to_gallery">Neues Bild in der Galerie verfügbar.</string>
-        
-  
-  
-  <string name="show_image_as_background">Bild hinten anzeigen</string>
-        
-  
-  
+  <string name="show_image_as_background">Bild im Hintergrund anzeigen</string>
   <string name="how_many_puzzles">Wie viele Puzzleteile?</string>
-        
-  
-  
   <string name="show_puzzle_grid">Puzzleformen anzeigen</string>
-        
-  
-  
   <string name="main_menu_activity_play_the_game">Lass uns spielen!</string>
-        
-  
-  
-  <string name="play_sounds">Klang</string>
-        
-  
-  
+  <string name="play_sounds">Ton</string>
   <string name="wallpaper_ok">Das Bild wurde als Hintergrundbild festgelegt</string>
-      
-  
-  
-  <string name="main_menu_activity_play_part_2">Download Puzzled Girls Teil 2</string>
-    
-  
-  <string name="puzzle_activity_we_are_cutting">Ich schneide jetzt deine Puzzles …\nGib mir einfach etwas Zeit.</string>
-  
-  <string name="congratulations_top_10">Herzlichen Glückwunsch, Sie haben es in die Top 10 der schnellsten Lösungen geschafft!</string>
+  <string name="main_menu_activity_play_part_2">Puzzled Girls Teil 2 herunterladen</string>
+  <string name="puzzle_activity_we_are_cutting">Ich schneide gerade deine Puzzles aus…
+Gib mir einen Moment Zeit.</string>
+  <string name="congratulations_top_10">Herzlichen Glückwunsch, du hast es unter die Top 10 der schnellsten Lösungen geschafft!</string>
   <string name="high_scores">Highscores</string>
 </resources>

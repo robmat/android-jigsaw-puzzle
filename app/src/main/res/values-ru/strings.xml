@@ -3,55 +3,20 @@
 
 
 
-  <string name="main_menu_activity_unlocked_gallery">Галерея раскрытых фотографий</string>
-
-
-
-  <string name="main_menu_activity_more_apps">Больше подобных приложений</string>
-
-
-
-  <string name="main_menu_activity_play_to_uncover">Сначала поиграй в игру</string>
-
-
-
-  <string name="puzzle_activity_play_again">Играй еще раз</string>
-
-
-
+  <string name="main_menu_activity_unlocked_gallery">Галерея разблокированных изображений</string>
+  <string name="main_menu_activity_more_apps">Больше приложений, подобных этому</string>
+  <string name="main_menu_activity_play_to_uncover">Сначала сыграйте в игру</string>
+  <string name="puzzle_activity_play_again">Играть снова</string>
   <string name="image_added_to_gallery">Новое изображение доступно в галерее.</string>
-
-
-
-  <string name="show_image_as_background">Показать изображение сзади</string>
-
-
-
-  <string name="how_many_puzzles">Сколько частей головоломки?</string>
-
-
-
-  <string name="show_puzzle_grid">Показать формы головоломки</string>
-
-
-
+  <string name="show_image_as_background">Показать изображение в фоновом режиме</string>
+  <string name="how_many_puzzles">Сколько кусочков пазла?</string>
+  <string name="show_puzzle_grid">Показать формы пазла</string>
   <string name="main_menu_activity_play_the_game">Давайте играть!</string>
-
-
-
   <string name="play_sounds">Звук</string>
-
-
-
-  <string name="wallpaper_ok">Картинка установлена ​​в качестве обоев.</string>
-
-
-
+  <string name="wallpaper_ok">Изображение установлено в качестве обоев</string>
   <string name="main_menu_activity_play_part_2">Скачать Puzzled Girls часть 2</string>
-
-
-  <string name="puzzle_activity_we_are_cutting">Я сейчас режу твои пазлы…\nДай мне немного времени.</string>
-
-  <string name="congratulations_top_10">Поздравляем, вы попали в десятку самых быстрых решений!</string>
-  <string name="high_scores">Высокие баллы</string>
+  <string name="puzzle_activity_we_are_cutting">Я вырезаю ваши пазлы сейчас…
+Просто дайте мне немного времени.</string>
+  <string name="congratulations_top_10">Поздравляем, вы вошли в топ-10 самых быстрых решений!</string>
+  <string name="high_scores">Лучшие результаты</string>
 </resources>
