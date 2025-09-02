@@ -15,4 +15,5 @@
     <string name="show_image_as_background">पीछे छवि दिखाएँ</string>
     <string name="show_puzzle_grid">पहेली आकृतियाँ दिखाएँ</string>
     <string name="wallpaper_ok">चित्र को आपके वॉलपेपर के रूप में सेट कर दिया गया है</string>
+    <string name="main_menu_activity_continue_game">जारी रखें</string>
 </resources>

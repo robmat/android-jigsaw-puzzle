@@ -15,4 +15,5 @@
     <string name="show_image_as_background">在背景中显示图片</string>
     <string name="show_puzzle_grid">显示拼图形状</string>
     <string name="wallpaper_ok">图片已设置为您的壁纸</string>
+    <string name="main_menu_activity_continue_game">继续</string>
 </resources>

@@ -16,4 +16,5 @@
     <string name="show_image_as_background">Show image in the back</string>
     <string name="show_puzzle_grid">Show puzzle shapes</string>
     <string name="wallpaper_ok">The picture has been set as your wallpaper</string>
+    <string name="main_menu_activity_continue_game">Continue</string>
 </resources>

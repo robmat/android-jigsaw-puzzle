@@ -15,4 +15,5 @@
     <string name="show_image_as_background">পিছনে ছবি দেখান</string>
     <string name="show_puzzle_grid">ধাঁধার আকার দেখান</string>
     <string name="wallpaper_ok">ছবিটি আপনার ওয়ালপেপার হিসেবে সেট করা হয়েছে।</string>
+    <string name="main_menu_activity_continue_game">চালিয়ে যান</string>
 </resources>

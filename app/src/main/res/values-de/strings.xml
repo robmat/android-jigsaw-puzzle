@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Bild im Hintergrund anzeigen</string>
     <string name="show_puzzle_grid">Puzzleformen anzeigen</string>
     <string name="wallpaper_ok">Das Bild wurde als Hintergrundbild festgelegt</string>
+    <string name="main_menu_activity_continue_game">Fortsetzen</string>
 </resources>

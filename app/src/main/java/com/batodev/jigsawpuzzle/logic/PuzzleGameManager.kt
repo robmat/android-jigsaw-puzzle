@@ -34,6 +34,7 @@ class PuzzleGameManager(
     private val puzzleProgressListener: PuzzleProgressListener
 ) {
     var pieces: MutableList<PuzzlePiece> = mutableListOf()
+    var svgString: String? = null
     private val winSoundIds = listOf(
         R.raw.success_1, R.raw.success_2, R.raw.success_3, R.raw.success_4,
         R.raw.success_5, R.raw.success_6
@@ -60,7 +61,7 @@ class PuzzleGameManager(
         puzzleCurvesGenerator.height = bitmap.height.toDouble()
         puzzleCurvesGenerator.xn = puzzlesWidth.toDouble()
         puzzleCurvesGenerator.yn = puzzlesHeight.toDouble()
-        val svgString = puzzleCurvesGenerator.generateSvg()
+        this.svgString = puzzleCurvesGenerator.generateSvg()
 
         val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
         val canvas = Canvas(bitmapCopy)
@@ -70,7 +71,7 @@ class PuzzleGameManager(
             canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint)
         }
         if (settings.showGridInBackgroundOfThePuzzle) {
-            val svg = SVG.getFromString(svgString)
+            val svg = SVG.getFromString(this.svgString)
             svg.renderToCanvas(canvas)
         }
         imageView.setImageBitmap(bitmapCopy)
@@ -101,7 +102,7 @@ class PuzzleGameManager(
             }
             yCoord += pieceHeight
         }
-        PuzzleCutter.cut(bitmap, puzzlesHeight, puzzlesWidth, svgString, imageView, puzzleProgressListener, pieces)
+        PuzzleCutter.cut(bitmap, puzzlesHeight, puzzlesWidth, this.svgString, imageView, puzzleProgressListener, pieces)
     }
 
     /**
@@ -165,7 +166,7 @@ class PuzzleGameManager(
      * @return True if the game is over, false otherwise.
      * @see PuzzlePiece#canMove
      */
-    private fun isGameOver(): Boolean {
+    fun isGameOver(): Boolean {
         for (piece in pieces) {
             if (piece.canMove) {
                 return false

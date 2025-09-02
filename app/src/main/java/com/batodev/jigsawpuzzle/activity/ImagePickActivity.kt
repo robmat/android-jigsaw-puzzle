@@ -242,6 +242,7 @@ class ImagePickActivity : AppCompatActivity() {
     ) {
         FirebaseHelper.logButtonClick(this, "start_game")
         val intent = Intent(applicationContext, PuzzleActivity::class.java)
+        intent.putExtra("newGame", true)
         itemClickedIndex?.let {
             intent.putExtra("assetName", files[itemClickedIndex % files.size])
         }

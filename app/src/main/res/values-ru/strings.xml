@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Показать изображение в фоновом режиме</string>
     <string name="show_puzzle_grid">Показать формы пазла</string>
     <string name="wallpaper_ok">Изображение установлено в качестве обоев</string>
+    <string name="main_menu_activity_continue_game">Продолжить</string>
 </resources>

@@ -83,6 +83,23 @@
             app:nb_textStyle="normal" />
 
         <com.smb.glowbutton.NeonButton
+            android:id="@+id/main_menu_activity_continue_game"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:nb_cornerRadius="30dp"
+            app:nb_disabledStateColor="@android:color/darker_gray"
+            app:nb_drawableEnd="@drawable/ic_gamepad_36dp"
+            app:nb_drawablePadding="10dp"
+            app:nb_drawableStart="@drawable/ic_gamepad_36dp"
+            app:nb_gradientEnd="@color/colorAccent"
+            app:nb_gradientStart="@color/colorPrimary"
+            app:nb_text="@string/main_menu_activity_continue_game"
+            app:nb_textColor="@color/colorAccent"
+            app:nb_textSize="18dp"
+            app:nb_textStyle="normal" />
+
+        <com.smb.glowbutton.NeonButton
             android:id="@+id/main_menu_activity_unlocked_gallery"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

@@ -1,11 +1,18 @@
 package com.batodev.jigsawpuzzle.activity
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.Paint
 import android.graphics.Typeface
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
@@ -16,11 +23,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.createBitmap
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
@@ -31,10 +41,18 @@ import com.batodev.jigsawpuzzle.logic.ImageLoader
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
 import com.batodev.jigsawpuzzle.logic.PuzzleProgressListener
 import com.batodev.jigsawpuzzle.logic.Stopwatch
+import com.batodev.jigsawpuzzle.model.GameState
+import com.batodev.jigsawpuzzle.model.PieceState
+import com.batodev.jigsawpuzzle.view.PuzzlePiece
+import com.batodev.jigsawpuzzle.view.TouchListener
 import com.bumptech.glide.Glide
+import com.caverock.androidsvg.SVG
+import com.google.gson.Gson
 import com.otaliastudios.zoom.ZoomLayout
 import com.smb.glowbutton.NeonButton
 import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -48,6 +66,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     private val rateHelper: AppRatingHelper = AppRatingHelper(this)
     private lateinit var stopwatch: Stopwatch
     private lateinit var puzzleGameManager: PuzzleGameManager
+    private var isCuttingPuzzle: Boolean = false
 
     /**
      * Called when the activity is first created.
@@ -91,19 +110,30 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         layout.x = 0f
         layout.y = 0f
 
-        imageFileName = intent.getStringExtra("assetName")
-        val puzzlesWidth = settings.lastSetDifficultyCustomWidth
-        val puzzlesHeight = settings.lastSetDifficultyCustomHeight
+        if (intent.getBooleanExtra("newGame", false)) {
+            deleteSavedGame()
+        }
 
-        imageView.post {
-            val imageLoader = ImageLoader(imageView)
-            val bitmap = if (imageFileName != null) {
-                imageLoader.setPicFromAsset(imageFileName!!, assets)
-            } else {
-                val photoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
-                imageLoader.setPicFromPath(photoPath)
+        val savedGameFile = File(filesDir, "saved_game/gamestate.json")
+        if (savedGameFile.exists()) {
+            imageView.post { loadGameState(savedGameFile) }
+            imageView.post { bringMovablePiecesToFront() }
+        } else {
+            imageFileName = intent.getStringExtra("assetName")
+            val puzzlesWidth = settings.lastSetDifficultyCustomWidth
+            val puzzlesHeight = settings.lastSetDifficultyCustomHeight
+
+            imageView.post {
+                val imageLoader = ImageLoader(imageView)
+                val bitmap = if (imageFileName != null) {
+                    imageLoader.setPicFromAsset(imageFileName!!, assets)
+                } else {
+                    val photoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
+                    imageLoader.setPicFromPath(photoPath)
+                }
+                isCuttingPuzzle = true
+                puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
             }
-            puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
         }
 
         findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
@@ -122,6 +152,187 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             }
         }
         rateHelper.requestReview()
+    }
+
+    private fun bringMovablePiecesToFront() {
+        if (!this::puzzleGameManager.isInitialized) {
+            Log.w(PuzzleActivity::class.simpleName, "bringMovablePiecesToFront: puzzleGameManager not initialized")
+            return
+        }
+
+        puzzleGameManager.pieces.forEach { piece ->
+            if (piece.canMove) {
+                piece.bringToFront()
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        saveGameWithProgress()
+    }
+
+    private fun saveGameWithProgress() {
+        if (!this::puzzleGameManager.isInitialized || puzzleGameManager.pieces.isEmpty() || puzzleGameManager.isGameOver()) {
+            return
+        }
+
+        Thread {
+            saveGameState()
+            val intent = Intent("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
+            LocalBroadcastManager.getInstance(this@PuzzleActivity).sendBroadcast(intent)
+        }.start()
+    }
+
+    internal fun saveGameState() {
+        if (!this::puzzleGameManager.isInitialized || puzzleGameManager.pieces.isEmpty() || puzzleGameManager.isGameOver()) {
+            return
+        }
+
+        val savedGameDir = File(filesDir, "saved_game")
+        if (!savedGameDir.exists()) {
+            savedGameDir.mkdirs()
+        }
+
+        val pieceStates = mutableListOf<PieceState>()
+        puzzleGameManager.pieces.forEachIndexed { index, piece ->
+            val pieceImageFile = File(savedGameDir, "piece_$index.png")
+            try {
+                FileOutputStream(pieceImageFile).use { out ->
+                    val bitmap = (piece.drawable as? BitmapDrawable)?.bitmap
+                    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
+                }
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+            val lParams = piece.layoutParams as RelativeLayout.LayoutParams
+            val pieceState = PieceState(
+                xCoord = piece.xCoord,
+                yCoord = piece.yCoord,
+                currentX = lParams.leftMargin,
+                currentY = lParams.topMargin,
+                pieceWidth = piece.pieceWidth,
+                pieceHeight = piece.pieceHeight,
+                canMove = piece.canMove,
+                imagePath = pieceImageFile.absolutePath
+            )
+            pieceStates.add(pieceState)
+        }
+
+        val sourceBitmapFile = File(File(filesDir, "camera_images"), "temp.jpg")
+        var savedPhotoPath: String? = null
+        if (imageFileName == null && sourceBitmapFile.exists()) {
+            val destFile = File(savedGameDir, "source_image.jpg")
+            sourceBitmapFile.copyTo(destFile, true)
+            savedPhotoPath = destFile.absolutePath
+        }
+
+        val settings = SettingsHelper.load(this)
+        val gameState = GameState(
+            imageFileName = imageFileName,
+            photoPath = savedPhotoPath,
+            puzzlesWidth = settings.lastSetDifficultyCustomWidth,
+            puzzlesHeight = settings.lastSetDifficultyCustomHeight,
+            elapsedTime = stopwatch.elapsedTime,
+            pieces = pieceStates,
+            svgString = puzzleGameManager.svgString
+        )
+
+        val gson = Gson()
+        val jsonState = gson.toJson(gameState)
+        val gameStateFile = File(savedGameDir, "gamestate.json")
+        try {
+            gameStateFile.writeText(jsonState)
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        Log.d(PuzzleActivity::class.simpleName, "Game state saved to: ${gameStateFile.absolutePath}")
+
+        handler.post {
+            findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
+            findViewById<TextView>(R.id.progressText).visibility = View.GONE
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun loadGameState(gameStateFile: File) {
+        val gson = Gson()
+        val jsonState = gameStateFile.readText()
+        val gameState = gson.fromJson(jsonState, GameState::class.java)
+
+        val layout = findViewById<RelativeLayout>(R.id.layout)
+        val zoomableLayout = findViewById<ZoomLayout>(R.id.zoomableLayout)
+        val imageView = findViewById<ImageView>(R.id.imageView)
+
+        stopwatch.elapsedTime = gameState.elapsedTime
+        stopwatch.start()
+
+        imageFileName = gameState.imageFileName
+
+        val settings = SettingsHelper.load(this)
+        settings.lastSetDifficultyCustomWidth = gameState.puzzlesWidth
+        settings.lastSetDifficultyCustomHeight = gameState.puzzlesHeight
+        SettingsHelper.save(this, settings)
+
+        val imageLoader = ImageLoader(imageView)
+        val bitmap = if (gameState.imageFileName != null) {
+            imageLoader.setPicFromAsset(gameState.imageFileName, assets)
+        } else {
+            imageLoader.setPicFromPath(gameState.photoPath!!)
+        }
+
+        val svgString = gameState.svgString ?: run {
+            val puzzleCurvesGenerator = PuzzleCurvesGenerator()
+            puzzleCurvesGenerator.width = bitmap.width.toDouble()
+            puzzleCurvesGenerator.height = bitmap.height.toDouble()
+            puzzleCurvesGenerator.xn = gameState.puzzlesWidth.toDouble()
+            puzzleCurvesGenerator.yn = gameState.puzzlesHeight.toDouble()
+            puzzleCurvesGenerator.generateSvg()
+        }
+        puzzleGameManager.svgString = svgString
+
+        val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
+        val canvas = Canvas(bitmapCopy)
+        val paint = Paint()
+        paint.alpha = 70
+        if (settings.showImageInBackgroundOfThePuzzle) {
+            canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint)
+        }
+        if (settings.showGridInBackgroundOfThePuzzle) {
+            val svg = SVG.getFromString(svgString)
+            svg.renderToCanvas(canvas)
+        }
+        imageView.setImageBitmap(bitmapCopy)
+
+        val touchListener = TouchListener(puzzleGameManager, zoomableLayout)
+        val restoredPieces = mutableListOf<PuzzlePiece>()
+        gameState.pieces.forEach { pieceState ->
+            val piece = PuzzlePiece(this)
+            val pieceBitmap = BitmapFactory.decodeFile(pieceState.imagePath)
+            piece.setImageBitmap(pieceBitmap)
+
+            piece.xCoord = pieceState.xCoord
+            piece.yCoord = pieceState.yCoord
+            piece.pieceWidth = pieceState.pieceWidth
+            piece.pieceHeight = pieceState.pieceHeight
+            piece.canMove = pieceState.canMove
+
+            layout.addView(piece)
+            val lParams = piece.layoutParams as RelativeLayout.LayoutParams
+            lParams.leftMargin = pieceState.currentX
+            lParams.topMargin = pieceState.currentY
+            piece.layoutParams = lParams
+
+            if (piece.canMove) {
+                piece.setOnTouchListener(touchListener)
+            }
+            restoredPieces.add(piece)
+        }
+        puzzleGameManager.pieces = restoredPieces
+
+        findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
+        findViewById<TextView>(R.id.progressText).visibility = View.GONE
     }
 
     /**
@@ -148,6 +359,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      * Triggers the scattering of puzzle pieces on the game board.
      */
     override fun onCuttingFinished() {
+        isCuttingPuzzle = false
         puzzleGameManager.scatterPieces()
     }
 
@@ -190,6 +402,15 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val difficultyKey =
             "${settings.lastSetDifficultyCustomWidth}x${settings.lastSetDifficultyCustomHeight}"
         updateAndShowHighScores(elapsedTime, difficultyKey, settings)
+
+        deleteSavedGame()
+    }
+
+    private fun deleteSavedGame() {
+        val savedGameDir = File(filesDir, "saved_game")
+        if (savedGameDir.exists()) {
+            savedGameDir.deleteRecursively()
+        }
     }
 
     /**

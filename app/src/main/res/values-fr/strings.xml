@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Afficher l\'image en arrière-plan</string>
     <string name="show_puzzle_grid">Afficher les formes du puzzle</string>
     <string name="wallpaper_ok">L\'image a été définie comme fond d\'écran</string>
+    <string name="main_menu_activity_continue_game">Continuer</string>
 </resources>

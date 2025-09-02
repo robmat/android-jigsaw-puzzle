@@ -15,4 +15,5 @@
     <string name="show_image_as_background">画像を後ろに表示</string>
     <string name="show_puzzle_grid">パズルの形を表示する</string>
     <string name="wallpaper_ok">この写真は壁紙に設定されました</string>
+    <string name="main_menu_activity_continue_game">続ける</string>
 </resources>

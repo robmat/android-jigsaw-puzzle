@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Pokaż obraz w tle</string>
     <string name="show_puzzle_grid">Pokaż kształty puzzli</string>
     <string name="wallpaper_ok">Obraz został ustawiony jako tapeta</string>
+    <string name="main_menu_activity_continue_game">Kontynuuj</string>
 </resources>

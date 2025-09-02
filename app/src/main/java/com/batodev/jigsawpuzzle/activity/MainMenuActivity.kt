@@ -2,10 +2,10 @@ package com.batodev.jigsawpuzzle.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
@@ -19,6 +19,12 @@ import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.smb.glowbutton.NeonButton
+import java.io.File
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 
 /**
  * The main menu activity of the application.
@@ -39,33 +45,61 @@ class MainMenuActivity : AppCompatActivity() {
         RemoveBars.removeTopBottomAndActionBars(this)
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
+    }
 
+    private val saveCompleteReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val continueButton = findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
+            if (checkIfSaveIsAvailable() && continueButton.visibility != View.VISIBLE) {
+                animateMenuButtons(continueButton)
+            }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            saveCompleteReceiver,
+            IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
+        )
         val playButton = findViewById<NeonButton>(R.id.main_menu_activity_play_the_game)
+        val continueButton = findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
         val galleryButton = findViewById<NeonButton>(R.id.main_menu_activity_unlocked_gallery)
         val moreAppsButton = findViewById<NeonButton>(R.id.main_menu_activity_more_apps)
         val playPart2Button = findViewById<NeonButton>(R.id.main_menu_activity_play_part_2)
         val emberfoxLogo = findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo)
 
         playButton.visibility = View.INVISIBLE
+        continueButton.visibility = View.INVISIBLE
         galleryButton.visibility = View.INVISIBLE
         moreAppsButton.visibility = View.INVISIBLE
         playPart2Button.visibility = View.INVISIBLE
         emberfoxLogo.visibility = View.INVISIBLE
 
         playButton.setOnClickListener { play() }
+        continueButton.setOnClickListener { continueGame() }
         galleryButton.setOnClickListener { gallery() }
         moreAppsButton.setOnClickListener { moreApps() }
         playPart2Button.setOnClickListener { playPart2() }
 
-        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(this, playButton, galleryButton, moreAppsButton, playPart2Button)
+        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(this, playButton, continueButton, galleryButton, moreAppsButton, playPart2Button)
 
         // Delay the menu button animations
         Handler(Looper.getMainLooper()).postDelayed({
-            animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
-        }, 500) // Corrected to 9.5 seconds delay
+            if (checkIfSaveIsAvailable()) {
+                animateMenuButtons(playButton, continueButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
+            } else {
+                animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
+                continueButton.visibility = View.GONE
+            }
+        }, 500)
 
     }
 
+    override fun onPause() {
+        super.onPause()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(saveCompleteReceiver)
+    }
 
     private fun animateMenuButtons(vararg views: View) {
         for ((index, view) in views.withIndex()) {
@@ -100,6 +134,15 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     /**
+     * Starts the {@link PuzzleActivity} to continue the saved game.
+     * @see PuzzleActivity
+     */
+    fun continueGame() {
+        FirebaseHelper.logButtonClick(this, "continue_game")
+        startActivity(Intent(this, PuzzleActivity::class.java))
+    }
+
+    /**
      * Opens the {@link GalleryActivity} if there are unlocked pictures, otherwise shows a toast message.
      * @see GalleryActivity
      * @see SettingsHelper
@@ -131,4 +174,10 @@ class MainMenuActivity : AppCompatActivity() {
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
     }
+}
+
+private fun MainMenuActivity.checkIfSaveIsAvailable(): Boolean {
+    val savedGameFile = File(filesDir, "saved_game/gamestate.json")
+    Log.d(MainMenuActivity::class.simpleName, "savedGameFile.exists(): ${savedGameFile.exists()}")
+    return savedGameFile.exists()
 }

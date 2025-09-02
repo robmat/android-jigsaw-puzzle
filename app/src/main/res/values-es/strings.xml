@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Mostrar imagen de fondo</string>
     <string name="show_puzzle_grid">Mostrar formas de rompecabezas</string>
     <string name="wallpaper_ok">La imagen ha sido establecida como tu fondo de pantalla</string>
+    <string name="main_menu_activity_continue_game">Continuar</string>
 </resources>

@@ -15,4 +15,5 @@
     <string name="show_image_as_background">Mostrar imagem de fundo</string>
     <string name="show_puzzle_grid">Mostrar formas de quebra-cabeça</string>
     <string name="wallpaper_ok">A imagem foi definida como seu papel de parede</string>
+    <string name="main_menu_activity_continue_game">Continuar</string>
 </resources>
