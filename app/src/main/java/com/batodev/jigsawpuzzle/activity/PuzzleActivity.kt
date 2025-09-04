@@ -173,7 +173,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     }
 
     private fun saveGameWithProgress() {
-        if (!this::puzzleGameManager.isInitialized || puzzleGameManager.pieces.isEmpty() || puzzleGameManager.isGameOver()) {
+        if (!this::puzzleGameManager.isInitialized ||
+            puzzleGameManager.pieces.isEmpty() ||
+            isCuttingPuzzle ||
+            puzzleGameManager.isGameOver()) {
             return
         }
 
