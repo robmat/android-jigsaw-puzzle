@@ -4,6 +4,7 @@
     <string name="high_scores">উচ্চ স্কোর</string>
     <string name="how_many_puzzles">কত ধাঁধা টুকরা?</string>
     <string name="image_added_to_gallery">গ্যালারিতে উপলব্ধ নতুন ছবি.</string>
+    <string name="main_menu_activity_continue_game">চালিয়ে যান</string>
     <string name="main_menu_activity_more_apps">এই ধরনের আরও অ্যাপ</string>
     <string name="main_menu_activity_play_part_2">ডাউনলোড করুন Puzzled Girls পার্ট ২</string>
     <string name="main_menu_activity_play_the_game">চল খেলি!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">পিছনে ছবি দেখান</string>
     <string name="show_puzzle_grid">ধাঁধার আকার দেখান</string>
     <string name="wallpaper_ok">ছবিটি আপনার ওয়ালপেপার হিসেবে সেট করা হয়েছে।</string>
-    <string name="main_menu_activity_continue_game">চালিয়ে যান</string>
 </resources>

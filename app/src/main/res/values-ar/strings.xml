@@ -4,6 +4,7 @@
     <string name="high_scores">أعلى الدرجات</string>
     <string name="how_many_puzzles">كم عدد قطع اللغز؟</string>
     <string name="image_added_to_gallery">صورة جديدة متاحة في المعرض.</string>
+    <string name="main_menu_activity_continue_game">متابعة</string>
     <string name="main_menu_activity_more_apps">المزيد من التطبيقات مثل هذا</string>
     <string name="main_menu_activity_play_part_2">تنزيل Puzzled Girls الجزء الثاني</string>
     <string name="main_menu_activity_play_the_game">هيّا بنا لنلعب!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">إظهار الصورة في الخلف</string>
     <string name="show_puzzle_grid">عرض أشكال اللغز</string>
     <string name="wallpaper_ok">لقد تم تعيين الصورة كخلفية لجهازك</string>
-    <string name="main_menu_activity_continue_game">متابعة</string>
 </resources>

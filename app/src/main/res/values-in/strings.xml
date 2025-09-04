@@ -4,6 +4,7 @@
     <string name="high_scores">Skor Tinggi</string>
     <string name="how_many_puzzles">Berapa banyak potongan puzzle?</string>
     <string name="image_added_to_gallery">Gambar baru tersedia di galeri.</string>
+    <string name="main_menu_activity_continue_game">Lanjutkan</string>
     <string name="main_menu_activity_more_apps">Lebih banyak aplikasi seperti ini</string>
     <string name="main_menu_activity_play_part_2">Unduh Gadis Bingung bagian 2</string>
     <string name="main_menu_activity_play_the_game">Mari main!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">Tampilkan gambar di belakang</string>
     <string name="show_puzzle_grid">Tunjukkan bentuk teka-teki</string>
     <string name="wallpaper_ok">Gambar telah ditetapkan sebagai wallpaper Anda</string>
-    <string name="main_menu_activity_continue_game">Lanjutkan</string>
 </resources>

@@ -4,6 +4,7 @@
     <string name="high_scores">Highscores</string>
     <string name="how_many_puzzles">Wie viele Puzzleteile?</string>
     <string name="image_added_to_gallery">Neues Bild in der Galerie verfügbar.</string>
+    <string name="main_menu_activity_continue_game">Fortsetzen</string>
     <string name="main_menu_activity_more_apps">Mehr Apps wie diese</string>
     <string name="main_menu_activity_play_part_2">Puzzled Girls Teil 2 herunterladen</string>
     <string name="main_menu_activity_play_the_game">Lass uns spielen!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">Bild im Hintergrund anzeigen</string>
     <string name="show_puzzle_grid">Puzzleformen anzeigen</string>
     <string name="wallpaper_ok">Das Bild wurde als Hintergrundbild festgelegt</string>
-    <string name="main_menu_activity_continue_game">Fortsetzen</string>
 </resources>

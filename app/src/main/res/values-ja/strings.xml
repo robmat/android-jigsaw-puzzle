@@ -4,6 +4,7 @@
     <string name="high_scores">ハイスコア</string>
     <string name="how_many_puzzles">パズルのピースは何個ありますか？</string>
     <string name="image_added_to_gallery">新しい画像がギャラリーにあります。</string>
+    <string name="main_menu_activity_continue_game">続ける</string>
     <string name="main_menu_activity_more_apps">このようなアプリをもっと見る</string>
     <string name="main_menu_activity_play_part_2">パズルガールズパート2をダウンロード</string>
     <string name="main_menu_activity_play_the_game">遊ぼう！</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">画像を後ろに表示</string>
     <string name="show_puzzle_grid">パズルの形を表示する</string>
     <string name="wallpaper_ok">この写真は壁紙に設定されました</string>
-    <string name="main_menu_activity_continue_game">続ける</string>
 </resources>

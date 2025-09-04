@@ -4,6 +4,7 @@
     <string name="high_scores">Punteggi più alti</string>
     <string name="how_many_puzzles">Quanti pezzi del puzzle?</string>
     <string name="image_added_to_gallery">Nuova immagine disponibile nella galleria.</string>
+    <string name="main_menu_activity_continue_game">Continua</string>
     <string name="main_menu_activity_more_apps">Altre app come questa</string>
     <string name="main_menu_activity_play_part_2">Scarica Puzzled Girls parte 2</string>
     <string name="main_menu_activity_play_the_game">Giochiamo!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">Mostra immagine di sfondo</string>
     <string name="show_puzzle_grid">Mostra forme del puzzle</string>
     <string name="wallpaper_ok">L\'immagine è stata impostata come sfondo</string>
-    <string name="main_menu_activity_continue_game">Continua</string>
 </resources>

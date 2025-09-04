@@ -4,6 +4,7 @@
     <string name="high_scores">高分</string>
     <string name="how_many_puzzles">有多少块拼图？</string>
     <string name="image_added_to_gallery">图库中有新图片可用。</string>
+    <string name="main_menu_activity_continue_game">继续</string>
     <string name="main_menu_activity_more_apps">更多类似的应用</string>
     <string name="main_menu_activity_play_part_2">下载《Puzzled Girls》第 2 部分</string>
     <string name="main_menu_activity_play_the_game">我们来玩吧！</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">在背景中显示图片</string>
     <string name="show_puzzle_grid">显示拼图形状</string>
     <string name="wallpaper_ok">图片已设置为您的壁纸</string>
-    <string name="main_menu_activity_continue_game">继续</string>
 </resources>

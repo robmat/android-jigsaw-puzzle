@@ -4,6 +4,7 @@
     <string name="high_scores">Лучшие результаты</string>
     <string name="how_many_puzzles">Сколько кусочков пазла?</string>
     <string name="image_added_to_gallery">Новое изображение доступно в галерее.</string>
+    <string name="main_menu_activity_continue_game">Продолжить</string>
     <string name="main_menu_activity_more_apps">Больше приложений, подобных этому</string>
     <string name="main_menu_activity_play_part_2">Скачать Puzzled Girls часть 2</string>
     <string name="main_menu_activity_play_the_game">Давайте играть!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">Показать изображение в фоновом режиме</string>
     <string name="show_puzzle_grid">Показать формы пазла</string>
     <string name="wallpaper_ok">Изображение установлено в качестве обоев</string>
-    <string name="main_menu_activity_continue_game">Продолжить</string>
 </resources>

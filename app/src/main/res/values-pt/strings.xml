@@ -4,6 +4,7 @@
     <string name="high_scores">Pontuações mais altas</string>
     <string name="how_many_puzzles">Quantas peças de quebra-cabeça?</string>
     <string name="image_added_to_gallery">Nova imagem disponível na galeria.</string>
+    <string name="main_menu_activity_continue_game">Continuar</string>
     <string name="main_menu_activity_more_apps">Mais aplicativos como este</string>
     <string name="main_menu_activity_play_part_2">Baixar Puzzled Girls parte 2</string>
     <string name="main_menu_activity_play_the_game">Vamos jogar!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">Mostrar imagem de fundo</string>
     <string name="show_puzzle_grid">Mostrar formas de quebra-cabeça</string>
     <string name="wallpaper_ok">A imagem foi definida como seu papel de parede</string>
-    <string name="main_menu_activity_continue_game">Continuar</string>
 </resources>

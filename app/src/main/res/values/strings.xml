@@ -5,6 +5,7 @@
     <string name="high_scores">High Scores</string>
     <string name="how_many_puzzles">How many puzzle pieces?</string>
     <string name="image_added_to_gallery">New image available in the gallery.</string>
+    <string name="main_menu_activity_continue_game">Continue</string>
     <string name="main_menu_activity_more_apps">More apps like this</string>
     <string name="main_menu_activity_play_part_2">Download Puzzled Girls part 2</string>
     <string name="main_menu_activity_play_the_game">Let\'s play!</string>
@@ -16,5 +17,4 @@
     <string name="show_image_as_background">Show image in the back</string>
     <string name="show_puzzle_grid">Show puzzle shapes</string>
     <string name="wallpaper_ok">The picture has been set as your wallpaper</string>
-    <string name="main_menu_activity_continue_game">Continue</string>
 </resources>

@@ -4,6 +4,7 @@
     <string name="high_scores">اعلی اسکورز</string>
     <string name="how_many_puzzles">کتنے پہیلی کے ٹکڑے ہیں؟</string>
     <string name="image_added_to_gallery">نئی تصویر گیلری میں دستیاب ہے۔</string>
+    <string name="main_menu_activity_continue_game">جاری رکھیں</string>
     <string name="main_menu_activity_more_apps">اس طرح کی مزید ایپس</string>
     <string name="main_menu_activity_play_part_2">پریشان لڑکیاں حصہ 2 ڈاؤن لوڈ کریں۔</string>
     <string name="main_menu_activity_play_the_game">چلو کھیلتے ہیں!</string>
@@ -15,5 +16,4 @@
     <string name="show_image_as_background">پیچھے کی تصویر دکھائیں۔</string>
     <string name="show_puzzle_grid">پہیلی کی شکلیں دکھائیں۔</string>
     <string name="wallpaper_ok">تصویر کو آپ کے وال پیپر کے طور پر سیٹ کر دیا گیا ہے۔</string>
-    <string name="main_menu_activity_continue_game">جاری رکھیں</string>
 </resources>
