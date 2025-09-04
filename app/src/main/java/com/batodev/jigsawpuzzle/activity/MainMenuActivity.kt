@@ -58,6 +58,12 @@ class MainMenuActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+
+        val background = findViewById<ImageView>(R.id.main_menu_background)
+        ObjectAnimator.ofFloat(background, "alpha", 0f, 0.4f).apply {
+            duration = 2000
+            start()
+        }
         LocalBroadcastManager.getInstance(this).registerReceiver(
             saveCompleteReceiver,
             IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
