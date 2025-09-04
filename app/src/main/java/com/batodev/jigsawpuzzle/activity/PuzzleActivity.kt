@@ -56,7 +56,9 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.random.Random
 
+const val FAKE_PROGRESS_MAX = 10
 /**
  * The main activity for the puzzle game.
  */
@@ -67,6 +69,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     private lateinit var stopwatch: Stopwatch
     private lateinit var puzzleGameManager: PuzzleGameManager
     private var isCuttingPuzzle: Boolean = false
+    private var fakeProgress = 0
 
     /**
      * Called when the activity is first created.
@@ -133,6 +136,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                 }
                 isCuttingPuzzle = true
                 puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
+                fakeSomeProgress(puzzlesWidth * puzzlesHeight)
             }
         }
 
@@ -152,6 +156,21 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             }
         }
         rateHelper.requestReview()
+    }
+
+    /**
+     * Simulates some progress on the progress bar to enhance user experience during puzzle cutting.
+     * @param maxProgress The real maximum progress value to be set on the progress bar.
+     */
+    private fun fakeSomeProgress(maxProgress: Int) {
+        for (i in 1..FAKE_PROGRESS_MAX) {
+            handler.postDelayed({
+                fakeProgress = i
+                val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+                progressBar.progress = progressBar.progress + 1
+                progressBar.max = maxProgress + FAKE_PROGRESS_MAX
+            }, i * 1000L + (Random.nextInt(600) - 300))
+        }
     }
 
     private fun bringMovablePiecesToFront() {
@@ -347,8 +366,8 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     override fun onProgressUpdate(progress: Int, max: Int) {
         handler.post {
             val progressBar = findViewById<ProgressBar>(R.id.progressBar)
-            progressBar.max = max
-            progressBar.progress = progress
+            progressBar.max = max + FAKE_PROGRESS_MAX
+            progressBar.progress = progress + fakeProgress
             if (progress == max) {
                 progressBar.visibility = View.GONE
                 findViewById<TextView>(R.id.progressText).visibility = View.GONE
