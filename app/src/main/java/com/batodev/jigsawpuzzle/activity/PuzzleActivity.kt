@@ -68,7 +68,14 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     private val rateHelper: AppRatingHelper = AppRatingHelper(this)
     private lateinit var stopwatch: Stopwatch
     private lateinit var puzzleGameManager: PuzzleGameManager
-    private var isCuttingPuzzle: Boolean = false
+    companion object {
+        enum class PuzzleStatus {
+            IDLE,
+            CUTTING,
+            SAVING
+        }
+        val puzzleStatus = java.util.concurrent.atomic.AtomicReference(PuzzleStatus.IDLE)
+    }
     private var fakeProgress = 0
 
     /**
@@ -134,8 +141,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                     val photoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
                     imageLoader.setPicFromPath(photoPath)
                 }
-                isCuttingPuzzle = true
-                puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
+                if (puzzleStatus.compareAndSet(PuzzleStatus.IDLE, PuzzleStatus.CUTTING)) {
+                    puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
+                }
                 fakeSomeProgress(puzzlesWidth * puzzlesHeight)
             }
         }
@@ -192,18 +200,19 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     }
 
     private fun saveGameWithProgress() {
-        if (!this::puzzleGameManager.isInitialized ||
-            puzzleGameManager.pieces.isEmpty() ||
-            isCuttingPuzzle ||
-            puzzleGameManager.isGameOver()) {
-            return
-        }
-
-        Thread {
-            saveGameState()
-            val intent = Intent("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
+        if (puzzleStatus.compareAndSet(PuzzleStatus.IDLE, PuzzleStatus.SAVING)) {
+            val intent = Intent("com.batodev.jigsawpuzzle.SAVE_STARTED")
             LocalBroadcastManager.getInstance(this@PuzzleActivity).sendBroadcast(intent)
-        }.start()
+            Thread {
+                try {
+                    saveGameState()
+                    val completeIntent = Intent("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
+                    LocalBroadcastManager.getInstance(this@PuzzleActivity).sendBroadcast(completeIntent)
+                } finally {
+                    puzzleStatus.set(PuzzleStatus.IDLE)
+                }
+            }.start()
+        }
     }
 
     internal fun saveGameState() {
@@ -381,7 +390,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      * Triggers the scattering of puzzle pieces on the game board.
      */
     override fun onCuttingFinished() {
-        isCuttingPuzzle = false
+        puzzleStatus.set(PuzzleStatus.IDLE)
         puzzleGameManager.scatterPieces()
     }
 

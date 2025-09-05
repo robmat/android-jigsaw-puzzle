@@ -13,6 +13,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import com.batodev.jigsawpuzzle.R
+
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
@@ -47,6 +48,12 @@ class MainMenuActivity : AppCompatActivity() {
         AdHelper.loadAd(this)
     }
 
+    private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            findViewById<NeonButton>(R.id.main_menu_activity_continue_game).visibility = View.GONE
+        }
+    }
+
     private val saveCompleteReceiver: BroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             val continueButton = findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
@@ -64,6 +71,10 @@ class MainMenuActivity : AppCompatActivity() {
             duration = 2000
             start()
         }
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+            saveStartedReceiver,
+            IntentFilter("com.batodev.jigsawpuzzle.SAVE_STARTED")
+        )
         LocalBroadcastManager.getInstance(this).registerReceiver(
             saveCompleteReceiver,
             IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
@@ -92,7 +103,10 @@ class MainMenuActivity : AppCompatActivity() {
 
         // Delay the menu button animations
         Handler(Looper.getMainLooper()).postDelayed({
-            if (checkIfSaveIsAvailable()) {
+            val isSaving = PuzzleActivity.Companion.puzzleStatus.get() == PuzzleActivity.Companion.PuzzleStatus.SAVING
+            val saveExists = checkIfSaveIsAvailable()
+
+            if (saveExists && !isSaving) {
                 animateMenuButtons(playButton, continueButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
             } else {
                 animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
@@ -104,6 +118,7 @@ class MainMenuActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(saveStartedReceiver)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(saveCompleteReceiver)
     }
 
@@ -180,10 +195,11 @@ class MainMenuActivity : AppCompatActivity() {
         startActivity(Intent(Intent.ACTION_VIEW,
             "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
     }
-}
 
-private fun MainMenuActivity.checkIfSaveIsAvailable(): Boolean {
-    val savedGameFile = File(filesDir, "saved_game/gamestate.json")
-    Log.d(MainMenuActivity::class.simpleName, "savedGameFile.exists(): ${savedGameFile.exists()}")
-    return savedGameFile.exists()
+    private fun checkIfSaveIsAvailable(): Boolean {
+        val savedGameFile = File(filesDir, "saved_game/gamestate.json")
+        Log.d(MainMenuActivity::class.simpleName, "savedGameFile.exists(): ${savedGameFile.exists()}")
+        return savedGameFile.exists()
+    }
+
 }
