@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Google Play game services IDs. Save this file as res/values/games-ids.xml in your project.-->
+<resources>
+    <!--app_id-->
+    <string name="app_id" translatable="false">355233798290</string>
+    <!--package_name-->
+    <string name="package_name" translatable="false">com.batodev.jigsawpuzzle</string>
+    <!--achievement Globetrotter-->
+    <string name="achievement_globetrotter" translatable="false">CgkIkrHWrKsKEAIQHw</string>
+    <!--achievement Night Owl-->
+    <string name="achievement_night_owl" translatable="false">CgkIkrHWrKsKEAIQHg</string>
+    <!--achievement Daily Ritual-->
+    <string name="achievement_daily_ritual" translatable="false">CgkIkrHWrKsKEAIQHQ</string>
+    <!--achievement In the Zone-->
+    <string name="achievement_in_the_zone" translatable="false">CgkIkrHWrKsKEAIQHA</string>
+    <!--achievement Piece Enthusiast-->
+    <string name="achievement_piece_enthusiast" translatable="false">CgkIkrHWrKsKEAIQGw</string>
+    <!--achievement Photographer-->
+    <string name="achievement_photographer" translatable="false">CgkIkrHWrKsKEAIQGg</string>
+    <!--achievement Window Shopper-->
+    <string name="achievement_window_shopper" translatable="false">CgkIkrHWrKsKEAIQGQ</string>
+    <!--achievement I Like This One-->
+    <string name="achievement_i_like_this_one" translatable="false">CgkIkrHWrKsKEAIQGA</string>
+    <!--achievement To Be Continued...-->
+    <string name="achievement_to_be_continued..." translatable="false">CgkIkrHWrKsKEAIQFw</string>
+    <!--achievement Apprentice-->
+    <string name="achievement_apprentice" translatable="false">CgkIkrHWrKsKEAIQFg</string>
+    <!--achievement Speedster-->
+    <string name="achievement_speedster" translatable="false">CgkIkrHWrKsKEAIQFQ</string>
+    <!--achievement Curator-->
+    <string name="achievement_curator" translatable="false">CgkIkrHWrKsKEAIQFA</string>
+    <!--achievement Journeyman-->
+    <string name="achievement_journeyman" translatable="false">CgkIkrHWrKsKEAIQEw</string>
+    <!--achievement Quick Game-->
+    <string name="achievement_quick_game" translatable="false">CgkIkrHWrKsKEAIQEg</string>
+    <!--achievement Veteran-->
+    <string name="achievement_veteran" translatable="false">CgkIkrHWrKsKEAIQEQ</string>
+    <!--achievement Record Setter-->
+    <string name="achievement_record_setter" translatable="false">CgkIkrHWrKsKEAIQEA</string>
+    <!--achievement Collector-->
+    <string name="achievement_collector" translatable="false">CgkIkrHWrKsKEAIQDw</string>
+    <!--achievement Piece Collector-->
+    <string name="achievement_piece_collector" translatable="false">CgkIkrHWrKsKEAIQDg</string>
+    <!--achievement Welcome Back-->
+    <string name="achievement_welcome_back" translatable="false">CgkIkrHWrKsKEAIQDQ</string>
+    <!--achievement Purist-->
+    <string name="achievement_purist" translatable="false">CgkIkrHWrKsKEAIQDA</string>
+    <!--achievement Puzzle Initiate-->
+    <string name="achievement_puzzle_initiate" translatable="false">CgkIkrHWrKsKEAIQCw</string>
+    <!--achievement First Piece Down-->
+    <string name="achievement_first_piece_down" translatable="false">CgkIkrHWrKsKEAIQCg</string>
+    <!--achievement Show and Tell-->
+    <string name="achievement_show_and_tell" translatable="false">CgkIkrHWrKsKEAIQCQ</string>
+    <!--achievement Top of the Charts-->
+    <string name="achievement_top_of_the_charts" translatable="false">CgkIkrHWrKsKEAIQCA</string>
+    <!--achievement Silent Solver-->
+    <string name="achievement_silent_solver" translatable="false">CgkIkrHWrKsKEAIQBw</string>
+    <!--achievement Puzzle Master-->
+    <string name="achievement_puzzle_master" translatable="false">CgkIkrHWrKsKEAIQBg</string>
+    <!--achievement Gallery Complete-->
+    <string name="achievement_gallery_complete" translatable="false">CgkIkrHWrKsKEAIQBQ</string>
+    <!--achievement The Big Picture-->
+    <string name="achievement_the_big_picture" translatable="false">CgkIkrHWrKsKEAIQBA</string>
+    <!--achievement Marathoner-->
+    <string name="achievement_marathoner" translatable="false">CgkIkrHWrKsKEAIQAw</string>
+    <!--achievement Maximum Effort-->
+    <string name="achievement_maximum_effort" translatable="false">CgkIkrHWrKsKEAIQAg</string>
+</resources>
