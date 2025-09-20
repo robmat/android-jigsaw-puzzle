@@ -1,4 +1,3 @@
-Name,Description,Incremental value,Steps Needed,Initial State,Points,List Order
 "First Piece Down","Place your first puzzle piece.",false,1,REVEALED,5,1
 "Puzzle Initiate","Complete your first puzzle of any size.",false,1,REVEALED,5,2
 "Quick Game","Solve a puzzle with fewer than 20 pieces.",false,1,REVEALED,5,3
