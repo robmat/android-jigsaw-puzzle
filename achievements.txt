@@ -1,0 +1,39 @@
+# Jigsaw Puzzle Game Achievements (v2)
+
+### Getting Started
+1.  **First Piece Down:** Place your first puzzle piece.
+2.  **Puzzle Initiate:** Complete your first puzzle of any size.
+3.  **Quick Game:** Solve a puzzle with fewer than 20 pieces.
+4.  **Photographer:** Solve a puzzle using a new photo from your camera.
+5.  **Curator:** Solve a puzzle using an image from your device's gallery.
+
+### Progression & Volume
+6.  **Apprentice:** Solve 10 puzzles.
+7.  **Journeyman:** Solve 25 puzzles.
+8.  **Veteran:** Solve 50 puzzles.
+9.  **Puzzle Master:** Solve 100 puzzles.
+10. **Piece Collector:** Place a total of 1,000 pieces.
+11. **Piece Enthusiast:** Place a total of 5,000 pieces.
+12. **Marathoner:** Accumulate 10 hours of total playtime.
+13. **Daily Ritual:** Open the game and play on 3 consecutive days.
+
+### Challenge & Difficulty
+14. **The Big Picture:** Solve a puzzle with over 100 pieces.
+15. **Maximum Effort:** Solve a puzzle with the maximum number of pieces (143).
+16. **Purist:** Solve a 100+ piece puzzle with both "Show image in background" and "Show puzzle grid" disabled.
+17. **Silent Solver:** Solve a puzzle with the "Play Sounds" setting disabled.
+18. **Speedster:** Solve a puzzle with 50+ pieces in under 3 minutes.
+19. **Record Setter:** Beat your own personal best time for any difficulty.
+20. **Top of the Charts:** Achieve the #1 high score for any difficulty level.
+
+### Special & Hidden
+21. **I Like This One:** Set a completed puzzle as your phone wallpaper from the gallery.
+22. **Show and Tell:** Use the share feature in the gallery.
+23. **Welcome Back:** Load and continue a saved game from the main menu.
+24. **To Be Continued...:** Press the "Download Puzzled Girls part 2" button.
+25. **Window Shopper:** Press the "More apps like this" button.
+26. **Globetrotter:** Start a game in three different languages.
+27. **Night Owl:** Finish a puzzle between midnight and 4 AM.
+28. **In the Zone:** Place 50 pieces correctly in a row without a mistake.
+29. **Collector:** Unlock 10 different images in the rewards gallery.
+30. **Gallery Complete:** Unlock all of the default bundled images.

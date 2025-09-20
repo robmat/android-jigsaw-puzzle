@@ -1,16 +1,17 @@
+Name,Description,Incremental value,Steps Needed,Initial State,Points,List Order
 "First Piece Down","Place your first puzzle piece.",false,1,REVEALED,5,1
 "Puzzle Initiate","Complete your first puzzle of any size.",false,1,REVEALED,5,2
 "Quick Game","Solve a puzzle with fewer than 20 pieces.",false,1,REVEALED,5,3
 "Photographer","Solve a puzzle using a new photo from your camera.",false,1,REVEALED,5,4
 "Curator","Solve a puzzle using an image from your device's gallery.",false,1,REVEALED,5,5
-"Apprentice","Solve 10 puzzles.",false,10,REVEALED,5,6
-"Journeyman","Solve 25 puzzles.",false,25,REVEALED,5,7
-"Veteran","Solve 50 puzzles.",false,50,REVEALED,5,8
-"Puzzle Master","Solve 100 puzzles.",false,100,REVEALED,5,9
-"Piece Collector","Place a total of 1,000 pieces.",false,1000,REVEALED,5,10
-"Piece Enthusiast","Place a total of 5,000 pieces.",false,5000,REVEALED,5,11
-"Marathoner","Accumulate 10 hours of total playtime.",false,10,REVEALED,5,12
-"Daily Ritual","Open the game and play on 3 consecutive days.",false,3,REVEALED,5,13
+"Apprentice","Solve 10 puzzles.",true,10,REVEALED,5,6
+"Journeyman","Solve 25 puzzles.",true,25,REVEALED,5,7
+"Veteran","Solve 50 puzzles.",true,50,REVEALED,5,8
+"Puzzle Master","Solve 100 puzzles.",true,100,REVEALED,5,9
+"Piece Collector","Place a total of 1,000 pieces.",true,1000,REVEALED,5,10
+"Piece Enthusiast","Place a total of 5,000 pieces.",true,5000,REVEALED,5,11
+"Marathoner","Accumulate 10 hours of total playtime.",true,10,REVEALED,5,12
+"Daily Ritual","Open the game and play on 3 consecutive days.",true,3,REVEALED,5,13
 "The Big Picture","Solve a puzzle with over 100 pieces.",false,1,REVEALED,5,14
 "Maximum Effort","Solve a puzzle with the maximum number of pieces (143).",false,1,REVEALED,5,15
 "Purist","Solve a 100+ piece puzzle with both ""Show image in background"" and ""Show puzzle grid"" disabled.",false,1,REVEALED,5,16
@@ -25,6 +26,6 @@
 "Window Shopper","Press the ""More apps like this"" button.",false,1,REVEALED,5,25
 "Globetrotter","Start a game in three different languages.",false,1,REVEALED,5,26
 "Night Owl","Finish a puzzle between midnight and 4 AM.",false,1,REVEALED,5,27
-"In the Zone","Place 50 pieces correctly in a row without a mistake.",false,50,REVEALED,5,28
-"Collector","Unlock 10 different images in the rewards gallery.",false,10,REVEALED,5,29
-"Gallery Complete","Unlock all of the default bundled images.",false,20,REVEALED,5,30
+"In the Zone","Place 50 pieces correctly in a row without a mistake.",true,50,REVEALED,5,28
+"Collector","Unlock 10 different images in the rewards gallery.",true,10,REVEALED,5,29
+"Gallery Complete","Unlock all of the default bundled images.",true,20,REVEALED,5,30
