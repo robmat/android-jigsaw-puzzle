@@ -54,5 +54,7 @@
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-9667420067790140~7287633890" />
+        <meta-data android:name="com.google.android.gms.games.APP_ID"
+            android:value="355233798290"/>
     </application>
 </manifest>

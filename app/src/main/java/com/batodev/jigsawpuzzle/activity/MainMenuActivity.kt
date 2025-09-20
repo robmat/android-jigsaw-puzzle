@@ -26,6 +26,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.google.android.gms.games.PlayGamesSdk
 
 /**
  * The main menu activity of the application.
@@ -46,6 +47,7 @@ class MainMenuActivity : AppCompatActivity() {
         RemoveBars.removeTopBottomAndActionBars(this)
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
+        PlayGamesSdk.initialize(this);
     }
 
     private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
