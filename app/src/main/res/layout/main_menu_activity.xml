@@ -151,10 +151,23 @@
         android:layout_width="72dp"
         android:layout_height="72dp"
         android:layout_marginBottom="20dp"
+        android:layout_marginStart="40dp"
         android:contentDescription="@string/app_name"
         android:src="@drawable/emberfox_logo"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/main_menu_activity_achievements"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="40dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_cup_36dp"
+        app:tint="@color/colorPrimaryDark"
+        android:background="@drawable/none"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -32,8 +32,7 @@
 23. **Welcome Back:** Load and continue a saved game from the main menu.
 24. **To Be Continued...:** Press the "Download Puzzled Girls part 2" button.
 25. **Window Shopper:** Press the "More apps like this" button.
-26. **Globetrotter:** Start a game in three different languages.
-27. **Night Owl:** Finish a puzzle between midnight and 4 AM.
-28. **In the Zone:** Place 50 pieces correctly in a row without a mistake.
-29. **Collector:** Unlock 10 different images in the rewards gallery.
-30. **Gallery Complete:** Unlock all of the default bundled images.
+26. **Night Owl:** Finish a puzzle between midnight and 4 AM.
+27. **In the Zone:** Place 50 pieces correctly in a row without a mistake.
+28. **Collector:** Unlock 10 different images in the rewards gallery.
+29. **Gallery Complete:** Unlock all of the default bundled images.

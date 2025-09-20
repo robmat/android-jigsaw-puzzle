@@ -2,6 +2,10 @@ package com.batodev.jigsawpuzzle.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,28 +14,29 @@ import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.batodev.jigsawpuzzle.R
-
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
+import com.google.android.gms.games.PlayGames
+import com.google.android.gms.games.PlayGamesSdk
+import com.google.android.gms.tasks.OnSuccessListener
 import com.smb.glowbutton.NeonButton
 import java.io.File
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
-import com.google.android.gms.games.PlayGamesSdk
 
 /**
  * The main menu activity of the application.
  */
 class MainMenuActivity : AppCompatActivity() {
+    private lateinit var achievementsLauncher: ActivityResultLauncher<Intent>
+
     /**
      * Called when the activity is first created.
      * Initializes the UI, loads settings, and sets up event listeners for menu buttons.
@@ -48,6 +53,8 @@ class MainMenuActivity : AppCompatActivity() {
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
         PlayGamesSdk.initialize(this);
+        initializeAchievementsLauncher()
+        signInSilently()
     }
 
     private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -87,6 +94,7 @@ class MainMenuActivity : AppCompatActivity() {
         val moreAppsButton = findViewById<NeonButton>(R.id.main_menu_activity_more_apps)
         val playPart2Button = findViewById<NeonButton>(R.id.main_menu_activity_play_part_2)
         val emberfoxLogo = findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo)
+        val achievementButton = findViewById<ImageView>(R.id.main_menu_activity_achievements)
 
         playButton.visibility = View.INVISIBLE
         continueButton.visibility = View.INVISIBLE
@@ -94,24 +102,49 @@ class MainMenuActivity : AppCompatActivity() {
         moreAppsButton.visibility = View.INVISIBLE
         playPart2Button.visibility = View.INVISIBLE
         emberfoxLogo.visibility = View.INVISIBLE
+        achievementButton.visibility = View.INVISIBLE
 
         playButton.setOnClickListener { play() }
         continueButton.setOnClickListener { continueGame() }
         galleryButton.setOnClickListener { gallery() }
         moreAppsButton.setOnClickListener { moreApps() }
         playPart2Button.setOnClickListener { playPart2() }
+        achievementButton.setOnClickListener { achievements() }
 
-        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(this, playButton, continueButton, galleryButton, moreAppsButton, playPart2Button)
+        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(
+            this,
+            playButton,
+            continueButton,
+            galleryButton,
+            moreAppsButton,
+            playPart2Button
+        )
 
         // Delay the menu button animations
         Handler(Looper.getMainLooper()).postDelayed({
-            val isSaving = PuzzleActivity.Companion.puzzleStatus.get() == PuzzleActivity.Companion.PuzzleStatus.SAVING
+            val isSaving =
+                PuzzleActivity.Companion.puzzleStatus.get() == PuzzleActivity.Companion.PuzzleStatus.SAVING
             val saveExists = checkIfSaveIsAvailable()
 
             if (saveExists && !isSaving) {
-                animateMenuButtons(playButton, continueButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
+                animateMenuButtons(
+                    playButton,
+                    continueButton,
+                    galleryButton,
+                    moreAppsButton,
+                    playPart2Button,
+                    emberfoxLogo,
+                    achievementButton
+                )
             } else {
-                animateMenuButtons(playButton, galleryButton, moreAppsButton, playPart2Button, emberfoxLogo)
+                animateMenuButtons(
+                    playButton,
+                    galleryButton,
+                    moreAppsButton,
+                    playPart2Button,
+                    emberfoxLogo,
+                    achievementButton
+                )
                 continueButton.visibility = View.GONE
             }
         }, 500)
@@ -122,6 +155,43 @@ class MainMenuActivity : AppCompatActivity() {
         super.onPause()
         LocalBroadcastManager.getInstance(this).unregisterReceiver(saveStartedReceiver)
         LocalBroadcastManager.getInstance(this).unregisterReceiver(saveCompleteReceiver)
+    }
+
+    private fun signInSilently() {
+        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
+        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
+            if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
+                // User is already signed in or silent sign-in was successful
+                Log.d(MainMenuActivity::class.simpleName, "User is authenticated.")
+                // Now you can proceed to show achievements
+            } else {
+                // User is not signed in or silent sign-in failed
+                Log.d(MainMenuActivity::class.simpleName, "User not authenticated. Attempting interactive sign-in.")
+                signInInteractively()
+            }
+        }
+    }
+
+    private fun signInInteractively() {
+        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
+        gamesSignInClient.signIn().addOnCompleteListener { signInTask ->
+            if (signInTask.isSuccessful && signInTask.result.isAuthenticated) {
+                Log.d(MainMenuActivity::class.simpleName, "Interactive sign-in successful.")
+            } else {
+                Log.e(MainMenuActivity::class.simpleName, "Interactive sign-in failed ${signInTask.result} ${signInTask.exception}.", signInTask.exception)
+            }
+        }
+    }
+
+    private fun initializeAchievementsLauncher() {
+        achievementsLauncher = registerForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { result ->
+            Log.d(
+                MainMenuActivity::class.simpleName,
+                "Returned from Achievements ${result.resultCode}"
+            )
+        }
     }
 
     private fun animateMenuButtons(vararg views: View) {
@@ -176,7 +246,8 @@ class MainMenuActivity : AppCompatActivity() {
         if (!SettingsHelper.load(this).uncoveredPics.isEmpty()) {
             startActivity(Intent(this, GalleryActivity::class.java))
         } else {
-            Toast.makeText(this, R.string.main_menu_activity_play_to_uncover, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.main_menu_activity_play_to_uncover, Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -185,8 +256,12 @@ class MainMenuActivity : AppCompatActivity() {
      */
     fun moreApps() {
         FirebaseHelper.logButtonClick(this, "more_apps")
-        startActivity(Intent(Intent.ACTION_VIEW,
-            "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()))
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/dev?id=8228670503574649511".toUri()
+            )
+        )
     }
 
     /**
@@ -194,14 +269,51 @@ class MainMenuActivity : AppCompatActivity() {
      */
     fun playPart2() {
         FirebaseHelper.logButtonClick(this, "play_part_2")
-        startActivity(Intent(Intent.ACTION_VIEW,
-            "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()))
+        startActivity(
+            Intent(
+                Intent.ACTION_VIEW,
+                "https://play.google.com/store/apps/details?id=com.batodev.jigsawpuzzle3".toUri()
+            )
+        )
     }
 
     private fun checkIfSaveIsAvailable(): Boolean {
         val savedGameFile = File(filesDir, "saved_game/gamestate.json")
-        Log.d(MainMenuActivity::class.simpleName, "savedGameFile.exists(): ${savedGameFile.exists()}")
+        Log.d(
+            MainMenuActivity::class.simpleName,
+            "savedGameFile.exists(): ${savedGameFile.exists()}"
+        )
         return savedGameFile.exists()
     }
 
+    private fun achievements() {
+        PlayGamesSdk.initialize(this) // Initialize if not already done
+        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
+
+        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
+            if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
+                // User is signed in, proceed to show achievements
+                val achievementsClient = PlayGames.getAchievementsClient(this)
+                achievementsClient.achievementsIntent
+                    .addOnSuccessListener { intent ->
+                        try {
+                            achievementsLauncher.launch(intent)
+                        } catch (e: Exception) {
+                            // Handle cases where the activity might not be found
+                            Log.e(MainMenuActivity::class.simpleName, "Could not launch achievements intent", e)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(MainMenuActivity::class.simpleName, "Couldn't get Achievements Intent", e)
+                        // Handle failure (e.g., show a message to the user)
+                    }
+            } else {
+                // User is not signed in, prompt them to sign in
+                Log.w(MainMenuActivity::class.simpleName, "User not signed in. Prompting for sign-in.")
+                // Start your sign-in flow here
+                // For example:
+                signInSilently()
+            }
+        }
+    }
 }

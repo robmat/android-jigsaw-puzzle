@@ -23,8 +23,7 @@
 "Welcome Back","Load and continue a saved game from the main menu.",false,1,REVEALED,5,23
 "To Be Continued...","Press the ""Download Puzzled Girls part 2"" button.",false,1,REVEALED,5,24
 "Window Shopper","Press the ""More apps like this"" button.",false,1,REVEALED,5,25
-"Globetrotter","Start a game in three different languages.",false,1,REVEALED,5,26
-"Night Owl","Finish a puzzle between midnight and 4 AM.",false,1,REVEALED,5,27
-"In the Zone","Place 50 pieces correctly in a row without a mistake.",true,50,REVEALED,5,28
-"Collector","Unlock 10 different images in the rewards gallery.",true,10,REVEALED,5,29
-"Gallery Complete","Unlock all of the default bundled images.",true,20,REVEALED,5,30
+"Night Owl","Finish a puzzle between midnight and 4 AM.",false,1,REVEALED,5,26
+"In the Zone","Place 50 pieces correctly in a row without a mistake.",true,50,REVEALED,5,27
+"Collector","Unlock 10 different images in the rewards gallery.",true,10,REVEALED,5,28
+"Gallery Complete","Unlock all of the default bundled images.",true,20,REVEALED,5,29

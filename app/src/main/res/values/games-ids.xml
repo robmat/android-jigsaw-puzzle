@@ -5,8 +5,6 @@
     <string name="app_id" translatable="false">355233798290</string>
     <!--package_name-->
     <string name="package_name" translatable="false">com.batodev.jigsawpuzzle</string>
-    <!--achievement Globetrotter-->
-    <string name="achievement_globetrotter" translatable="false">CgkIkrHWrKsKEAIQPQ</string>
     <!--achievement Night Owl-->
     <string name="achievement_night_owl" translatable="false">CgkIkrHWrKsKEAIQPA</string>
     <!--achievement Daily Ritual-->
