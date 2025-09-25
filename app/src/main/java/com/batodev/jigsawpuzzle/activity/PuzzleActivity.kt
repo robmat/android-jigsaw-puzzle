@@ -455,13 +455,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (totalPieces < 20) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_quick_game)
         }
-
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.CAMERA.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_photographer)
         }
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.GALLERY.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_curator)
         }
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_apprentice, 1)
         return settings
     }
 

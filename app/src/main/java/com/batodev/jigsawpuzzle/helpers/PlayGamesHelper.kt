@@ -11,4 +11,9 @@ object PlayGamesHelper {
         PlayGames.getAchievementsClient(context)
             .unlock(context.getString(achievementId))
     }
+
+    fun progressAchievement(context: Activity, achievementId: Int, increment: Int) {
+        PlayGames.getAchievementsClient(context)
+            .increment(context.getString(achievementId), increment)
+    }
 }
