@@ -459,6 +459,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.CAMERA.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_photographer)
         }
+        if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.GALLERY.name) == true) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_curator)
+        }
         return settings
     }
 
