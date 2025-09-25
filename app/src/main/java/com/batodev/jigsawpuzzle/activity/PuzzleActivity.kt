@@ -408,11 +408,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     @SuppressLint("ClickableViewAccessibility")
     fun onGameOver() {
         FirebaseHelper.logEvent(this, "game_over")
-        PlayGamesHelper.unlockAchievement(this, R.string.achievement_puzzle_initiate)
+        val settings = handleAchievements()
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
         konfetti.visibility = View.VISIBLE
-        val settings = SettingsHelper.load(this)
         imageFileName?.let {
             if (!settings.uncoveredPics.contains(it)) {
                 settings.uncoveredPics.add(it)
@@ -444,6 +443,17 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (savedGameDir.exists()) {
             savedGameDir.deleteRecursively()
         }
+    }
+
+    private fun PuzzleActivity.handleAchievements(): Settings {
+        PlayGamesHelper.unlockAchievement(this, R.string.achievement_puzzle_initiate)
+        val settings = SettingsHelper.load(this)
+        val totalPieces =
+            settings.lastSetDifficultyCustomWidth * settings.lastSetDifficultyCustomHeight
+        if (totalPieces < 20) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_quick_game)
+        }
+        return settings
     }
 
     /**
