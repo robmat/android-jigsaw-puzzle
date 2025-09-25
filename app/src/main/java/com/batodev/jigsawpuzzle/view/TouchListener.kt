@@ -105,6 +105,8 @@ class TouchListener(
                             view.translationY = 0f
 
                             puzzleGameManager.checkGameOver()
+                            PlayGamesHelper.progressAchievement(puzzleGameManager.activity, R.string.achievement_piece_collector, 1)
+                            PlayGamesHelper.progressAchievement(puzzleGameManager.activity, R.string.achievement_piece_enthusiast, 1)
                         }
                     })
                     animatorSet.start()
