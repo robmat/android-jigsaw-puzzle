@@ -35,6 +35,7 @@ import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
+import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.batodev.jigsawpuzzle.logic.ImageLoader
@@ -407,6 +408,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     @SuppressLint("ClickableViewAccessibility")
     fun onGameOver() {
         FirebaseHelper.logEvent(this, "game_over")
+        PlayGamesHelper.unlockAchievement(this, R.string.achievement_puzzle_initiate)
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
         konfetti.visibility = View.VISIBLE
