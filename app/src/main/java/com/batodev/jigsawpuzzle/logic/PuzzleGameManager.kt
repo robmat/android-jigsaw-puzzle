@@ -26,7 +26,7 @@ import java.util.Random
  * A class for managing the puzzle game logic.
  */
 class PuzzleGameManager(
-    private val activity: AppCompatActivity,
+    val activity: AppCompatActivity,
     private val layout: RelativeLayout,
     private val imageView: ImageView,
     private val zoomableLayout: ZoomLayout,

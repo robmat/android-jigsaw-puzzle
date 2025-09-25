@@ -12,7 +12,9 @@ import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
+import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
+import com.batodev.jigsawpuzzle.R
 import com.otaliastudios.zoom.ZoomLayout
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -78,6 +80,10 @@ class TouchListener(
                 )
                 if (xDiff <= tolerance && yDiff <= tolerance) {
                     FirebaseHelper.logEvent(view.context, "piece_placed_correctly")
+                    PlayGamesHelper.unlockAchievement(
+                        puzzleGameManager.activity,
+                        R.string.achievement_first_piece_down
+                    )
                     piece.canMove = false // Prevent further interaction during animation
                     sendViewToBack(piece)
                     val animatorSet = AnimatorSet()
