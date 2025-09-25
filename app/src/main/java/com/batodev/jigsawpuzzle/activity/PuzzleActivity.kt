@@ -57,6 +57,7 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.compareTo
 import kotlin.random.Random
 
 const val FAKE_PROGRESS_MAX = 10
@@ -409,6 +410,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     fun onGameOver() {
         FirebaseHelper.logEvent(this, "game_over")
         val settings = handleAchievements()
+
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
         konfetti.visibility = View.VISIBLE
@@ -445,13 +447,17 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
     }
 
-    private fun PuzzleActivity.handleAchievements(): Settings {
+    private fun handleAchievements(): Settings {
         PlayGamesHelper.unlockAchievement(this, R.string.achievement_puzzle_initiate)
         val settings = SettingsHelper.load(this)
         val totalPieces =
             settings.lastSetDifficultyCustomWidth * settings.lastSetDifficultyCustomHeight
         if (totalPieces < 20) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_quick_game)
+        }
+
+        if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.CAMERA.name) == true) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_photographer)
         }
         return settings
     }

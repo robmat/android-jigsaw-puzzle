@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
@@ -46,6 +47,9 @@ private const val EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 2
 
 private const val DIFF_SPLIT = "X"
 
+enum class PhotoSource {
+    CAMERA, GALLERY
+}
 /**
  * An activity for picking an image from the gallery or camera to use in the puzzle.
  */
@@ -81,7 +85,7 @@ class ImagePickActivity : AppCompatActivity() {
             grid.adapter = ImageAdapter(this)
             grid.onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
                 FirebaseHelper.logEvent(this, "image_picked_from_grid")
-                showStartGamePopup(itemClickedIndex, null)
+                showStartGamePopup(itemClickedIndex, null, PhotoSource.CAMERA)
             }
         } catch (e: IOException) {
             FirebaseHelper.logException(this, "onCreate", e.message)
@@ -101,7 +105,12 @@ class ImagePickActivity : AppCompatActivity() {
      * @param mCurrentPhotoPath The file path of the selected image from camera/gallery, or null if from assets.
      */
     @SuppressLint("ClickableViewAccessibility")
-    private fun showStartGamePopup(itemClickedIndex: Int?, mCurrentPhotoPath: String?) {
+    private fun showStartGamePopup(
+        itemClickedIndex: Int?,
+        mCurrentPhotoPath: String?,
+        photoSource: PhotoSource
+    ) {
+        Log.d(ImagePickActivity::class.simpleName, "showStartGamePopup: $itemClickedIndex, $mCurrentPhotoPath")
         val settings = SettingsHelper.load(this)
         val inflater = getSystemService(LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val popupView: View = inflater.inflate(R.layout.start_game_popup, null)
@@ -122,7 +131,8 @@ class ImagePickActivity : AppCompatActivity() {
             startTheGame(
                 itemClickedIndex,
                 mCurrentPhotoPath,
-                alertDialog
+                alertDialog,
+                photoSource
             )
         }
         startButton.setOnTouchListener { view, event ->
@@ -238,7 +248,8 @@ class ImagePickActivity : AppCompatActivity() {
     private fun startTheGame(
         itemClickedIndex: Int?,
         mCurrentPhotoPath: String?,
-        alertDialog: AlertDialog
+        alertDialog: AlertDialog,
+        photoSource: PhotoSource
     ) {
         FirebaseHelper.logButtonClick(this, "start_game")
         val intent = Intent(applicationContext, PuzzleActivity::class.java)
@@ -249,6 +260,7 @@ class ImagePickActivity : AppCompatActivity() {
         mCurrentPhotoPath?.let {
             intent.putExtra("mCurrentPhotoPath", it)
         }
+        intent.putExtra(PhotoSource::class.simpleName, photoSource.toString())
         startActivity(intent)
         alertDialog.dismiss()
         finish()
@@ -264,7 +276,7 @@ class ImagePickActivity : AppCompatActivity() {
         if (ar) {
             photoUri?.let {
                 FirebaseHelper.logEvent(this, "image_from_camera_success")
-                showStartGamePopup(null, photoUri.toString())
+                showStartGamePopup(null, photoUri.toString(), PhotoSource.CAMERA)
             }
         } else {
             FirebaseHelper.logEvent(this, "image_from_camera_canceled")
@@ -347,7 +359,7 @@ class ImagePickActivity : AppCompatActivity() {
      * @param it The URI of the selected image.
      * @throws IOException if an I/O error occurs during file copying.
      */
-    private fun copyFileAndStartGame(it: Uri?) {
+    private fun copyFileAndStartGame(it: Uri?, photoSource: PhotoSource) {
         it?.let {
             try {
                 contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
@@ -366,7 +378,7 @@ class ImagePickActivity : AppCompatActivity() {
                         }
                         outputStream.close()
                         inputStream.close()
-                        showStartGamePopup(null, pathToSave.toString())
+                        showStartGamePopup(null, pathToSave.toString(), photoSource)
                     }
                 }
             } catch (e: IOException) {
@@ -385,7 +397,7 @@ class ImagePickActivity : AppCompatActivity() {
     ) {
         if (it != null) {
             FirebaseHelper.logEvent(this, "image_from_gallery_success")
-            copyFileAndStartGame(it)
+            copyFileAndStartGame(it, PhotoSource.GALLERY)
         } else {
             FirebaseHelper.logEvent(this, "image_from_gallery_canceled")
         }
