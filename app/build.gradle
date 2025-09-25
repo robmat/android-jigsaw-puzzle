@@ -19,10 +19,48 @@ android {
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
+
+    signingConfigs {
+        prodSigned {
+            // This configuration will be populated by the logic below
+            // based on whether the keystore.properties file is found
+            // and whether a debugProdSigned variant is being built.
+        }
+    }
+
+    // Conditionally load keystore properties or set N/A for prodSigned
+    // when a task related to debugProdSigned is being built.
+    def keystorePropertiesFile = rootProject.file("keystore.properties")
+    if (keystorePropertiesFile.exists()) {
+        def keystoreProperties = new Properties()
+        new FileInputStream(keystorePropertiesFile).withCloseable { fis ->
+            keystoreProperties.load(fis)
+        }
+        android.signingConfigs.prodSigned {
+            storeFile file(keystoreProperties.getProperty('storeFile'))
+            storePassword keystoreProperties.getProperty('storePassword')
+            keyAlias keystoreProperties.getProperty('keyAlias')
+            keyPassword keystoreProperties.getProperty('keyPassword')
+        }
+    } else {
+        logger.warn("Warning: keystore.properties not found. Do not build the 'debugProdSigned' variant.")
+        android.signingConfigs.prodSigned {
+            storeFile rootProject.file("N/A")
+            storePassword "N/A"
+            keyAlias "N/A"
+            keyPassword "N/A"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Note: The 'release' build type does not use signingConfigs.prodSigned in this setup.
+            // If it were to, the above logic would need to consider it, or a separate signingConfig for release would be needed.
+        }
+        debugProdSigned {
+            signingConfig signingConfigs.prodSigned
         }
     }
     namespace 'com.batodev.jigsawpuzzle'

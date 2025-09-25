@@ -27,7 +27,6 @@ import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.google.android.gms.games.PlayGames
 import com.google.android.gms.games.PlayGamesSdk
-import com.google.android.gms.tasks.OnSuccessListener
 import com.smb.glowbutton.NeonButton
 import java.io.File
 
@@ -52,9 +51,8 @@ class MainMenuActivity : AppCompatActivity() {
         RemoveBars.removeTopBottomAndActionBars(this)
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
-        PlayGamesSdk.initialize(this);
+        PlayGamesSdk.initialize(this)
         initializeAchievementsLauncher()
-        signInSilently()
     }
 
     private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -109,7 +107,7 @@ class MainMenuActivity : AppCompatActivity() {
         galleryButton.setOnClickListener { gallery() }
         moreAppsButton.setOnClickListener { moreApps() }
         playPart2Button.setOnClickListener { playPart2() }
-        achievementButton.setOnClickListener { achievements() }
+        achievementButton.setOnClickListener { showAchievements() }
 
         NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(
             this,
@@ -157,28 +155,37 @@ class MainMenuActivity : AppCompatActivity() {
         LocalBroadcastManager.getInstance(this).unregisterReceiver(saveCompleteReceiver)
     }
 
-    private fun signInSilently() {
+    private fun signInSilently(onSuccess: () -> Unit = {}) {
         val gamesSignInClient = PlayGames.getGamesSignInClient(this)
         gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
             if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
                 // User is already signed in or silent sign-in was successful
                 Log.d(MainMenuActivity::class.simpleName, "User is authenticated.")
                 // Now you can proceed to show achievements
+                onSuccess.invoke()
             } else {
                 // User is not signed in or silent sign-in failed
-                Log.d(MainMenuActivity::class.simpleName, "User not authenticated. Attempting interactive sign-in.")
-                signInInteractively()
+                Log.d(
+                    MainMenuActivity::class.simpleName,
+                    "User not authenticated. Attempting interactive sign-in."
+                )
+                signInInteractively(onSuccess)
             }
         }
     }
 
-    private fun signInInteractively() {
+    private fun signInInteractively(onSuccess: () -> Unit = {}) {
         val gamesSignInClient = PlayGames.getGamesSignInClient(this)
         gamesSignInClient.signIn().addOnCompleteListener { signInTask ->
             if (signInTask.isSuccessful && signInTask.result.isAuthenticated) {
                 Log.d(MainMenuActivity::class.simpleName, "Interactive sign-in successful.")
+                onSuccess()
             } else {
-                Log.e(MainMenuActivity::class.simpleName, "Interactive sign-in failed ${signInTask.result} ${signInTask.exception}.", signInTask.exception)
+                Log.e(
+                    MainMenuActivity::class.simpleName,
+                    "Interactive sign-in failed ${signInTask.result} ${signInTask.exception}.",
+                    signInTask.exception
+                )
             }
         }
     }
@@ -286,34 +293,24 @@ class MainMenuActivity : AppCompatActivity() {
         return savedGameFile.exists()
     }
 
-    private fun achievements() {
-        PlayGamesSdk.initialize(this) // Initialize if not already done
-        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
-
-        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
-            if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
-                // User is signed in, proceed to show achievements
-                val achievementsClient = PlayGames.getAchievementsClient(this)
-                achievementsClient.achievementsIntent
-                    .addOnSuccessListener { intent ->
-                        try {
-                            achievementsLauncher.launch(intent)
-                        } catch (e: Exception) {
-                            // Handle cases where the activity might not be found
-                            Log.e(MainMenuActivity::class.simpleName, "Could not launch achievements intent", e)
-                        }
+    private fun showAchievements() {
+        signInSilently() {
+            PlayGames.getAchievementsClient(this)
+                .achievementsIntent
+                .addOnSuccessListener { intent ->
+                    try {
+                        achievementsLauncher.launch(intent)
+                    } catch (e: Exception) {
+                        Log.e(
+                            MainMenuActivity::class.simpleName,
+                            "Could not launch achievements intent",
+                            e
+                        )
                     }
-                    .addOnFailureListener { e ->
-                        Log.e(MainMenuActivity::class.simpleName, "Couldn't get Achievements Intent", e)
-                        // Handle failure (e.g., show a message to the user)
-                    }
-            } else {
-                // User is not signed in, prompt them to sign in
-                Log.w(MainMenuActivity::class.simpleName, "User not signed in. Prompting for sign-in.")
-                // Start your sign-in flow here
-                // For example:
-                signInSilently()
-            }
+                }
+                .addOnFailureListener { e ->
+                    Log.e(MainMenuActivity::class.simpleName, "Couldn't get Achievements Intent", e)
+                }
         }
     }
 }
