@@ -462,6 +462,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_curator)
         }
         PlayGamesHelper.progressAchievement(this, R.string.achievement_apprentice, 1)
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_journeyman, 1)
         return settings
     }
 
