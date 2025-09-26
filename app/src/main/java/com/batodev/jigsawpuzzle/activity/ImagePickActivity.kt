@@ -50,6 +50,10 @@ private const val DIFF_SPLIT = "X"
 enum class PhotoSource {
     CAMERA, GALLERY
 }
+
+const val MAX_COLUMNS = 11
+const val MAX_ROWS = MAX_COLUMNS + 2
+
 /**
  * An activity for picking an image from the gallery or camera to use in the puzzle.
  */
@@ -181,8 +185,9 @@ class ImagePickActivity : AppCompatActivity() {
      */
     private fun setUpDiffSpinner(popupView: View, settings: Settings) {
         val dimensionsList = mutableListOf<String>()
-        for (i in 2..11) {
-            val dimension = "${i * (i + 2)} (${i}$DIFF_SPLIT${i + 2})" // Generate the dimension string
+        for (i in 2..MAX_COLUMNS) {
+            val differenceBetweenColsAndRowsCount = MAX_ROWS - MAX_COLUMNS
+            val dimension = "${i * (i + differenceBetweenColsAndRowsCount)} (${i}$DIFF_SPLIT${i + differenceBetweenColsAndRowsCount})" // Generate the dimension string
             dimensionsList.add(dimension) // Add it to the list
         }
         // Use the custom layout R.layout.custom_spinner_item
