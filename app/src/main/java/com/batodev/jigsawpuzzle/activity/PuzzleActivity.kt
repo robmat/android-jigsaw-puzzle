@@ -471,6 +471,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (totalPieces >= 100 && !settings.showImageInBackgroundOfThePuzzle && !settings.showGridInBackgroundOfThePuzzle) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_purist)
         }
+        if (!settings.playSounds) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_silent_solver)
+        }
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.CAMERA.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_photographer)
         }
