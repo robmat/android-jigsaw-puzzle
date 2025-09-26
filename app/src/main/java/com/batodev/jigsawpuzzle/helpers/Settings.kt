@@ -49,4 +49,12 @@ class Settings {
      * The total time the user has played the game, in seconds, up until 3600. Than zeroed.
      */
     var marathonerPlaytime: Int = 0
+    /**
+     * A list of dates when the user has played the game, used for the "Daily Ritual" achievement.
+     */
+    var dailyRitualPlayDates: MutableList<String> = ArrayList()
+    /**
+     * The maximum daily ritual streak.
+     */
+    var maxDailyRitualStreak: Int = 0
 }

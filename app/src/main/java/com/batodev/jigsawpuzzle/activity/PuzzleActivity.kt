@@ -33,6 +33,7 @@ import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
+import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
@@ -165,6 +166,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             }
         }
         rateHelper.requestReview()
+        AchievementHelper.updateDailyRitualAchievement(this)
     }
 
     /**

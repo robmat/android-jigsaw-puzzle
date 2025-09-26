@@ -19,6 +19,8 @@ private const val SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE = "showImageInBackgroun
 private const val PLAY_SOUNDS = "playSounds"
 private const val HIGHSCORES = "highscores"
 private const val MARATHONER_PLAYTIME = "marathonerPlaytime"
+private const val DAILY_RITUAL_PLAY_DATES = "dailyRitualPlayDates"
+private const val MAX_DAILY_RITUAL_STREAK = "maxDailyRitualStreak"
 
 /**
  * A helper object for saving and loading application settings.
@@ -45,6 +47,8 @@ object SettingsHelper {
             putString(UNCOVERED_PICS, settings.uncoveredPics.joinToString(SEPARATOR))
             putString(HIGHSCORES, gson.toJson(settings.highscores))
             putInt(MARATHONER_PLAYTIME, settings.marathonerPlaytime)
+            putString(DAILY_RITUAL_PLAY_DATES, settings.dailyRitualPlayDates.joinToString(SEPARATOR))
+            putInt(MAX_DAILY_RITUAL_STREAK, settings.maxDailyRitualStreak)
             apply()
             Log.d(SettingsHelper.javaClass.simpleName, "Saved: $settings")
         }
@@ -73,6 +77,9 @@ object SettingsHelper {
         val type = object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
         settings.highscores = gson.fromJson(highscoresJson, type)
         settings.marathonerPlaytime = prefs.getInt(MARATHONER_PLAYTIME, 0)
+        settings.dailyRitualPlayDates = prefs.getString(DAILY_RITUAL_PLAY_DATES, "")!!.split(SEPARATOR).toMutableList()
+        settings.dailyRitualPlayDates.remove("")
+        settings.maxDailyRitualStreak = prefs.getInt(MAX_DAILY_RITUAL_STREAK, 0)
         return settings
     }
 }
