@@ -410,7 +410,8 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     @SuppressLint("ClickableViewAccessibility")
     fun onGameOver() {
         FirebaseHelper.logEvent(this, "game_over")
-        val settings = handleAchievements()
+        val elapsedTime = stopwatch.elapsedTime
+        val settings = handleAchievements(elapsedTime)
 
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
         Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
@@ -433,7 +434,6 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
         AdHelper.showAd(this)
 
-        val elapsedTime = stopwatch.elapsedTime
         val difficultyKey =
             "${settings.lastSetDifficultyCustomWidth}x${settings.lastSetDifficultyCustomHeight}"
         updateAndShowHighScores(elapsedTime, difficultyKey, settings)
@@ -454,13 +454,16 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         }
     }
 
-    private fun handleAchievements(): Settings {
+    private fun handleAchievements(elapsedTime: Int): Settings {
         PlayGamesHelper.unlockAchievement(this, R.string.achievement_puzzle_initiate)
         val settings = SettingsHelper.load(this)
         val totalPieces =
             settings.lastSetDifficultyCustomWidth * settings.lastSetDifficultyCustomHeight
         if (totalPieces < 20) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_quick_game)
+        }
+        if (totalPieces >= 50 && elapsedTime < 180) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_speedster)
         }
         if (totalPieces > 100) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_the_big_picture)
