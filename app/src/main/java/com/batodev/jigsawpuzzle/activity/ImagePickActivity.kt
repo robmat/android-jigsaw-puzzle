@@ -364,7 +364,7 @@ class ImagePickActivity : AppCompatActivity() {
      * @param it The URI of the selected image.
      * @throws IOException if an I/O error occurs during file copying.
      */
-    private fun copyFileAndStartGame(it: Uri?, photoSource: PhotoSource) {
+    private fun copyFileAndStartGame(it: Uri?) {
         it?.let {
             try {
                 contentResolver.openFileDescriptor(it, "r").use { parcelFileDescriptor ->
@@ -383,7 +383,7 @@ class ImagePickActivity : AppCompatActivity() {
                         }
                         outputStream.close()
                         inputStream.close()
-                        showStartGamePopup(null, pathToSave.toString(), photoSource)
+                        showStartGamePopup(null, pathToSave.toString(), PhotoSource.GALLERY)
                     }
                 }
             } catch (e: IOException) {
@@ -402,7 +402,7 @@ class ImagePickActivity : AppCompatActivity() {
     ) {
         if (it != null) {
             FirebaseHelper.logEvent(this, "image_from_gallery_success")
-            copyFileAndStartGame(it, PhotoSource.GALLERY)
+            copyFileAndStartGame(it)
         } else {
             FirebaseHelper.logEvent(this, "image_from_gallery_canceled")
         }
