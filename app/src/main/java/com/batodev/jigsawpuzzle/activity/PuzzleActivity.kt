@@ -57,7 +57,6 @@ import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.compareTo
 import kotlin.random.Random
 
 const val FAKE_PROGRESS_MAX = 10
@@ -436,8 +435,14 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val difficultyKey =
             "${settings.lastSetDifficultyCustomWidth}x${settings.lastSetDifficultyCustomHeight}"
         updateAndShowHighScores(elapsedTime, difficultyKey, settings)
-
         deleteSavedGame()
+        settings.marathonerPlaytime += elapsedTime
+        Log.d(PuzzleActivity::class.simpleName, "Total playtime: ${settings.marathonerPlaytime} seconds, elapsed this game: $elapsedTime seconds")
+        if (settings.marathonerPlaytime >= 3600) {
+            settings.marathonerPlaytime = 0
+            PlayGamesHelper.progressAchievement(this, R.string.achievement_marathoner, 1)
+        }
+        SettingsHelper.save(this, settings)
     }
 
     private fun deleteSavedGame() {
@@ -501,8 +506,6 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         while (highScores.size > 10) {
             highScores.removeAt(10)
         }
-
-        SettingsHelper.save(this, settings)
 
         showHighScorePopup(difficultyKey, highScores, highScores.indexOf(newScoreString))
 

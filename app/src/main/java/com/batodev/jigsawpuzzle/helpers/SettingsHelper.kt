@@ -18,6 +18,7 @@ private const val LAST_SET_DIFFICULTY_CUSTOM_WIDTH = "lastSetDifficultyCustomWid
 private const val SHOW_IMAGE_IN_BACKGROUND_OF_THE_PUZZLE = "showImageInBackgroundOfThePuzzle"
 private const val PLAY_SOUNDS = "playSounds"
 private const val HIGHSCORES = "highscores"
+private const val MARATHONER_PLAYTIME = "marathonerPlaytime"
 
 /**
  * A helper object for saving and loading application settings.
@@ -43,6 +44,7 @@ object SettingsHelper {
             putBoolean(PLAY_SOUNDS, settings.playSounds)
             putString(UNCOVERED_PICS, settings.uncoveredPics.joinToString(SEPARATOR))
             putString(HIGHSCORES, gson.toJson(settings.highscores))
+            putInt(MARATHONER_PLAYTIME, settings.marathonerPlaytime)
             apply()
             Log.d(SettingsHelper.javaClass.simpleName, "Saved: $settings")
         }
@@ -70,6 +72,7 @@ object SettingsHelper {
         val highscoresJson = prefs.getString(HIGHSCORES, "{}") ?: "{}"
         val type = object : TypeToken<MutableMap<String, MutableList<String>>>() {}.type
         settings.highscores = gson.fromJson(highscoresJson, type)
+        settings.marathonerPlaytime = prefs.getInt(MARATHONER_PLAYTIME, 0)
         return settings
     }
 }

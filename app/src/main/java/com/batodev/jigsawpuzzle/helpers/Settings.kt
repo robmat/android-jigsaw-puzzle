@@ -45,4 +45,8 @@ class Settings {
      * The key is the difficulty (e.g., "3x5") and the value is a list of high score strings (e.g., "MM:SS - YYYY-MM-DD HH:MM").
      */
     var highscores: MutableMap<String, MutableList<String>> = mutableMapOf()
+    /**
+     * The total time the user has played the game, in seconds, up until 3600. Than zeroed.
+     */
+    var marathonerPlaytime: Int = 0
 }
