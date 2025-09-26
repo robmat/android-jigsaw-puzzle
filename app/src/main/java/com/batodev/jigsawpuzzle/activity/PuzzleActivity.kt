@@ -468,6 +468,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (totalPieces >= MAX_COLUMNS * MAX_ROWS) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_maximum_effort)
         }
+        if (totalPieces >= 100 && !settings.showImageInBackgroundOfThePuzzle && !settings.showGridInBackgroundOfThePuzzle) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_purist)
+        }
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.CAMERA.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_photographer)
         }
