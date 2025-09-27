@@ -525,9 +525,14 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             highScores.removeAt(10)
         }
 
-        showHighScorePopup(difficultyKey, highScores, highScores.indexOf(newScoreString))
+        val indexOfNewScore = highScores.indexOf(newScoreString)
+        showHighScorePopup(difficultyKey, highScores, indexOfNewScore)
 
-        if (highScores.indexOf(newScoreString) <= 10 && highScores.indexOf(newScoreString) != -1) {
+        if (indexOfNewScore <= 10 && indexOfNewScore != -1) {
+            Log.d(PuzzleActivity::class.simpleName, "New high score! indexOfNewScore: $indexOfNewScore, highScores.size: ${highScores.size}")
+            if (indexOfNewScore == 0 && highScores.size == 10) {
+                PlayGamesHelper.unlockAchievement(this, R.string.achievement_top_of_the_charts)
+            }
             FirebaseHelper.logEvent(this, "new_highscore")
             Toast.makeText(this, getString(R.string.congratulations_top_10), Toast.LENGTH_LONG)
                 .show()
