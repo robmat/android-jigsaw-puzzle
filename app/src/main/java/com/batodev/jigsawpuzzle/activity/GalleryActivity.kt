@@ -24,6 +24,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
+import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
 import java.io.File
@@ -280,6 +281,7 @@ class GalleryActivity : AppCompatActivity() {
             val wallpaperManager = WallpaperManager.getInstance(this)
             val bitmap = BitmapFactory.decodeFile(fileShared.absolutePath)
             wallpaperManager.setBitmap(bitmap)
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_i_like_this_one)
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
         } catch (e: Exception) {
             FirebaseHelper.logException(this, "wallpaperClicked", e.message)
