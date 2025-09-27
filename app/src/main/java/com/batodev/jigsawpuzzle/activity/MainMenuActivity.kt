@@ -264,6 +264,7 @@ class MainMenuActivity : AppCompatActivity() {
      */
     fun moreApps() {
         FirebaseHelper.logButtonClick(this, "more_apps")
+        PlayGamesHelper.unlockAchievement(this, R.string.achievement_window_shopper)
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
