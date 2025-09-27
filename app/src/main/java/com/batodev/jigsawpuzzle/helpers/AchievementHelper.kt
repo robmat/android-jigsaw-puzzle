@@ -101,5 +101,12 @@ object AchievementHelper {
             PlayGamesHelper.unlockAchievement(context as Activity, R.string.achievement_collector)
         }
     }
+
+    fun checkGalleryCompleteAchievement(context: Context, settings: Settings) {
+        val allImages = context.assets.list("img")?.filter { it.endsWith(".jpg") || it.endsWith(".png") }
+        if (allImages != null && settings.uncoveredPics.containsAll(allImages)) {
+            PlayGamesHelper.progressAchievement(context as Activity, R.string.achievement_gallery_complete, 20)
+        }
+    }
 }
 
