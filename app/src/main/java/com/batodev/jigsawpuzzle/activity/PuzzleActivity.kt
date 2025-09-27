@@ -291,6 +291,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun loadGameState(gameStateFile: File) {
+        PlayGamesHelper.unlockAchievement(this, R.string.achievement_welcome_back)
         val gson = Gson()
         val jsonState = gameStateFile.readText()
         val gameState = gson.fromJson(jsonState, GameState::class.java)

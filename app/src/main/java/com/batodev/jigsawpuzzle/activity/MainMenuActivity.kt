@@ -23,6 +23,7 @@ import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
+import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
 import com.batodev.jigsawpuzzle.helpers.RemoveBars
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.google.android.gms.games.PlayGames
@@ -276,6 +277,7 @@ class MainMenuActivity : AppCompatActivity() {
      */
     fun playPart2() {
         FirebaseHelper.logButtonClick(this, "play_part_2")
+        PlayGamesHelper.unlockAchievement(this, R.string.achievement_to_be_continued___)
         startActivity(
             Intent(
                 Intent.ACTION_VIEW,
