@@ -261,6 +261,7 @@ class GalleryActivity : AppCompatActivity() {
             val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
             shareIntent.type = "image/*"
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_show_and_tell)
             ContextCompat.startActivity(this, shareIntent, null)
         } catch (e: Exception) {
             FirebaseHelper.logException(this, "shareClicked", e.message)
