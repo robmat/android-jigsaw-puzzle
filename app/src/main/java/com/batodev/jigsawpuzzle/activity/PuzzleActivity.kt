@@ -56,6 +56,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.random.Random
@@ -489,6 +490,12 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         PlayGamesHelper.progressAchievement(this, R.string.achievement_veteran, 1)
         PlayGamesHelper.progressAchievement(this, R.string.achievement_puzzle_master, 1)
         AchievementHelper.checkRecordSetterAchievement(this, elapsedTime, settings)
+
+        val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        if (currentHour in 0..4) {
+            PlayGamesHelper.unlockAchievement(this, R.string.achievement_night_owl)
+        }
+
         return settings
     }
 
