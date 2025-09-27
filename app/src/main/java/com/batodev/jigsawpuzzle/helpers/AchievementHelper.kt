@@ -58,5 +58,20 @@ object AchievementHelper {
         Log.v(TAG, "Settings saved.")
     }
 
+    fun checkRecordSetterAchievement(context: Activity, elapsedTime: Int, settings: Settings) {
+        val difficultyKey =
+            "${settings.lastSetDifficultyCustomWidth}x${settings.lastSetDifficultyCustomHeight}"
+        val highScores = settings.highscores[difficultyKey]
+        if (highScores != null && highScores.isNotEmpty()) {
+            val bestTime = highScores[0]
+            val parts = bestTime.split(" - ")
+            val timeParts = parts[0].split(":")
+            val bestTimeInSeconds = timeParts[0].toInt() * 60 + timeParts[1].toInt()
+            if (elapsedTime < bestTimeInSeconds) {
+                PlayGamesHelper.unlockAchievement(context, R.string.achievement_record_setter)
+            }
+        }
+    }
+
 }
 

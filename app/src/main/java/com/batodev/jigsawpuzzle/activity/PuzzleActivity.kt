@@ -487,6 +487,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         PlayGamesHelper.progressAchievement(this, R.string.achievement_journeyman, 1)
         PlayGamesHelper.progressAchievement(this, R.string.achievement_veteran, 1)
         PlayGamesHelper.progressAchievement(this, R.string.achievement_puzzle_master, 1)
+        AchievementHelper.checkRecordSetterAchievement(this, elapsedTime, settings)
         return settings
     }
 
