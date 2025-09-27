@@ -95,5 +95,11 @@ object AchievementHelper {
         SettingsHelper.save(context, settings)
         Log.v(TAG, "Settings saved.")
     }
+
+    fun checkCollectorAchievement(context: Context, settings: Settings) {
+        if (settings.uncoveredPics.size >= 10) {
+            PlayGamesHelper.unlockAchievement(context as Activity, R.string.achievement_collector)
+        }
+    }
 }
 

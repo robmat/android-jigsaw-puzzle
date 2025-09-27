@@ -490,6 +490,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         PlayGamesHelper.progressAchievement(this, R.string.achievement_veteran, 1)
         PlayGamesHelper.progressAchievement(this, R.string.achievement_puzzle_master, 1)
         AchievementHelper.checkRecordSetterAchievement(this, elapsedTime, settings)
+        AchievementHelper.checkCollectorAchievement(this, settings)
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
         if (currentHour in 0..4) {
