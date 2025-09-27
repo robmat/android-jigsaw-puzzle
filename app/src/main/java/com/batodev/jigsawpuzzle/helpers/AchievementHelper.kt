@@ -98,7 +98,7 @@ object AchievementHelper {
 
     fun checkCollectorAchievement(context: Context, settings: Settings) {
         if (settings.uncoveredPics.size >= 10) {
-            PlayGamesHelper.unlockAchievement(context as Activity, R.string.achievement_collector)
+            PlayGamesHelper.progressAchievement(context as Activity, R.string.achievement_collector, 10)
         }
     }
 
@@ -109,4 +109,3 @@ object AchievementHelper {
         }
     }
 }
-
