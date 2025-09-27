@@ -17,7 +17,7 @@
 "Silent Solver","Solve a puzzle with the ""Play Sounds"" setting disabled.",false,1,REVEALED,5,17
 "Speedster","Solve a puzzle with 50+ pieces in under 3 minutes.",false,1,REVEALED,5,18
 "Record Setter","Beat your own personal best time for any difficulty.",false,1,REVEALED,5,19
-"Top of the Charts","Achieve the #1 high score for any difficulty level.",false,1,REVEALED,5,20
+"Top of the Charts","Achieve the #1 high score for any difficulty level with 10 entries already.",false,1,REVEALED,5,20
 "I Like This One","Set a completed puzzle as your phone wallpaper from the gallery.",false,1,REVEALED,5,21
 "Show and Tell","Use the share feature in the gallery.",false,1,REVEALED,5,22
 "Welcome Back","Load and continue a saved game from the main menu.",false,1,REVEALED,5,23
