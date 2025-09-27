@@ -57,4 +57,12 @@ class Settings {
      * The maximum daily ritual streak.
      */
     var maxDailyRitualStreak: Int = 0
+    /**
+     * The current streak of correctly placed pieces in a row.
+     */
+    var inTheZoneCurrentStreak: Int = 0
+    /**
+     * The maximum streak of correctly placed pieces in a row.
+     */
+    var inTheZoneMaxStreak: Int = 0
 }

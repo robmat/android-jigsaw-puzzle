@@ -10,8 +10,8 @@ import java.util.Date
 import java.util.Locale
 
 object AchievementHelper {
+    val TAG: String = AchievementHelper::class.java.simpleName
     fun updateDailyRitualAchievement(context: Context) {
-        val TAG = AchievementHelper::class.java.simpleName
         val settings = SettingsHelper.load(context)
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
         Log.v(TAG, "Today's date: $today")
@@ -73,5 +73,27 @@ object AchievementHelper {
         }
     }
 
+    fun updateInTheZoneAchievement(context: Activity, isCorrect: Boolean) {
+        val settings = SettingsHelper.load(context)
+        Log.v(TAG, "updateInTheZoneAchievement called. isCorrect: $isCorrect")
+        if (isCorrect) {
+            settings.inTheZoneCurrentStreak++
+            Log.v(TAG, "Current streak incremented: ${settings.inTheZoneCurrentStreak}")
+            if (settings.inTheZoneCurrentStreak > settings.inTheZoneMaxStreak) {
+                settings.inTheZoneMaxStreak = settings.inTheZoneCurrentStreak
+                Log.v(TAG, "New max streak: ${settings.inTheZoneMaxStreak}. Reporting achievement progress.")
+                PlayGamesHelper.progressAchievement(
+                    context,
+                    R.string.achievement_in_the_zone,
+                    1
+                )
+            }
+        } else {
+            Log.v(TAG, "Answer incorrect. Streak reset.")
+            settings.inTheZoneCurrentStreak = 0
+        }
+        SettingsHelper.save(context, settings)
+        Log.v(TAG, "Settings saved.")
+    }
 }
 

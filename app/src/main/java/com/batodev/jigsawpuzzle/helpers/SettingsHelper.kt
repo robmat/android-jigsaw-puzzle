@@ -21,6 +21,8 @@ private const val HIGHSCORES = "highscores"
 private const val MARATHONER_PLAYTIME = "marathonerPlaytime"
 private const val DAILY_RITUAL_PLAY_DATES = "dailyRitualPlayDates"
 private const val MAX_DAILY_RITUAL_STREAK = "maxDailyRitualStreak"
+private const val IN_THE_ZONE_CURRENT_STREAK = "inTheZoneCurrentStreak"
+private const val IN_THE_ZONE_MAX_STREAK = "inTheZoneMaxStreak"
 
 /**
  * A helper object for saving and loading application settings.
@@ -49,6 +51,8 @@ object SettingsHelper {
             putInt(MARATHONER_PLAYTIME, settings.marathonerPlaytime)
             putString(DAILY_RITUAL_PLAY_DATES, settings.dailyRitualPlayDates.joinToString(SEPARATOR))
             putInt(MAX_DAILY_RITUAL_STREAK, settings.maxDailyRitualStreak)
+            putInt(IN_THE_ZONE_CURRENT_STREAK, settings.inTheZoneCurrentStreak)
+            putInt(IN_THE_ZONE_MAX_STREAK, settings.inTheZoneMaxStreak)
             apply()
             Log.d(SettingsHelper.javaClass.simpleName, "Saved: $settings")
         }
@@ -80,6 +84,8 @@ object SettingsHelper {
         settings.dailyRitualPlayDates = prefs.getString(DAILY_RITUAL_PLAY_DATES, "")!!.split(SEPARATOR).toMutableList()
         settings.dailyRitualPlayDates.remove("")
         settings.maxDailyRitualStreak = prefs.getInt(MAX_DAILY_RITUAL_STREAK, 0)
+        settings.inTheZoneCurrentStreak = prefs.getInt(IN_THE_ZONE_CURRENT_STREAK, 0)
+        settings.inTheZoneMaxStreak = prefs.getInt(IN_THE_ZONE_MAX_STREAK, 0)
         return settings
     }
 }

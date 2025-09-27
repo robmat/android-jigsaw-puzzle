@@ -13,6 +13,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
+import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
 import com.batodev.jigsawpuzzle.R
 import com.otaliastudios.zoom.ZoomLayout
@@ -78,8 +79,9 @@ class TouchListener(
                     TouchListener::class.simpleName,
                     "ACTION_UP: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, xDiff=$xDiff, yDiff=$yDiff, tolerance=$tolerance"
                 )
-                if (xDiff <= tolerance && yDiff <= tolerance) {
+                if (xDiff <= tolerance && yDiff <= tolerance) { // piece placed correctly
                     FirebaseHelper.logEvent(view.context, "piece_placed_correctly")
+                    AchievementHelper.updateInTheZoneAchievement(puzzleGameManager.activity, true)
                     PlayGamesHelper.unlockAchievement(
                         puzzleGameManager.activity,
                         R.string.achievement_first_piece_down
@@ -111,6 +113,7 @@ class TouchListener(
                     })
                     animatorSet.start()
                 } else {
+                    AchievementHelper.updateInTheZoneAchievement(puzzleGameManager.activity, false)
                     FirebaseHelper.logEvent(view.context, "piece_placed_incorrectly")
                 }
                 view.performClick()
