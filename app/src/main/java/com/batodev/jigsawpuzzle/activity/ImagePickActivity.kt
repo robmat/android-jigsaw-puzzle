@@ -48,7 +48,7 @@ private const val EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 2
 private const val DIFF_SPLIT = "X"
 
 enum class PhotoSource {
-    CAMERA, GALLERY
+    CAMERA, GALLERY, BUNDLED
 }
 
 const val MAX_COLUMNS = 11
@@ -89,7 +89,7 @@ class ImagePickActivity : AppCompatActivity() {
             grid.adapter = ImageAdapter(this)
             grid.onItemClickListener = OnItemClickListener { _: AdapterView<*>?, _: View?, itemClickedIndex: Int, _: Long ->
                 FirebaseHelper.logEvent(this, "image_picked_from_grid")
-                showStartGamePopup(itemClickedIndex, null, PhotoSource.CAMERA)
+                showStartGamePopup(itemClickedIndex, null, PhotoSource.BUNDLED)
             }
         } catch (e: IOException) {
             FirebaseHelper.logException(this, "onCreate", e.message)
