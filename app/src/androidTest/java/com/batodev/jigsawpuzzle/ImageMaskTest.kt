@@ -100,19 +100,21 @@ class ImageMaskTest {
     @Test
     @Throws(IOException::class)
     fun cutOutSinglePuzzlePiece() {
+        val overallStartTime = System.currentTimeMillis()
+
         // 1. Load the source image from assets to get its dimensions
         val assetManager = context.assets
         val inputStream = assetManager.open("img/00000-1215728026.jpg")
         val originalBitmap = BitmapFactory.decodeStream(inputStream)
-        val puzzleWidth = originalBitmap.width.toDouble()
-        val puzzleHeight = originalBitmap.height.toDouble()
+        val puzzleWidth = originalBitmap.width
+        val puzzleHeight = originalBitmap.height
 
         // 2. Generate the SVG string for the puzzle grid using image dimensions
         val piecesX = 4.0
         val piecesY = 3.0
         val generator = PuzzleCurvesGenerator().apply {
-            width = puzzleWidth
-            height = puzzleHeight
+            width = puzzleWidth.toDouble()
+            height = puzzleHeight.toDouble()
             xn = piecesX
             yn = piecesY
         }
@@ -121,31 +123,35 @@ class ImageMaskTest {
         // 3. Render the SVG and create a mask from it
         val maskingStartTime = System.currentTimeMillis()
         val svg = SVG.getFromString(svgString)
-        val maskBitmap = Bitmap.createBitmap(puzzleWidth.toInt(), puzzleHeight.toInt(), Bitmap.Config.ARGB_8888)
+        val maskBitmap = Bitmap.createBitmap(puzzleWidth, puzzleHeight, Bitmap.Config.ARGB_8888)
         val maskCanvas = Canvas(maskBitmap)
         svg.renderToCanvas(maskCanvas)
 
-        val overallStartTime = System.currentTimeMillis()
-        // 4. Use Flood Fill to isolate a single piece
+        // OPTIMIZATION: Get pixels into a buffer for fast manipulation
+        val pixels = IntArray(puzzleWidth * puzzleHeight)
+        maskBitmap.getPixels(pixels, 0, puzzleWidth, 0, 0, puzzleWidth, puzzleHeight)
+
+        // 4. Use Flood Fill on the pixel buffer to isolate a single piece
         val startX = (puzzleWidth / piecesX / 2).toInt()
         val startY = (puzzleHeight / piecesY / 2).toInt()
         val floodFillStartTime = System.currentTimeMillis()
-        floodFill(maskBitmap, startX, startY, Color.TRANSPARENT, Color.WHITE)
+        floodFill(pixels, puzzleWidth, puzzleHeight, startX, startY, Color.TRANSPARENT, Color.WHITE)
         val floodFillDuration = System.currentTimeMillis() - floodFillStartTime
 
-        // Invert the mask
-        for (x in 0 until maskBitmap.width) {
-            for (y in 0 until maskBitmap.height) {
-                if (maskBitmap.getPixel(x, y) != Color.WHITE) {
-                    maskBitmap.setPixel(x, y, Color.TRANSPARENT)
-                }
+        // Invert the mask in the buffer
+        for (i in pixels.indices) {
+            if (pixels[i] != Color.WHITE) {
+                pixels[i] = Color.TRANSPARENT
             }
         }
+
+        // OPTIMIZATION: Write the modified pixels back to the bitmap
+        maskBitmap.setPixels(pixels, 0, puzzleWidth, 0, 0, puzzleWidth, puzzleHeight)
         val maskingDuration = System.currentTimeMillis() - maskingStartTime
 
         // 5. Apply the mask to the source image
         val cuttingStartTime = System.currentTimeMillis()
-        val resultBitmap = Bitmap.createBitmap(puzzleWidth.toInt(), puzzleHeight.toInt(), Bitmap.Config.ARGB_8888)
+        val resultBitmap = Bitmap.createBitmap(puzzleWidth, puzzleHeight, Bitmap.Config.ARGB_8888)
         val resultCanvas = Canvas(resultBitmap)
         val paint = Paint(Paint.ANTI_ALIAS_FLAG)
         resultCanvas.drawBitmap(maskBitmap, 0f, 0f, paint)
@@ -162,7 +168,7 @@ class ImageMaskTest {
 
         // 7. Log timings and verify the file was created
         val overallDuration = System.currentTimeMillis() - overallStartTime
-        Log.d("ImageMaskTest", "--- Performance --- ")
+        Log.d("ImageMaskTest", "--- Performance (Optimized) --- ")
         Log.d("ImageMaskTest", "Flood Fill took: $floodFillDuration ms")
         Log.d("ImageMaskTest", "Total Masking (Render + Flood Fill + Invert) took: $maskingDuration ms")
         Log.d("ImageMaskTest", "Cutting (Applying Mask) took: $cuttingDuration ms")
@@ -174,26 +180,29 @@ class ImageMaskTest {
 
     /**
      * Fills a connected area of a bitmap with a new color, starting from a seed point.
-     * This is an iterative (queue-based) implementation to avoid stack overflow errors.
-     * @param bitmap The bitmap to modify.
+     * This optimized version operates on a 1D array of pixels for performance.
+     * @param pixels The array of pixels to modify.
+     * @param width The width of the source bitmap.
+     * @param height The height of the source bitmap.
      * @param x The starting x-coordinate.
      * @param y The starting y-coordinate.
      * @param targetColor The color of the area to be filled.
      * @param newColor The color to fill the area with.
      */
-    private fun floodFill(bitmap: Bitmap, x: Int, y: Int, targetColor: Int, newColor: Int) {
+    private fun floodFill(pixels: IntArray, width: Int, height: Int, x: Int, y: Int, targetColor: Int, newColor: Int) {
         if (targetColor == newColor) return
 
-        val queue: Queue<Point> = LinkedList<Point>()
+        val queue: Queue<Point> = LinkedList()
         queue.add(Point(x, y))
 
         while (queue.isNotEmpty()) {
             val p = queue.poll() ?: continue
 
-            if (p.x < 0 || p.x >= bitmap.width || p.y < 0 || p.y >= bitmap.height) continue
+            if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height) continue
 
-            if (bitmap.getPixel(p.x, p.y) == targetColor) {
-                bitmap.setPixel(p.x, p.y, newColor)
+            val index = p.y * width + p.x
+            if (pixels[index] == targetColor) {
+                pixels[index] = newColor
                 queue.add(Point(p.x + 1, p.y))
                 queue.add(Point(p.x - 1, p.y))
                 queue.add(Point(p.x, p.y + 1))
