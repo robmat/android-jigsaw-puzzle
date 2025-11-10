@@ -35,4 +35,20 @@ class PuzzleCurvesGeneratorTest {
         // Assert that the two generated SVG strings are different
         assertThat("Generated SVGs should be different due to internal randomness", svgString1, `is`(not(equalTo(svgString2))))
     }
+
+    @Test
+    fun generatesWellFormedSvg() {
+        val generator = PuzzleCurvesGenerator().apply {
+            width = 400.0
+            height = 300.0
+            xn = 4.0
+            yn = 3.0
+        }
+        val svgString = generator.generateSvg()
+
+        assertThat("SVG should start with <svg", svgString, startsWith("<svg"))
+        assertThat("SVG should end with </svg>", svgString, endsWith("</svg>"))
+        assertThat("SVG should contain width attribute", svgString, containsString("width=\"400.0\""))
+        assertThat("SVG should contain height attribute", svgString, containsString("height=\"300.0\""))
+    }
 }
