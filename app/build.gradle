@@ -13,7 +13,7 @@ android {
         targetSdkVersion 36
         versionCode 28
         versionName "6.3"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_21
@@ -96,4 +96,6 @@ dependencies {
     testRuntimeOnly "org.junit.platform:junit-platform-launcher:6.0.0-RC3"
 
     testImplementation "org.hamcrest:hamcrest:3.0"
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
 }
