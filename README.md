@@ -22,9 +22,24 @@ Upon completing a puzzle, the image you just solved is added to your personal in
 
 ## Cutting Algorithm
 
-The puzzle pieces are dynamically generated using a sophisticated cutting algorithm. The core of this is the `PuzzleCurvesGenerator`, which creates unique, pseudo-random SVG paths for the puzzle edges. This ensures that every puzzle has a distinct set of piece shapes.
+The project previously used a single static cutter. The cutting code has been refactored into a small strategy API so multiple cutting algorithms can coexist and be swapped easily.
 
-The `PuzzleCutter` then uses these SVG paths to slice the source image. It employs a flood fill algorithm to accurately define the bitmap for each individual piece, resulting in a clean and precise cut. This advanced technique guarantees a different cut for every game and realistic look.
+- PuzzleCutter (interface)
+  - Defines `cut(sourceImage: Bitmap, rows: Int, cols: Int, svgString: String?, imageView: ImageView, puzzleProgressListener: PuzzleProgressListener, pieces: List<PuzzlePiece>): List<Bitmap>`.
+
+- Implementations included in this repo:
+  - FloodFillPuzzleCutter — The original approach: renders the SVG grid into a bitmap and performs a flood-fill on that rendered grid to collect per-piece pixels directly from the source image. This is CPU-bound and parallelized across a fixed thread pool.
+  - MaskBitmapPuzzleCutter — An alternative mask-based approach: renders the SVG once to a mask bitmap, then for each piece creates a per-piece mask (flood-filling the mask's transparent areas), applies the mask with Porter-Duff SRC_IN to the source image, and then crops the visible bounds. This approach tends to be easier to reason about and may perform differently depending on image size and device.
+
+- Default
+  - The code exposes a factory `PuzzleCutter.default()` returning the default implementation (currently `MaskBitmapPuzzleCutter`). You can change the default there or inject a different implementation where `PuzzleGameManager` is constructed.
+
+- Benchmark/test
+  - An instrumented test `ImageMaskTest.cutOutAllPuzzlePieces` (androidTest) runs both implementations against the same image and logs timings and piece counts. The test writes results to `cacheDir/cutter_benchmark/timing.txt` for quick inspection.
+
+- Notes and trade-offs
+  - Both cutters use a fixed thread pool; the FloodFill version marks pixels directly on a rendered SVG grid (modifies a working bitmap during flood-fill), while the MaskBitmap version operates on pixel arrays and uses alpha-based transparency checks. The best choice can vary per-device and per-image; use the benchmark test to compare on your target devices.
+  - If you need to force a specific cutter at runtime, pass the desired `PuzzleCutter` implementation into `PuzzleGameManager` (a constructor parameter) or change the factory function.
 
 ## License
 
