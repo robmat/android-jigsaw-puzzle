@@ -1,4 +1,3 @@
-
 package com.batodev.jigsawpuzzle
 
 import android.content.Context
@@ -6,196 +5,126 @@ import android.graphics.*
 import android.util.Log
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
-import com.caverock.androidsvg.SVG
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
-import java.io.FileOutputStream
 import java.io.IOException
-import java.util.LinkedList
-import java.util.Queue
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import java.io.InputStream
+import java.util.concurrent.atomic.AtomicBoolean
 
-// This annotation tells JUnit to run the test with AndroidJUnit4, which is a test runner for Android instrumented tests.
 @RunWith(AndroidJUnit4::class)
 class ImageMaskTest {
-
-    // A lateinit property to hold the application context. It will be initialized in the setup method.
     private lateinit var context: Context
 
-    // This method is annotated with @Before, so it will be executed before each test method.
     @Before
-    fun setup() {
-        // Get the context of the application under test.
-        context = InstrumentationRegistry.getInstrumentation().targetContext
-    }
+    fun setup() { context = InstrumentationRegistry.getInstrumentation().targetContext }
 
     @Test
     @Throws(IOException::class)
     fun cutOutAllPuzzlePieces() {
-        val overallStartTime = System.currentTimeMillis()
+        // Desired puzzle grid (can adjust as needed)
+        val rows = 6
+        val cols = 4
 
-        // 1. Load the source image from assets to get its dimensions
-        val assetManager = context.assets
-        val inputStream = assetManager.open("img/00000-1215728026.jpg")
-        val originalBitmap = BitmapFactory.decodeStream(inputStream)
+        // Try to load provided sample asset image; fallback to synthetic gradient if missing
+        val assetPath = "img/00000-1215728026.jpg"
+        val originalBitmap: Bitmap = try {
+            val assetManager = context.assets
+            val inputStream: InputStream = assetManager.open(assetPath)
+            BitmapFactory.decodeStream(inputStream).also { inputStream.close() }
+        } catch (e: Exception) {
+            Log.w("PuzzleCutterBenchmark", "Asset $assetPath not found, using synthetic gradient: ${e.message}")
+            val w = 960; val h = 720
+            Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888).apply {
+                val c = Canvas(this); val p = Paint()
+                for (y in 0 until h) { val ratio = y / h.toFloat(); p.color = Color.rgb((255 * ratio).toInt(), (255 * (1 - ratio)).toInt(), 128); c.drawLine(0f, y.toFloat(), w.toFloat(), y.toFloat(), p) }
+            }
+        }
         val puzzleWidth = originalBitmap.width
         val puzzleHeight = originalBitmap.height
+        Log.i("PuzzleCutterBenchmark", "Loaded bitmap ${puzzleWidth}x${puzzleHeight}")
 
-        // 2. Generate the SVG string for the puzzle grid using image dimensions
-        val piecesX = 3.0
-        val piecesY = 4.0
-        val totalPieces = (piecesX * piecesY).toInt()
-        val generator = PuzzleCurvesGenerator().apply {
-            width = puzzleWidth.toDouble()
-            height = puzzleHeight.toDouble()
-            xn = piecesX
-            yn = piecesY
-        }
+        // Generate SVG for puzzle curves based on actual bitmap size
+        val generator = com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator().apply {
+            this.width = puzzleWidth.toDouble(); this.height = puzzleHeight.toDouble(); this.xn = cols.toDouble(); this.yn = rows.toDouble() }
         val svgString = generator.generateSvg()
 
-        // 3. Render the SVG to a base bitmap
-        val svg = SVG.getFromString(svgString)
-        val baseMaskBitmap = Bitmap.createBitmap(puzzleWidth, puzzleHeight, Bitmap.Config.ARGB_8888)
-        val maskCanvas = Canvas(baseMaskBitmap)
-        svg.renderToCanvas(maskCanvas)
+        // Dummy ImageView (needed for cutter coordinate alignment)
+        val imageView = android.widget.ImageView(context)
 
-        // Get the pixels of the base mask once
-        val basePixels = IntArray(puzzleWidth * puzzleHeight)
-        baseMaskBitmap.getPixels(basePixels, 0, puzzleWidth, 0, 0, puzzleWidth, puzzleHeight)
-
-        // 4. Use a thread pool to process all pieces in parallel
-        val executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())
-        val outputDir = context.filesDir
-
-        for (i in 0 until totalPieces) {
-            executor.submit {
-                val pieceX = i % piecesX.toInt()
-                val pieceY = i / piecesX.toInt()
-
-                // Work on a copy of the pixels to ensure thread safety
-                val pixelsForPiece = basePixels.clone()
-
-                // Find the starting point for flood fill in the center of the target piece
-                val startX = (puzzleWidth / piecesX * (pieceX + 0.5)).toInt()
-                val startY = (puzzleHeight / piecesY * (pieceY + 0.5)).toInt()
-
-                // Isolate the piece with Flood Fill
-                floodFill(pixelsForPiece, puzzleWidth, puzzleHeight, startX, startY, Color.TRANSPARENT, Color.WHITE)
-
-                // Invert the mask: make the filled area the only opaque part
-                for (j in pixelsForPiece.indices) {
-                    if (pixelsForPiece[j] != Color.WHITE) {
-                        pixelsForPiece[j] = Color.TRANSPARENT
-                    }
+        // Helper to allocate PuzzlePiece placeholders
+        fun createPieces(): MutableList<com.batodev.jigsawpuzzle.view.PuzzlePiece> {
+            val pieces = mutableListOf<com.batodev.jigsawpuzzle.view.PuzzlePiece>()
+            val pieceWidth = puzzleWidth / cols; val pieceHeight = puzzleHeight / rows
+            var yCoord = 0
+            for (r in 0 until rows) {
+                var xCoord = 0
+                for (c in 0 until cols) {
+                    val offsetX = if (c > 0) pieceWidth / 3 else 0
+                    val offsetY = if (r > 0) pieceHeight / 3 else 0
+                    val p = com.batodev.jigsawpuzzle.view.PuzzlePiece(context)
+                    p.xCoord = xCoord - offsetX + imageView.left + 4
+                    p.yCoord = yCoord - offsetY + imageView.top + 7
+                    p.pieceWidth = pieceWidth + offsetX
+                    p.pieceHeight = pieceHeight + offsetY
+                    pieces.add(p); xCoord += pieceWidth
                 }
-
-                // Create a bitmap for the isolated piece mask
-                val pieceMaskBitmap = Bitmap.createBitmap(puzzleWidth, puzzleHeight, Bitmap.Config.ARGB_8888)
-                pieceMaskBitmap.setPixels(pixelsForPiece, 0, puzzleWidth, 0, 0, puzzleWidth, puzzleHeight)
-
-                // Apply the mask to the source image
-                val maskedBitmap = Bitmap.createBitmap(puzzleWidth, puzzleHeight, Bitmap.Config.ARGB_8888)
-                val pieceCanvas = Canvas(maskedBitmap)
-                val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-                pieceCanvas.drawBitmap(pieceMaskBitmap, 0f, 0f, paint)
-                paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
-                pieceCanvas.drawBitmap(originalBitmap, 0f, 0f, paint)
-
-                // Crop the result to the visible puzzle piece
-                val bounds = findVisibleBounds(maskedBitmap)
-                val finalBitmap = if (bounds != null && bounds.width() > 0 && bounds.height() > 0) {
-                    Bitmap.createBitmap(maskedBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
-                } else {
-                    maskedBitmap // Fallback
-                }
-
-                // Save the final piece
-                val outputFile = File(outputDir, "puzzle_piece_$i.png")
-                FileOutputStream(outputFile).use { out ->
-                    finalBitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
-                Log.d("ImageMaskTest", "Saved piece $i to ${outputFile.absolutePath}")
+                yCoord += pieceHeight
             }
+            return pieces
         }
 
-        // 5. Wait for all threads to finish and verify
-        executor.shutdown()
-        try {
-            // Wait a reasonable amount of time for all pieces to be processed
-            executor.awaitTermination(5, TimeUnit.MINUTES)
-        } catch (e: InterruptedException) {
-            Thread.currentThread().interrupt()
-            return // Exit if the wait is interrupted
+        // Completion flags
+        val floodFinished = AtomicBoolean(false)
+        val maskFinished = AtomicBoolean(false)
+
+        // Stub progress listener template factory
+        fun progressListener(doneFlag: AtomicBoolean) = object : com.batodev.jigsawpuzzle.logic.PuzzleProgressListener {
+            override fun onProgressUpdate(progress: Int, max: Int) { /* ignore granular */ }
+            override fun onCuttingFinished() { doneFlag.set(true) }
+            override fun postToHandler(r: Runnable) { r.run() }
         }
 
-        val overallDuration = System.currentTimeMillis() - overallStartTime
-        Log.d("ImageMaskTest", "--- Performance (Parallel) --- ")
-        Log.d("ImageMaskTest", "Overall operation for $totalPieces pieces took: $overallDuration ms")
+        val expectedPieces = rows * cols
 
-        // Verify all files were created
-        for (i in 0 until totalPieces) {
-            val outputFile = File(outputDir, "puzzle_piece_$i.png")
-            assertTrue("Puzzle piece file #$i was not created.", outputFile.exists())
-            assertTrue("Puzzle piece file #$i is empty.", outputFile.length() > 0)
+        // FloodFill benchmark
+        val floodFillCutter = com.batodev.jigsawpuzzle.cut.FloodFillPuzzleCutter()
+        val floodPieces = createPieces()
+        val floodResultBitmaps = floodFillCutter.cut(originalBitmap, rows, cols, svgString, imageView, progressListener(floodFinished), floodPieces)
+        val floodStartNs = System.nanoTime()
+        // Wait until finished or timeout
+        val floodTimeoutNs = 30_000_000_000L // 30 seconds
+        while (!floodFinished.get() && System.nanoTime() - floodStartNs < floodTimeoutNs) {
+            Thread.sleep(25)
         }
-    }
+        val floodDurationMs = (System.nanoTime() - floodStartNs) / 1_000_000.0
 
-    /**
-     * Finds the bounding box of non-transparent pixels in a bitmap.
-     */
-    private fun findVisibleBounds(bitmap: Bitmap): Rect? {
-        val width = bitmap.width
-        val height = bitmap.height
-        val pixels = IntArray(width * height)
-        bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
-
-        var minX = width
-        var minY = height
-        var maxX = -1
-        var maxY = -1
-
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val index = y * width + x
-                if (pixels[index] ushr 24 != 0) { // Check alpha channel
-                    if (x < minX) minX = x
-                    if (y < minY) minY = y
-                    if (x > maxX) maxX = x
-                    if (y > maxY) maxY = y
-                }
-            }
+        // MaskBitmap benchmark
+        val maskCutter = com.batodev.jigsawpuzzle.cut.MaskBitmapPuzzleCutter()
+        val maskPieces = createPieces()
+        val maskResultBitmaps = maskCutter.cut(originalBitmap, rows, cols, svgString, imageView, progressListener(maskFinished), maskPieces)
+        val maskStartNs = System.nanoTime()
+        val maskTimeoutNs = 30_000_000_000L
+        while (!maskFinished.get() && System.nanoTime() - maskStartNs < maskTimeoutNs) {
+            Thread.sleep(25)
         }
+        val maskDurationMs = (System.nanoTime() - maskStartNs) / 1_000_000.0
 
-        return if (maxX < minX || maxY < minY) null else Rect(minX, minY, maxX + 1, maxY + 1)
-    }
+        Log.i("PuzzleCutterBenchmark", "FloodFill pieces=${floodResultBitmaps.size} elapsedMs=${"%.2f".format(floodDurationMs)} finished=${floodFinished.get()}")
+        Log.i("PuzzleCutterBenchmark", "MaskBitmap pieces=${maskResultBitmaps.size} elapsedMs=${"%.2f".format(maskDurationMs)} finished=${maskFinished.get()}")
 
-    /**
-     * Fills a connected area using an iterative, queue-based approach on a pixel array.
-     */
-    private fun floodFill(pixels: IntArray, width: Int, height: Int, x: Int, y: Int, targetColor: Int, newColor: Int) {
-        if (targetColor == newColor) return
+        // Assertions
+        assertTrue("FloodFill did not finish in time", floodFinished.get())
+        assertTrue("MaskBitmap did not finish in time", maskFinished.get())
+        assertTrue("FloodFill piece count mismatch", floodResultBitmaps.size == expectedPieces)
+        assertTrue("MaskBitmap piece count mismatch", maskResultBitmaps.size == expectedPieces)
+        assertTrue("FloodFill contains empty bitmap", floodResultBitmaps.all { it.width > 0 && it.height > 0 })
+        assertTrue("MaskBitmap contains empty bitmap", maskResultBitmaps.all { it.width > 0 && it.height > 0 })
 
-        val queue: Queue<Point> = LinkedList()
-        queue.add(Point(x, y))
-
-        while (queue.isNotEmpty()) {
-            val p = queue.poll() ?: continue
-
-            if (p.x < 0 || p.x >= width || p.y < 0 || p.y >= height) continue
-
-            val index = p.y * width + p.x
-            if (pixels[index] == targetColor) {
-                pixels[index] = newColor
-                queue.add(Point(p.x + 1, p.y))
-                queue.add(Point(p.x - 1, p.y))
-                queue.add(Point(p.x, p.y + 1))
-                queue.add(Point(p.x, p.y - 1))
-            }
-        }
+        // Persist timing output
+        val outDir = File(context.cacheDir, "cutter_benchmark").apply { mkdirs() }
+        File(outDir, "timing.txt").writeText("Asset=${assetPath}\nBitmap=${puzzleWidth}x${puzzleHeight}\nFloodFillMs=${floodDurationMs}\nMaskBitmapMs=${maskDurationMs}\n")
     }
 }

@@ -1,9 +1,6 @@
 package com.batodev.jigsawpuzzle.cut
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
+import android.graphics.*
 import android.widget.ImageView
 import androidx.core.graphics.createBitmap
 import androidx.core.graphics.get
@@ -19,45 +16,25 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Consumer
+import kotlin.math.max
+import kotlin.math.min
 
-/**
- * An object for cutting the puzzle pieces from the source image.
- */
-object PuzzleCutter {
-    private val numProcessors = Runtime.getRuntime().availableProcessors()
-    /**
-     * Cuts the source image into puzzle pieces based on the provided SVG string.
-     * This operation is performed asynchronously using a fixed thread pool.
-     * @param sourceImage The {@link Bitmap} of the original image to be cut.
-     * @param rows The number of rows for the puzzle grid.
-     * @param cols The number of columns for the puzzle grid.
-     * @param svgString The SVG string defining the puzzle piece shapes.
-     * @param imageView The {@link ImageView} where the puzzle pieces will be displayed.
-     * @param puzzleProgressListener A listener to report progress updates and completion.
-     * @param pieces A list of {@link PuzzlePiece} objects to populate with the cut bitmaps.
-     * @return A list of {@link Bitmap} objects, each representing a cut puzzle piece.
-     * @throws SVGParseException if the provided SVG string is invalid.
-     */
+interface PuzzleCutter {
     @Throws(SVGParseException::class)
-    fun cut(
-        sourceImage: Bitmap,
-        rows: Int,
-        cols: Int,
-        svgString: String?,
-        imageView: ImageView,
-        puzzleProgressListener: PuzzleProgressListener,
-        pieces: List<PuzzlePiece>,
-    ): List<Bitmap> {
+    fun cut(sourceImage: Bitmap, rows: Int, cols: Int, svgString: String?, imageView: ImageView, puzzleProgressListener: PuzzleProgressListener, pieces: List<PuzzlePiece>): List<Bitmap>
+    companion object { fun default(): PuzzleCutter = MaskBitmapPuzzleCutter() }
+}
+
+class FloodFillPuzzleCutter : PuzzleCutter {
+    private val numProcessors = Runtime.getRuntime().availableProcessors()
+    override fun cut(sourceImage: Bitmap, rows: Int, cols: Int, svgString: String?, imageView: ImageView, puzzleProgressListener: PuzzleProgressListener, pieces: List<PuzzlePiece>): List<Bitmap> {
         val result: MutableList<Bitmap> = ArrayList()
-        val startTime = System.currentTimeMillis()
         val svg = SVG.getFromString(svgString)
         val width = sourceImage.width
         val height = sourceImage.height
         val puzzleGridBitmap = createBitmap(width, height)
         val puzzleGridCanvas = Canvas(puzzleGridBitmap)
-        val whiteFill = Paint()
-        whiteFill.style = Paint.Style.FILL
-        whiteFill.color = Color.WHITE
+        val whiteFill = Paint(Paint.ANTI_ALIAS_FLAG).apply { style = Paint.Style.FILL; color = Color.WHITE }
         puzzleGridCanvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), whiteFill)
         svg.renderToCanvas(puzzleGridCanvas)
         val executor = Executors.newFixedThreadPool(numProcessors)
@@ -67,7 +44,7 @@ object PuzzleCutter {
         for (rowIndex in 0 until rows) {
             for (colIndex in 0 until cols) {
                 val piece = pieces[puzzleIndex++]
-                val puzzleCutJob = Runnable {
+                executor.submit {
                     val puzzleCenter = puzzlesCenterPoints[rowIndex][colIndex]
                     val reg = floodFill(puzzleGridBitmap, puzzleCenter!!.x, puzzleCenter.y)
                     val regionWidth = reg.width
@@ -75,219 +52,138 @@ object PuzzleCutter {
                     val regionMinX = reg.minX
                     val regionMinY = reg.minY
                     val puzzleBitmap = createBitmap(regionWidth + 1, regionHeight + 1)
-                    println("Flood fill took: " + (System.currentTimeMillis() - startTime) + "ms")
                     reg.points.forEach(Consumer { (x1, y1): Point ->
                         val rgbSource = sourceImage[x1, y1]
-                        val x = x1 - regionMinX
-                        val y = y1 - regionMinY
-                        puzzleBitmap[x, y] = rgbSource
+                        puzzleBitmap[x1 - regionMinX, y1 - regionMinY] = rgbSource
                     })
-                    result.add(puzzleBitmap)
-                    val setPuzzleImageAndPositions = Runnable {
+                    synchronized(result) { result.add(puzzleBitmap) }
+                    puzzleProgressListener.postToHandler {
                         piece.setImageBitmap(puzzleBitmap)
                         piece.pieceWidth = regionWidth
                         piece.pieceHeight = regionHeight
                         piece.xCoord = regionMinX + imageView.left
                         piece.yCoord = regionMinY + imageView.top
                     }
-                    puzzleProgressListener.postToHandler(setPuzzleImageAndPositions)
                     val progress = progressCounter.incrementAndGet()
-                    puzzleProgressListener.postToHandler {
-                        puzzleProgressListener.onProgressUpdate(progress, rows * cols)
-                    }
+                    puzzleProgressListener.postToHandler { puzzleProgressListener.onProgressUpdate(progress, rows * cols) }
                 }
-                executor.submit(puzzleCutJob)
-                println("Filling target took: " + (System.currentTimeMillis() - startTime) + "ms")
             }
         }
         executor.shutdown()
         Thread {
-            try {
-                val terminated = executor.awaitTermination(1, TimeUnit.HOURS)
-                println(terminated)
-            } catch (e: InterruptedException) {
-                FirebaseHelper.logException(imageView.context, "PuzzleCutter.cut", e.message)
-                throw RuntimeException(e)
+            try { executor.awaitTermination(1, TimeUnit.HOURS) } catch (e: InterruptedException) {
+                FirebaseHelper.logException(imageView.context, "FloodFillPuzzleCutter.cut", e.message); throw RuntimeException(e)
             }
             puzzleProgressListener.postToHandler { puzzleProgressListener.onCuttingFinished() }
         }.start()
         return result
     }
-
-    /**
-     * Performs a flood fill algorithm to identify a connected region of white pixels in a bitmap.
-     * Used to define the shape of a puzzle piece.
-     * @param image The {@link Bitmap} to perform the flood fill on. This bitmap will be modified during the process.
-     * @param startX The starting X-coordinate for the flood fill.
-     * @param startY The starting Y-coordinate for the flood fill.
-     * @return A {@link Region} object containing all points within the filled area.
-     */
     private fun floodFill(image: Bitmap, startX: Int, startY: Int): Region {
         val reg = Region(ArrayList())
         val queue: Queue<Point> = ArrayDeque()
-        val width = image.width
-        val height = image.height
-
-        // Check if starting point is within image bounds
-        if (startX < 0 || startY < 0 || startX >= width || startY >= height) {
-            return reg
-        }
-
-        // Check if starting point color is same as target color
-        if (image[startX, startY] != Color.WHITE) {
-            return reg
-        }
-
-        // Add starting point to queue
+        val width = image.width; val height = image.height
+        if (startX !in 0 until width || startY !in 0 until height) return reg
+        if (image[startX, startY] != Color.WHITE) return reg
         queue.add(Point(startX, startY))
-
-        // Perform flood fill
-        while (!queue.isEmpty()) {
-            val point = queue.poll()!!
-            val x = point.x
-            val y = point.y
-
-            // Check current pixel color
-            if (image[x, y] != Color.WHITE) {
-                continue
-            }
-
-            // Fill current pixel with fill color
-            image[x, y] = Color.GREEN
-            reg.points.add(Point(x, y))
-
-            // Add neighboring pixels to queue
-            if (x > 0) {
-                queue.add(Point(x - 1, y))
-            }
-            if (x < width - 1) {
-                queue.add(Point(x + 1, y))
-            }
-            if (y > 0) {
-                queue.add(Point(x, y - 1))
-            }
-            if (y < height - 1) {
-                queue.add(Point(x, y + 1))
-            }
+        while (queue.isNotEmpty()) {
+            val point = queue.poll()!!; val x = point.x; val y = point.y
+            if (image[x, y] != Color.WHITE) continue
+            image[x, y] = Color.GREEN; reg.points.add(Point(x, y))
+            if (x > 0) queue.add(Point(x - 1, y)); if (x < width - 1) queue.add(Point(x + 1, y))
+            if (y > 0) queue.add(Point(x, y - 1)); if (y < height - 1) queue.add(Point(x, y + 1))
         }
         return reg
     }
-
-    /**
-     * Divides an image into a grid and calculates the center point of each cell.
-     * @param image The {@link Bitmap} to divide.
-     * @param rows The number of rows in the grid.
-     * @param cols The number of columns in the grid.
-     * @return A 2D array of {@link Point} objects, where each point represents the center of a grid cell.
-     */
     private fun divideImage(image: Bitmap, rows: Int, cols: Int): Array<Array<Point?>> {
-        val width = image.width
-        val height = image.height
+        val cellWidth = image.width / cols; val cellHeight = image.height / rows
+        return Array(rows) { i -> Array(cols) { j -> Point(j * cellWidth + cellWidth / 2, i * cellHeight + cellHeight / 2) } }
+    }
+    internal class Point(var x: Int, var y: Int) { operator fun component1(): Int = x; operator fun component2(): Int = y }
+    internal class Region(val points: MutableCollection<Point>) {
+        private val maxX: Int get() = points.maxOfOrNull { it.x } ?: 0
+        val minX: Int get() = points.minOfOrNull { it.x } ?: 0
+        private val maxY: Int get() = points.maxOfOrNull { it.y } ?: 0
+        val minY: Int get() = points.minOfOrNull { it.y } ?: 0
+        val width: Int get() = maxX - minX; val height: Int get() = maxY - minY }
+}
 
-        // Calculate the width and height of each cell
-        val cellWidth = width / cols
-        val cellHeight = height / rows
-        val cellCenters = Array(rows) { arrayOfNulls<Point>(cols) }
-
-        // Loop through each cell and find its center
-        for (i in 0 until rows) {
-            for (j in 0 until cols) {
-                // Calculate the coordinates of the cell center
-                val centerX = j * cellWidth + cellWidth / 2
-                val centerY = i * cellHeight + cellHeight / 2
-                cellCenters[i][j] = Point(centerX, centerY)
+class MaskBitmapPuzzleCutter : PuzzleCutter {
+    private val numProcessors = Runtime.getRuntime().availableProcessors()
+    override fun cut(sourceImage: Bitmap, rows: Int, cols: Int, svgString: String?, imageView: ImageView, puzzleProgressListener: PuzzleProgressListener, pieces: List<PuzzlePiece>): List<Bitmap> {
+        val width = sourceImage.width; val height = sourceImage.height
+        val svg = SVG.getFromString(svgString)
+        val baseMaskBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val maskCanvas = Canvas(baseMaskBitmap); svg.renderToCanvas(maskCanvas)
+        val basePixels = IntArray(width * height); baseMaskBitmap.getPixels(basePixels, 0, width, 0, 0, width, height)
+        val executor = Executors.newFixedThreadPool(numProcessors)
+        val progressCounter = AtomicInteger(0); val result = mutableListOf<Bitmap>()
+        val totalPieces = rows * cols
+        for (i in 0 until totalPieces) {
+            val piece = pieces[i]
+            executor.submit {
+                val pieceX = i % cols; val pieceY = i / cols
+                val pixelsForPiece = basePixels.clone()
+                val startX = (width / cols.toDouble() * (pieceX + 0.5)).toInt()
+                val startY = (height / rows.toDouble() * (pieceY + 0.5)).toInt()
+                // The mask uses transparent as the target color and white as a temporary marker.
+                // Use the simplified floodFill which uses fixed colors internally.
+                floodFill(pixelsForPiece, width, height, startX, startY)
+                for (j in pixelsForPiece.indices) if (pixelsForPiece[j] != Color.WHITE) pixelsForPiece[j] = Color.TRANSPARENT
+                val pieceMaskBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                pieceMaskBitmap.setPixels(pixelsForPiece, 0, width, 0, 0, width, height)
+                val maskedBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+                val pieceCanvas = Canvas(maskedBitmap); val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+                pieceCanvas.drawBitmap(pieceMaskBitmap, 0f, 0f, paint); paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
+                pieceCanvas.drawBitmap(sourceImage, 0f, 0f, paint)
+                val bounds = findVisibleBounds(maskedBitmap)
+                val finalBitmap = if (bounds != null && bounds.width() > 0 && bounds.height() > 0) Bitmap.createBitmap(maskedBitmap, bounds.left, bounds.top, bounds.width(), bounds.height()) else maskedBitmap
+                synchronized(result) { result.add(finalBitmap) }
+                puzzleProgressListener.postToHandler {
+                    piece.setImageBitmap(finalBitmap)
+                    piece.pieceWidth = finalBitmap.width
+                    piece.pieceHeight = finalBitmap.height
+                    if (bounds != null) { piece.xCoord = bounds.left + imageView.left; piece.yCoord = bounds.top + imageView.top }
+                }
+                val progress = progressCounter.incrementAndGet()
+                puzzleProgressListener.postToHandler { puzzleProgressListener.onProgressUpdate(progress, totalPieces) }
             }
         }
-        return cellCenters
+        executor.shutdown()
+        Thread {
+            try { executor.awaitTermination(1, TimeUnit.HOURS) } catch (e: InterruptedException) {
+                FirebaseHelper.logException(imageView.context, "MaskBitmapPuzzleCutter.cut", e.message); throw RuntimeException(e) }
+            puzzleProgressListener.postToHandler { puzzleProgressListener.onCuttingFinished() }
+        }.start()
+        return result
     }
-
-    /**
-     * Represents a point in 2D space with integer coordinates.
-     * @param x The X-coordinate of the point.
-     * @param y The Y-coordinate of the point.
-     */
-    internal class Point(var x: Int, var y: Int) {
-        /**
-         * Returns the X-coordinate of the point.
-         * This is a component function for destructuring declarations.
-         * @return The X-coordinate.
-         */
-        operator fun component1(): Int {
-            return x
+    private fun findVisibleBounds(bitmap: Bitmap): Rect? {
+        val w = bitmap.width; val h = bitmap.height; val pixels = IntArray(w * h)
+        bitmap.getPixels(pixels, 0, w, 0, 0, w, h)
+        var minX = w; var minY = h; var maxX = -1; var maxY = -1
+        for (y in 0 until h) for (x in 0 until w) { val index = y * w + x; if (pixels[index] ushr 24 != 0) { minX = min(minX, x); minY = min(minY, y); maxX = max(maxX, x); maxY = max(maxY, y) } }
+        return if (maxX < minX || maxY < minY) null else Rect(minX, minY, maxX + 1, maxY + 1)
+    }
+    // Flood fill that treats transparent pixels as the target and marks them with white. This
+    // variant uses fixed colors to avoid redundant parameters and analyzer warnings.
+    private fun floodFill(pixels: IntArray, width: Int, height: Int, x: Int, y: Int) {
+        // We'll treat 'transparent' as target: alpha == 0. Mark visited pixels with opaque white.
+        // Validate start point
+        if (x !in 0..<width || y < 0 || y >= height) return
+        val startIndex = y * width + x
+        if ((pixels[startIndex] ushr 24) != 0) return // start pixel is not transparent
+        val queue: Queue<Point> = ArrayDeque()
+        queue.add(Point(x, y))
+        while (queue.isNotEmpty()) {
+            val p = queue.poll() ?: continue
+            if (p.x !in 0..<width || p.y < 0 || p.y >= height) continue
+            val index = p.y * width + p.x
+            val pixel = pixels[index]
+            // Alpha == 0 indicates transparent pixel
+            if (pixel ushr 24 == 0) {
+                pixels[index] = Color.WHITE
+                queue.add(Point(p.x + 1, p.y)); queue.add(Point(p.x - 1, p.y)); queue.add(Point(p.x, p.y + 1)); queue.add(Point(p.x, p.y - 1))
+            }
         }
-
-        /**
-         * Returns the Y-coordinate of the point.
-         * This is a component function for destructuring declarations.
-         * @return The Y-coordinate.
-         */
-        operator fun component2(): Int {
-            return y
-        }
     }
-
-    /**
-     * Represents a region defined by a collection of {@link Point} objects.
-     * Provides methods to calculate the bounding box (min/max X/Y, width, height) of the region.
-     * @param points The mutable collection of points that define the region.
-     */
-    internal class Region(val points: MutableCollection<Point>) {
-        /**
-         * Gets the maximum X-coordinate among all points in the region.
-         * @return The maximum X-coordinate.
-         */
-        private val maxX: Int
-            get() = points.stream().map(Point::x).max { obj: Int, anotherInteger: Int? ->
-                obj.compareTo(
-                    anotherInteger!!
-                )
-            }.orElse(0)
-
-        /**
-         * Gets the minimum X-coordinate among all points in the region.
-         * @return The minimum X-coordinate.
-         */
-        val minX: Int
-            get() = points.stream().map(Point::x).min { obj: Int, anotherInteger: Int? ->
-                obj.compareTo(
-                    anotherInteger!!
-                )
-            }.orElse(0)
-
-        /**
-         * Gets the maximum Y-coordinate among all points in the region.
-         * @return The maximum Y-coordinate.
-         */
-        private val maxY: Int
-            get() = points.stream().map(Point::y).max { obj: Int, anotherInteger: Int? ->
-                obj.compareTo(
-                    anotherInteger!!
-                )
-            }.orElse(0)
-
-        /**
-         * Gets the minimum Y-coordinate among all points in the region.
-         * @return The minimum Y-coordinate.
-         */
-        val minY: Int
-            get() = points.stream().map(Point::y).min { obj: Int, anotherInteger: Int? ->
-                obj.compareTo(
-                    anotherInteger!!
-                )
-            }.orElse(0)
-
-        /**
-         * Calculates the width of the bounding box of the region.
-         * @return The width of the region.
-         */
-        val width: Int
-            get() = maxX - minX
-
-        /**
-         * Calculates the height of the bounding box of the region.
-         * @return The height of the region.
-         */
-        val height: Int
-            get() = maxY - minY
-    }
+    private data class Point(val x: Int, val y: Int)
 }

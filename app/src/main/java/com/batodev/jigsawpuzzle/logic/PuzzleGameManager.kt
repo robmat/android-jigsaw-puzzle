@@ -102,7 +102,7 @@ class PuzzleGameManager(
             }
             yCoord += pieceHeight
         }
-        PuzzleCutter.cut(bitmap, puzzlesHeight, puzzlesWidth, this.svgString, imageView, puzzleProgressListener, pieces)
+        PuzzleCutter.default().cut(bitmap, puzzlesHeight, puzzlesWidth, this.svgString, imageView, puzzleProgressListener, pieces)
     }
 
     /**
