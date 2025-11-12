@@ -55,7 +55,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // Note: The 'release' build type does not use signingConfigs.prodSigned in this setup.
             // If it were to, the above logic would need to consider it, or a separate signingConfig for release would be needed.
         }
@@ -77,25 +77,25 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
     implementation 'androidx.exifinterface:exifinterface:1.4.1'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
-    implementation 'com.google.android.gms:play-services-ads:24.6.0'
+    implementation 'com.google.android.gms:play-services-ads:24.7.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'com.github.bumptech.glide:glide:5.0.5'
     implementation 'com.caverock:androidsvg-aar:1.4'
     implementation 'com.google.android.play:review-ktx:2.0.2'
     implementation 'com.otaliastudios:zoomlayout:1.9.0'
     implementation 'com.google.code.gson:gson:2.13.2'
-    implementation platform('com.google.firebase:firebase-bom:34.3.0')
+    implementation platform('com.google.firebase:firebase-bom:34.5.0')
     implementation 'com.google.firebase:firebase-analytics'
     ksp 'com.github.bumptech.glide:ksp:5.0.5'
     implementation("com.github.SMehranB:GlowButton:2.0.1")
     implementation "com.google.android.gms:play-services-games-v2:21.0.0"
 
-    testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.0-RC3"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:6.0.0-RC3"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.0-RC3"
-    testRuntimeOnly "org.junit.platform:junit-platform-launcher:6.0.0-RC3"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:6.0.1"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:6.0.1"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:6.0.1"
+    testRuntimeOnly "org.junit.platform:junit-platform-launcher:6.0.1"
 
     testImplementation "org.hamcrest:hamcrest:3.0"
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'androidx.test.ext:junit:1.3.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
 }
