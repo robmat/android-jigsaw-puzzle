@@ -260,6 +260,8 @@ class GalleryActivity : AppCompatActivity() {
             val applicationId = this.application.applicationContext.packageName
             val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.clipData = android.content.ClipData.newRawUri("", uri)
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             shareIntent.type = "image/*"
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_show_and_tell)
             ContextCompat.startActivity(this, shareIntent, null)
