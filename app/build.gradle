@@ -3,7 +3,20 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.devtools.ksp'
     id 'com.google.gms.google-services'
+    id 'com.github.triplet.play'
+    id 'com.batodev.releasetools'
 }
+
+// Shared secrets (dev_keystore.jks etc.) live one folder up, distinct from
+// the project-local keystore.properties used by prodSigned below.
+def sharedKeystorePropertiesFile = rootProject.file("../keystore.properties")
+def sharedKeystoreProperties = new Properties()
+if (sharedKeystorePropertiesFile.exists()) {
+    sharedKeystoreProperties.load(new FileInputStream(sharedKeystorePropertiesFile))
+}
+
+def versionProps = new Properties()
+file("version.properties").withInputStream { versionProps.load(it) }
 
 android {
     defaultConfig {
@@ -11,8 +24,8 @@ android {
         minSdkVersion 24
         compileSdk = 36
         targetSdkVersion 36
-        versionCode 29
-        versionName "7.0"
+        versionCode versionProps.getProperty("versionCode").toInteger()
+        versionName versionProps.getProperty("versionName")
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     compileOptions {
@@ -25,6 +38,14 @@ android {
             // This configuration will be populated by the logic below
             // based on whether the keystore.properties file is found
             // and whether a debugProdSigned variant is being built.
+        }
+        release {
+            if (sharedKeystorePropertiesFile.exists()) {
+                storeFile rootProject.file(sharedKeystoreProperties['storeFile'])
+                storePassword sharedKeystoreProperties['storePassword']
+                keyAlias sharedKeystoreProperties['keyAlias']
+                keyPassword sharedKeystoreProperties['keyPassword']
+            }
         }
     }
 
@@ -56,8 +77,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            // Note: The 'release' build type does not use signingConfigs.prodSigned in this setup.
-            // If it were to, the above logic would need to consider it, or a separate signingConfig for release would be needed.
+            signingConfig signingConfigs.release
         }
         debugProdSigned {
             signingConfig signingConfigs.prodSigned
@@ -70,6 +90,12 @@ android {
             useJUnitPlatform()
         }
     }
+}
+
+play {
+    serviceAccountCredentials.set(rootProject.file("../play-console-api-465319-0f9c399097c5.json"))
+    track.set("internal")
+    defaultToAppBundles.set(true)
 }
 
 dependencies {
