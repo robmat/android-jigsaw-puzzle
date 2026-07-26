@@ -10,7 +10,11 @@ data class GameState(
     val elapsedTime: Int,
     val pieces: List<PieceState>,
     val svgString: String?
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}
 
 data class PieceState(
     val xCoord: Int,
@@ -21,4 +25,8 @@ data class PieceState(
     val pieceHeight: Int,
     val canMove: Boolean,
     val imagePath: String
-) : Serializable
+) : Serializable {
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}

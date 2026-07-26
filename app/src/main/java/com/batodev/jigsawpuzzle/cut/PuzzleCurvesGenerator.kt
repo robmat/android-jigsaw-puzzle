@@ -1,9 +1,9 @@
 package com.batodev.jigsawpuzzle.cut
 
+import java.util.concurrent.atomic.AtomicLong // Import for AtomicLong
 import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sin
-import java.util.concurrent.atomic.AtomicLong // Import for AtomicLong
 
 /**
  * A class for generating the SVG curves for the puzzle pieces.
@@ -11,6 +11,12 @@ import java.util.concurrent.atomic.AtomicLong // Import for AtomicLong
 class PuzzleCurvesGenerator {
 
     companion object {
+        private const val DEFAULT_TENSION = 0.1
+        private const val DEFAULT_JITTER = 0.05
+        private const val RANDOM_MULTIPLIER = 10000.0
+        private const val BOOL_THRESHOLD = 0.5
+        private const val ROUNDING_PRECISION = 100.0
+
         // Using AtomicLong for a thread-safe incrementing seed component
         private val seedOffset = AtomicLong(0L)
 
@@ -48,8 +54,8 @@ class PuzzleCurvesGenerator {
     private var c = 0.0
     private var d = 0.0
     private var e = 0.0
-    private var t = 0.1
-    private var j = 0.05
+    private var t = DEFAULT_TENSION
+    private var j = DEFAULT_JITTER
     private var xi = 0.0
     private var yi = 0.0
     var xn = 0.0
@@ -67,7 +73,7 @@ class PuzzleCurvesGenerator {
      * @return A pseudo-random double.
      */
     private fun random(): Double {
-        val x = sin(seed) * 10000
+        val x = sin(seed) * RANDOM_MULTIPLIER
         seed += 1.0 // Incrementing seed here is part of the existing pseudo-random generation
         return x - floor(x)
     }
@@ -88,7 +94,7 @@ class PuzzleCurvesGenerator {
      * @return True if the random value is greater than 0.5, false otherwise.
      */
     private fun rBool(): Boolean {
-        return random() > 0.5
+        return random() > BOOL_THRESHOLD
     }
 
     /**
@@ -151,7 +157,7 @@ class PuzzleCurvesGenerator {
      */
     private fun l(v: Double): Double {
         val ret = ol() + sl() * v
-        return (ret * 100).roundToInt().toDouble() / 100
+        return (ret * ROUNDING_PRECISION).roundToInt().toDouble() / ROUNDING_PRECISION
     }
 
     /**
@@ -161,7 +167,7 @@ class PuzzleCurvesGenerator {
      */
     private fun w(v: Double): Double {
         val ret = ow() + sw() * v * if (flip) -1.0 else 1.0
-        return (ret * 100).roundToInt().toDouble() / 100
+        return (ret * ROUNDING_PRECISION).roundToInt().toDouble() / ROUNDING_PRECISION
     }
 
     /**

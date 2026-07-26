@@ -1,9 +1,7 @@
 package com.batodev.jigsawpuzzle.helpers
 
 import android.app.Activity
-import android.content.Context
 import android.util.Log
-import com.batodev.jigsawpuzzle.R
 import com.google.android.gms.games.PlayGames
 
 object PlayGamesHelper {
@@ -17,6 +15,9 @@ object PlayGamesHelper {
     fun progressAchievement(context: Activity, achievementId: Int, increment: Int) {
         PlayGames.getAchievementsClient(context)
             .increment(context.getString(achievementId), increment)
-        Log.d(PlayGamesHelper::class.java.simpleName, "Achievement progressed $increment: ${context.getString(achievementId)}")
+        Log.d(
+            PlayGamesHelper::class.java.simpleName,
+            "Achievement progressed $increment: ${context.getString(achievementId)}"
+        )
     }
 }

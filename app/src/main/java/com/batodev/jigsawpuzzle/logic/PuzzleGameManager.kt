@@ -13,6 +13,7 @@ import androidx.core.graphics.createBitmap
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.activity.PuzzleActivity
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
+import com.batodev.jigsawpuzzle.cut.PuzzleCutRequest
 import com.batodev.jigsawpuzzle.cut.PuzzleCutter
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
@@ -33,11 +34,25 @@ class PuzzleGameManager(
     private val settings: Settings,
     private val puzzleProgressListener: PuzzleProgressListener
 ) {
+    companion object {
+        private const val BACKGROUND_IMAGE_ALPHA = 70
+        private const val PIECE_OVERLAP_DIVISOR = 3
+        private const val PIECE_X_OFFSET = 4
+        private const val PIECE_Y_OFFSET = 7
+        private const val SCATTER_TOP_MARGIN = 10
+        private const val SCATTER_ANIMATION_DURATION_MS = 500L
+        private const val SCATTER_MAX_START_DELAY_MS = 1501
+    }
+
     var pieces: MutableList<PuzzlePiece> = mutableListOf()
     var svgString: String? = null
     private val winSoundIds = listOf(
-        R.raw.success_1, R.raw.success_2, R.raw.success_3, R.raw.success_4,
-        R.raw.success_5, R.raw.success_6
+        R.raw.success_1,
+        R.raw.success_2,
+        R.raw.success_3,
+        R.raw.success_4,
+        R.raw.success_5,
+        R.raw.success_6
     )
     private val okSoundsIds = listOf(
         R.raw.ok_1, R.raw.ok_2, R.raw.ok_3, R.raw.ok_4, R.raw.ok_5, R.raw.ok_6, R.raw.ok_7, R.raw.ok_8,
@@ -66,7 +81,7 @@ class PuzzleGameManager(
         val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
         val canvas = Canvas(bitmapCopy)
         val paint = Paint()
-        paint.alpha = 70
+        paint.alpha = BACKGROUND_IMAGE_ALPHA
         if (settings.showImageInBackgroundOfThePuzzle) {
             canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint)
         }
@@ -86,15 +101,15 @@ class PuzzleGameManager(
                 var offsetX = 0
                 var offsetY = 0
                 if (col > 0) {
-                    offsetX = pieceWidth / 3
+                    offsetX = pieceWidth / PIECE_OVERLAP_DIVISOR
                 }
                 if (row > 0) {
-                    offsetY = pieceHeight / 3
+                    offsetY = pieceHeight / PIECE_OVERLAP_DIVISOR
                 }
 
                 val piece = PuzzlePiece(activity)
-                piece.xCoord = xCoord - offsetX + imageView.left + 4
-                piece.yCoord = yCoord - offsetY + imageView.top + 7
+                piece.xCoord = xCoord - offsetX + imageView.left + PIECE_X_OFFSET
+                piece.yCoord = yCoord - offsetY + imageView.top + PIECE_Y_OFFSET
                 piece.pieceWidth = pieceWidth + offsetX
                 piece.pieceHeight = pieceHeight + offsetY
                 pieces.add(piece)
@@ -102,7 +117,17 @@ class PuzzleGameManager(
             }
             yCoord += pieceHeight
         }
-        PuzzleCutter.default().cut(bitmap, puzzlesHeight, puzzlesWidth, this.svgString, imageView, puzzleProgressListener, pieces)
+        PuzzleCutter.default().cut(
+            PuzzleCutRequest(
+                sourceImage = bitmap,
+                rows = puzzlesHeight,
+                cols = puzzlesWidth,
+                svgString = this.svgString,
+                imageView = imageView,
+                puzzleProgressListener = puzzleProgressListener,
+                pieces = pieces
+            )
+        )
     }
 
     /**
@@ -125,7 +150,7 @@ class PuzzleGameManager(
             val lParams = piece.layoutParams as RelativeLayout.LayoutParams
             lParams.leftMargin = Random().nextInt(layout.width - piece.pieceWidth)
             val imageViewBottom = imageView.bottom
-            val minTopMargin = imageViewBottom + 10
+            val minTopMargin = imageViewBottom + SCATTER_TOP_MARGIN
             val maxTopMargin = layout.height - piece.pieceHeight
             lParams.topMargin = if (maxTopMargin > minTopMargin) {
                 minTopMargin + Random().nextInt(maxTopMargin - minTopMargin)
@@ -139,8 +164,8 @@ class PuzzleGameManager(
             val scaleYAnimator = ObjectAnimator.ofFloat(piece, "scaleY", 0f, 1f)
             val animatorSet = AnimatorSet()
             animatorSet.playTogether(scaleXAnimator, scaleYAnimator)
-            animatorSet.duration = 500 // milliseconds
-            animatorSet.startDelay = Random().nextInt(1501).toLong() // Random delay between 0 and 1500 ms
+            animatorSet.duration = SCATTER_ANIMATION_DURATION_MS
+            animatorSet.startDelay = Random().nextInt(SCATTER_MAX_START_DELAY_MS).toLong() // 0-1500 ms
             animatorSet.interpolator = AccelerateDecelerateInterpolator()
             animatorSet.start()
         }

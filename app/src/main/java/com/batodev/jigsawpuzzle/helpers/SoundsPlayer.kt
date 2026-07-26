@@ -14,7 +14,7 @@ object SoundsPlayer {
      * @param activity The {@link AppCompatActivity} context used to create the {@link MediaPlayer}.
      * @see SettingsHelper
      */
-    fun play(res : Int, activity: AppCompatActivity) {
+    fun play(res: Int, activity: AppCompatActivity) {
         if (SettingsHelper.load(activity).playSounds) {
             val mp = MediaPlayer.create(activity, res)
             mp.setOnCompletionListener { mp.release() }

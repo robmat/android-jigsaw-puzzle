@@ -10,6 +10,10 @@ import java.util.Date
 import java.util.Locale
 
 object AchievementHelper {
+    private const val SECONDS_PER_MINUTE = 60
+    private const val COLLECTOR_UNCOVERED_THRESHOLD = 10
+    private const val GALLERY_COMPLETE_PROGRESS_STEP = 20
+
     val TAG: String = AchievementHelper::class.java.simpleName
     fun updateDailyRitualAchievement(context: Context) {
         val settings = SettingsHelper.load(context)
@@ -66,7 +70,7 @@ object AchievementHelper {
             val bestTime = highScores[0]
             val parts = bestTime.split(" - ")
             val timeParts = parts[0].split(":")
-            val bestTimeInSeconds = timeParts[0].toInt() * 60 + timeParts[1].toInt()
+            val bestTimeInSeconds = timeParts[0].toInt() * SECONDS_PER_MINUTE + timeParts[1].toInt()
             if (elapsedTime < bestTimeInSeconds) {
                 PlayGamesHelper.unlockAchievement(context, R.string.achievement_record_setter)
             }
@@ -97,15 +101,23 @@ object AchievementHelper {
     }
 
     fun checkCollectorAchievement(context: Context, settings: Settings) {
-        if (settings.uncoveredPics.size >= 10) {
-            PlayGamesHelper.progressAchievement(context as Activity, R.string.achievement_collector, 10)
+        if (settings.uncoveredPics.size >= COLLECTOR_UNCOVERED_THRESHOLD) {
+            PlayGamesHelper.progressAchievement(
+                context as Activity,
+                R.string.achievement_collector,
+                COLLECTOR_UNCOVERED_THRESHOLD
+            )
         }
     }
 
     fun checkGalleryCompleteAchievement(context: Context, settings: Settings) {
         val allImages = context.assets.list("img")?.filter { it.endsWith(".jpg") || it.endsWith(".png") }
         if (allImages != null && settings.uncoveredPics.containsAll(allImages)) {
-            PlayGamesHelper.progressAchievement(context as Activity, R.string.achievement_gallery_complete, 20)
+            PlayGamesHelper.progressAchievement(
+                context as Activity,
+                R.string.achievement_gallery_complete,
+                GALLERY_COMPLETE_PROGRESS_STEP
+            )
         }
     }
 }

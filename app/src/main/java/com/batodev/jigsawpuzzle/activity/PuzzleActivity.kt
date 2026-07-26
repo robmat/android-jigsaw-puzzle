@@ -31,9 +31,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
+import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.AppRatingHelper
-import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
@@ -62,6 +62,7 @@ import java.util.Locale
 import kotlin.random.Random
 
 const val FAKE_PROGRESS_MAX = 10
+
 /**
  * The main activity for the puzzle game.
  */
@@ -78,7 +79,24 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             SAVING
         }
         val puzzleStatus = java.util.concurrent.atomic.AtomicReference(PuzzleStatus.IDLE)
+
+        private const val SECONDS_PER_MINUTE = 60
+        private const val MAX_HIGH_SCORES = 10
+        private const val HIGH_SCORE_TEXT_SIZE_SP = 16f
+        private const val FAKE_PROGRESS_BASE_DELAY_MS = 1000L
+        private const val FAKE_PROGRESS_JITTER_RANGE = 600
+        private const val FAKE_PROGRESS_JITTER_OFFSET = 300
+        private const val PNG_COMPRESS_QUALITY = 100
+        private const val BACKGROUND_IMAGE_ALPHA = 70
+        private const val MARATHONER_SECONDS_THRESHOLD = 3600
+        private const val QUICK_GAME_PIECE_THRESHOLD = 20
+        private const val SPEEDSTER_PIECE_THRESHOLD = 50
+        private const val SPEEDSTER_TIME_THRESHOLD_SECONDS = 180
+        private const val LARGE_PUZZLE_PIECE_THRESHOLD = 100
+        private const val NIGHT_OWL_HOUR_END = 4
+        private const val ACHIEVEMENT_PROGRESS_STEP = 1
     }
+
     private var fakeProgress = 0
 
     /**
@@ -94,14 +112,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         supportActionBar?.hide()
         setContentView(R.layout.activity_puzzle)
         FirebaseHelper.logScreenView(this, "PuzzleActivity")
-
-        val windowInsetsController =
-            WindowCompat.getInsetsController(this.window, this.window.decorView)
-        windowInsetsController.let { controller ->
-            controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        }
+        hideSystemBars()
 
         val stopWatchText = findViewById<TextView>(R.id.stopwatchText)
         stopWatchText.bringToFront()
@@ -115,6 +126,29 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         puzzleGameManager =
             PuzzleGameManager(this, layout, imageView, zoomableLayout, settings, this)
 
+        setupLayoutDimensions(layout)
+
+        if (intent.getBooleanExtra("newGame", false)) {
+            deleteSavedGame()
+        }
+
+        resumeOrStartNewGame(imageView, settings)
+        setupPlayAgainButton()
+        rateHelper.requestReview()
+        AchievementHelper.updateDailyRitualAchievement(this)
+    }
+
+    private fun hideSystemBars() {
+        val windowInsetsController =
+            WindowCompat.getInsetsController(this.window, this.window.decorView)
+        windowInsetsController.let { controller ->
+            controller.hide(WindowInsetsCompat.Type.systemBars())
+            controller.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+    }
+
+    private fun setupLayoutDimensions(layout: RelativeLayout) {
         val displayMetrics = resources.displayMetrics
         val params = layout.layoutParams
         params.width = displayMetrics.widthPixels
@@ -122,11 +156,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         layout.layoutParams = params
         layout.x = 0f
         layout.y = 0f
+    }
 
-        if (intent.getBooleanExtra("newGame", false)) {
-            deleteSavedGame()
-        }
-
+    private fun resumeOrStartNewGame(imageView: ImageView, settings: Settings) {
         val savedGameFile = File(filesDir, "saved_game/gamestate.json")
         if (savedGameFile.exists()) {
             imageView.post { loadGameState(savedGameFile) }
@@ -150,7 +182,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                 fakeSomeProgress(puzzlesWidth * puzzlesHeight)
             }
         }
+    }
 
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupPlayAgainButton() {
         findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
             it.setOnClickListener {
                 FirebaseHelper.logButtonClick(this, "play_again")
@@ -158,7 +193,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             }
             it.visibility = View.GONE
             it.setOnTouchListener { view, event ->
-                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(
+                NeonBtnOnPressChangeLook.applyPressedLook(
                     view,
                     event,
                     this@PuzzleActivity
@@ -166,8 +201,6 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                 true
             }
         }
-        rateHelper.requestReview()
-        AchievementHelper.updateDailyRitualAchievement(this)
     }
 
     /**
@@ -176,12 +209,14 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      */
     private fun fakeSomeProgress(maxProgress: Int) {
         for (i in 1..FAKE_PROGRESS_MAX) {
+            val jitter = Random.nextInt(FAKE_PROGRESS_JITTER_RANGE) - FAKE_PROGRESS_JITTER_OFFSET
+            val delay = i * FAKE_PROGRESS_BASE_DELAY_MS + jitter
             handler.postDelayed({
                 fakeProgress = i
                 val progressBar = findViewById<ProgressBar>(R.id.progressBar)
                 progressBar.progress = progressBar.progress + 1
                 progressBar.max = maxProgress + FAKE_PROGRESS_MAX
-            }, i * 1000L + (Random.nextInt(600) - 300))
+            }, delay)
         }
     }
 
@@ -220,7 +255,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
     }
 
     internal fun saveGameState() {
-        if (!this::puzzleGameManager.isInitialized || puzzleGameManager.pieces.isEmpty() || puzzleGameManager.isGameOver()) {
+        if (!this::puzzleGameManager.isInitialized ||
+            puzzleGameManager.pieces.isEmpty() ||
+            puzzleGameManager.isGameOver()
+        ) {
             return
         }
 
@@ -229,31 +267,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             savedGameDir.mkdirs()
         }
 
-        val pieceStates = mutableListOf<PieceState>()
-        puzzleGameManager.pieces.forEachIndexed { index, piece ->
-            val pieceImageFile = File(savedGameDir, "piece_$index.png")
-            try {
-                FileOutputStream(pieceImageFile).use { out ->
-                    val bitmap = (piece.drawable as? BitmapDrawable)?.bitmap
-                    bitmap?.compress(Bitmap.CompressFormat.PNG, 100, out)
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-
-            val lParams = piece.layoutParams as RelativeLayout.LayoutParams
-            val pieceState = PieceState(
-                xCoord = piece.xCoord,
-                yCoord = piece.yCoord,
-                currentX = lParams.leftMargin,
-                currentY = lParams.topMargin,
-                pieceWidth = piece.pieceWidth,
-                pieceHeight = piece.pieceHeight,
-                canMove = piece.canMove,
-                imagePath = pieceImageFile.absolutePath
-            )
-            pieceStates.add(pieceState)
-        }
+        val pieceStates = serializePieces(savedGameDir)
 
         val sourceBitmapFile = File(File(filesDir, "camera_images"), "temp.jpg")
         var savedPhotoPath: String? = null
@@ -273,21 +287,56 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             pieces = pieceStates,
             svgString = puzzleGameManager.svgString
         )
+        writeGameStateFile(savedGameDir, gameState)
 
+        handler.post {
+            findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
+            findViewById<TextView>(R.id.progressText).visibility = View.GONE
+        }
+    }
+
+    private fun serializePieces(savedGameDir: File): List<PieceState> {
+        val pieceStates = mutableListOf<PieceState>()
+        puzzleGameManager.pieces.forEachIndexed { index, piece ->
+            val pieceImageFile = File(savedGameDir, "piece_$index.png")
+            try {
+                FileOutputStream(pieceImageFile).use { out ->
+                    val bitmap = (piece.drawable as? BitmapDrawable)?.bitmap
+                    bitmap?.compress(Bitmap.CompressFormat.PNG, PNG_COMPRESS_QUALITY, out)
+                }
+            } catch (e: IOException) {
+                FirebaseHelper.logException(this, "serializePieces", e.message)
+                Log.w(PuzzleActivity::class.simpleName, "Error writing piece image $index", e)
+            }
+
+            val lParams = piece.layoutParams as RelativeLayout.LayoutParams
+            pieceStates.add(
+                PieceState(
+                    xCoord = piece.xCoord,
+                    yCoord = piece.yCoord,
+                    currentX = lParams.leftMargin,
+                    currentY = lParams.topMargin,
+                    pieceWidth = piece.pieceWidth,
+                    pieceHeight = piece.pieceHeight,
+                    canMove = piece.canMove,
+                    imagePath = pieceImageFile.absolutePath
+                )
+            )
+        }
+        return pieceStates
+    }
+
+    private fun writeGameStateFile(savedGameDir: File, gameState: GameState) {
         val gson = Gson()
         val jsonState = gson.toJson(gameState)
         val gameStateFile = File(savedGameDir, "gamestate.json")
         try {
             gameStateFile.writeText(jsonState)
         } catch (e: IOException) {
-            e.printStackTrace()
+            FirebaseHelper.logException(this, "writeGameStateFile", e.message)
+            Log.w(PuzzleActivity::class.simpleName, "Error writing game state file", e)
         }
         Log.d(PuzzleActivity::class.simpleName, "Game state saved to: ${gameStateFile.absolutePath}")
-
-        handler.post {
-            findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
-            findViewById<TextView>(R.id.progressText).visibility = View.GONE
-        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -318,20 +367,30 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             imageLoader.setPicFromPath(gameState.photoPath!!)
         }
 
-        val svgString = gameState.svgString ?: run {
-            val puzzleCurvesGenerator = PuzzleCurvesGenerator()
-            puzzleCurvesGenerator.width = bitmap.width.toDouble()
-            puzzleCurvesGenerator.height = bitmap.height.toDouble()
-            puzzleCurvesGenerator.xn = gameState.puzzlesWidth.toDouble()
-            puzzleCurvesGenerator.yn = gameState.puzzlesHeight.toDouble()
-            puzzleCurvesGenerator.generateSvg()
-        }
+        val svgString = gameState.svgString ?: generateSvgString(bitmap, gameState)
         puzzleGameManager.svgString = svgString
 
+        drawPuzzleBackground(imageView, bitmap, svgString, settings)
+        puzzleGameManager.pieces = restorePieces(layout, zoomableLayout, gameState)
+
+        findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
+        findViewById<TextView>(R.id.progressText).visibility = View.GONE
+    }
+
+    private fun generateSvgString(bitmap: Bitmap, gameState: GameState): String {
+        val puzzleCurvesGenerator = PuzzleCurvesGenerator()
+        puzzleCurvesGenerator.width = bitmap.width.toDouble()
+        puzzleCurvesGenerator.height = bitmap.height.toDouble()
+        puzzleCurvesGenerator.xn = gameState.puzzlesWidth.toDouble()
+        puzzleCurvesGenerator.yn = gameState.puzzlesHeight.toDouble()
+        return puzzleCurvesGenerator.generateSvg()
+    }
+
+    private fun drawPuzzleBackground(imageView: ImageView, bitmap: Bitmap, svgString: String, settings: Settings) {
         val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
         val canvas = Canvas(bitmapCopy)
         val paint = Paint()
-        paint.alpha = 70
+        paint.alpha = BACKGROUND_IMAGE_ALPHA
         if (settings.showImageInBackgroundOfThePuzzle) {
             canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint)
         }
@@ -340,7 +399,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             svg.renderToCanvas(canvas)
         }
         imageView.setImageBitmap(bitmapCopy)
+    }
 
+    private fun restorePieces(
+        layout: RelativeLayout,
+        zoomableLayout: ZoomLayout,
+        gameState: GameState,
+    ): MutableList<PuzzlePiece> {
         val touchListener = TouchListener(puzzleGameManager, zoomableLayout)
         val restoredPieces = mutableListOf<PuzzlePiece>()
         gameState.pieces.forEach { pieceState ->
@@ -365,10 +430,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             }
             restoredPieces.add(piece)
         }
-        puzzleGameManager.pieces = restoredPieces
-
-        findViewById<ProgressBar>(R.id.progressBar).visibility = View.GONE
-        findViewById<TextView>(R.id.progressText).visibility = View.GONE
+        return restoredPieces
     }
 
     /**
@@ -430,7 +492,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         findViewById<NeonButton>(R.id.puzzle_activity_play_again).let {
             it.visibility = View.VISIBLE
             it.setOnTouchListener { view, event ->
-                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(view, event, this@PuzzleActivity)
+                NeonBtnOnPressChangeLook.applyPressedLook(view, event, this@PuzzleActivity)
                 true
             }
         }
@@ -441,10 +503,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         updateAndShowHighScores(elapsedTime, difficultyKey, settings)
         deleteSavedGame()
         settings.marathonerPlaytime += elapsedTime
-        Log.d(PuzzleActivity::class.simpleName, "Total playtime: ${settings.marathonerPlaytime} seconds, elapsed this game: $elapsedTime seconds")
-        if (settings.marathonerPlaytime >= 3600) {
+        Log.d(
+            PuzzleActivity::class.simpleName,
+            "Total playtime: ${settings.marathonerPlaytime} seconds, elapsed this game: $elapsedTime seconds"
+        )
+        if (settings.marathonerPlaytime >= MARATHONER_SECONDS_THRESHOLD) {
             settings.marathonerPlaytime = 0
-            PlayGamesHelper.progressAchievement(this, R.string.achievement_marathoner, 1)
+            PlayGamesHelper.progressAchievement(this, R.string.achievement_marathoner, ACHIEVEMENT_PROGRESS_STEP)
         }
         SettingsHelper.save(this, settings)
     }
@@ -461,19 +526,20 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val settings = SettingsHelper.load(this)
         val totalPieces =
             settings.lastSetDifficultyCustomWidth * settings.lastSetDifficultyCustomHeight
-        if (totalPieces < 20) {
+        if (totalPieces < QUICK_GAME_PIECE_THRESHOLD) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_quick_game)
         }
-        if (totalPieces >= 50 && elapsedTime < 180) {
+        if (totalPieces >= SPEEDSTER_PIECE_THRESHOLD && elapsedTime < SPEEDSTER_TIME_THRESHOLD_SECONDS) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_speedster)
         }
-        if (totalPieces > 100) {
+        if (totalPieces > LARGE_PUZZLE_PIECE_THRESHOLD) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_the_big_picture)
         }
         if (totalPieces >= MAX_COLUMNS * MAX_ROWS) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_maximum_effort)
         }
-        if (totalPieces >= 100 && !settings.showImageInBackgroundOfThePuzzle && !settings.showGridInBackgroundOfThePuzzle) {
+        val isMinimalist = !settings.showImageInBackgroundOfThePuzzle && !settings.showGridInBackgroundOfThePuzzle
+        if (totalPieces >= LARGE_PUZZLE_PIECE_THRESHOLD && isMinimalist) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_purist)
         }
         if (!settings.playSounds) {
@@ -485,16 +551,16 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         if (intent.getStringExtra(PhotoSource::class.simpleName)?.equals(PhotoSource.GALLERY.name) == true) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_curator)
         }
-        PlayGamesHelper.progressAchievement(this, R.string.achievement_apprentice, 1)
-        PlayGamesHelper.progressAchievement(this, R.string.achievement_journeyman, 1)
-        PlayGamesHelper.progressAchievement(this, R.string.achievement_veteran, 1)
-        PlayGamesHelper.progressAchievement(this, R.string.achievement_puzzle_master, 1)
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_apprentice, ACHIEVEMENT_PROGRESS_STEP)
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_journeyman, ACHIEVEMENT_PROGRESS_STEP)
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_veteran, ACHIEVEMENT_PROGRESS_STEP)
+        PlayGamesHelper.progressAchievement(this, R.string.achievement_puzzle_master, ACHIEVEMENT_PROGRESS_STEP)
         AchievementHelper.checkRecordSetterAchievement(this, elapsedTime, settings)
         AchievementHelper.checkCollectorAchievement(this, settings)
         AchievementHelper.checkGalleryCompleteAchievement(this, settings)
 
         val currentHour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-        if (currentHour in 0..4) {
+        if (currentHour in 0..NIGHT_OWL_HOUR_END) {
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_night_owl)
         }
 
@@ -518,10 +584,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val newScoreString = String.format(
             Locale.getDefault(),
             "%02d:%02d",
-            currentScoreInSeconds / 60,
-            currentScoreInSeconds % 60
+            currentScoreInSeconds / SECONDS_PER_MINUTE,
+            currentScoreInSeconds % SECONDS_PER_MINUTE
         ) +
-                " - " + dateFormat.format(Date())
+            " - " + dateFormat.format(Date())
 
         highScores.add(newScoreString)
 
@@ -529,18 +595,21 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         highScores.sortBy {
             val parts = it.split(" - ")
             val timeParts = parts[0].split(":")
-            timeParts[0].toInt() * 60 + timeParts[1].toInt()
+            timeParts[0].toInt() * SECONDS_PER_MINUTE + timeParts[1].toInt()
         }
-        while (highScores.size > 10) {
-            highScores.removeAt(10)
+        while (highScores.size > MAX_HIGH_SCORES) {
+            highScores.removeAt(MAX_HIGH_SCORES)
         }
 
         val indexOfNewScore = highScores.indexOf(newScoreString)
         showHighScorePopup(difficultyKey, highScores, indexOfNewScore)
 
-        if (indexOfNewScore <= 10 && indexOfNewScore != -1) {
-            Log.d(PuzzleActivity::class.simpleName, "New high score! indexOfNewScore: $indexOfNewScore, highScores.size: ${highScores.size}")
-            if (indexOfNewScore == 0 && highScores.size == 10) {
+        if (indexOfNewScore <= MAX_HIGH_SCORES && indexOfNewScore != -1) {
+            Log.d(
+                PuzzleActivity::class.simpleName,
+                "New high score! indexOfNewScore: $indexOfNewScore, highScores.size: ${highScores.size}"
+            )
+            if (indexOfNewScore == 0 && highScores.size == MAX_HIGH_SCORES) {
                 PlayGamesHelper.unlockAchievement(this, R.string.achievement_top_of_the_charts)
             }
             FirebaseHelper.logEvent(this, "new_highscore")
@@ -576,7 +645,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
             val scoreTextView = TextView(this)
             scoreTextView.setTextColor(resources.getColor(R.color.white, null))
             scoreTextView.text = "${index + 1}. $scoreString"
-            scoreTextView.textSize = 16f // Use 16f for sp
+            scoreTextView.textSize = HIGH_SCORE_TEXT_SIZE_SP
             if (index == newScoreIndex) {
                 scoreTextView.setTypeface(null, Typeface.BOLD)
             }
@@ -597,7 +666,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                 alertDialog.dismiss()
             }
             it.setOnTouchListener { view, event ->
-                NeonBtnOnPressChangeLook.neonBtnOnPressChangeLook(view, event, this@PuzzleActivity)
+                NeonBtnOnPressChangeLook.applyPressedLook(view, event, this@PuzzleActivity)
                 true
             }
         }

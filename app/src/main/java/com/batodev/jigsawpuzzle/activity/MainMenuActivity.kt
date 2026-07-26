@@ -35,6 +35,15 @@ import java.io.File
  * The main menu activity of the application.
  */
 class MainMenuActivity : AppCompatActivity() {
+    companion object {
+        private const val BACKGROUND_FADE_ALPHA = 0.4f
+        private const val BACKGROUND_FADE_DURATION_MS = 2000L
+        private const val MENU_ANIMATION_DELAY_MS = 500L
+        private const val MENU_BUTTON_INITIAL_SCALE = 0.5f
+        private const val MENU_BUTTON_ANIMATION_DURATION_MS = 500L
+        private const val MENU_BUTTON_STAGGER_DELAY_MS = 200L
+    }
+
     private lateinit var achievementsLauncher: ActivityResultLauncher<Intent>
 
     /**
@@ -71,14 +80,38 @@ class MainMenuActivity : AppCompatActivity() {
         }
     }
 
+    private class MenuButtons(
+        val playButton: NeonButton,
+        val continueButton: NeonButton,
+        val galleryButton: NeonButton,
+        val moreAppsButton: NeonButton,
+        val playPart2Button: NeonButton,
+    )
+
+    private class MenuDecor(
+        val emberfoxLogo: ImageView,
+        val achievementButton: ImageView,
+    )
+
+    private data class MenuScreen(val buttons: MenuButtons, val decor: MenuDecor)
+
     override fun onResume() {
         super.onResume()
+        fadeInBackground()
+        registerSaveReceivers()
+        val screen = initMenuButtons()
+        scheduleMenuAnimation(screen)
+    }
 
+    private fun fadeInBackground() {
         val background = findViewById<ImageView>(R.id.main_menu_background)
-        ObjectAnimator.ofFloat(background, "alpha", 0f, 0.4f).apply {
-            duration = 2000
+        ObjectAnimator.ofFloat(background, "alpha", 0f, BACKGROUND_FADE_ALPHA).apply {
+            duration = BACKGROUND_FADE_DURATION_MS
             start()
         }
+    }
+
+    private fun registerSaveReceivers() {
         LocalBroadcastManager.getInstance(this).registerReceiver(
             saveStartedReceiver,
             IntentFilter("com.batodev.jigsawpuzzle.SAVE_STARTED")
@@ -87,38 +120,54 @@ class MainMenuActivity : AppCompatActivity() {
             saveCompleteReceiver,
             IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
         )
-        val playButton = findViewById<NeonButton>(R.id.main_menu_activity_play_the_game)
-        val continueButton = findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
-        val galleryButton = findViewById<NeonButton>(R.id.main_menu_activity_unlocked_gallery)
-        val moreAppsButton = findViewById<NeonButton>(R.id.main_menu_activity_more_apps)
-        val playPart2Button = findViewById<NeonButton>(R.id.main_menu_activity_play_part_2)
-        val emberfoxLogo = findViewById<ImageView>(R.id.main_menu_activity_emberfox_logo)
-        val achievementButton = findViewById<ImageView>(R.id.main_menu_activity_achievements)
+    }
 
-        playButton.visibility = View.INVISIBLE
-        continueButton.visibility = View.INVISIBLE
-        galleryButton.visibility = View.INVISIBLE
-        moreAppsButton.visibility = View.INVISIBLE
-        playPart2Button.visibility = View.INVISIBLE
-        emberfoxLogo.visibility = View.INVISIBLE
-        achievementButton.visibility = View.INVISIBLE
+    private fun initMenuButtons(): MenuScreen {
+        val buttons = MenuButtons(
+            playButton = findViewById(R.id.main_menu_activity_play_the_game),
+            continueButton = findViewById(R.id.main_menu_activity_continue_game),
+            galleryButton = findViewById(R.id.main_menu_activity_unlocked_gallery),
+            moreAppsButton = findViewById(R.id.main_menu_activity_more_apps),
+            playPart2Button = findViewById(R.id.main_menu_activity_play_part_2),
+        )
+        val decor = MenuDecor(
+            emberfoxLogo = findViewById(R.id.main_menu_activity_emberfox_logo),
+            achievementButton = findViewById(R.id.main_menu_activity_achievements),
+        )
 
-        playButton.setOnClickListener { play() }
-        continueButton.setOnClickListener { continueGame() }
-        galleryButton.setOnClickListener { gallery() }
-        moreAppsButton.setOnClickListener { moreApps() }
-        playPart2Button.setOnClickListener { playPart2() }
-        achievementButton.setOnClickListener { showAchievements() }
+        val allViews = listOf(
+            buttons.playButton,
+            buttons.continueButton,
+            buttons.galleryButton,
+            buttons.moreAppsButton,
+            buttons.playPart2Button,
+            decor.emberfoxLogo,
+            decor.achievementButton
+        )
+        for (view in allViews) {
+            view.visibility = View.INVISIBLE
+        }
+
+        buttons.playButton.setOnClickListener { play() }
+        buttons.continueButton.setOnClickListener { continueGame() }
+        buttons.galleryButton.setOnClickListener { gallery() }
+        buttons.moreAppsButton.setOnClickListener { moreApps() }
+        buttons.playPart2Button.setOnClickListener { playPart2() }
+        decor.achievementButton.setOnClickListener { showAchievements() }
 
         NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(
             this,
-            playButton,
-            continueButton,
-            galleryButton,
-            moreAppsButton,
-            playPart2Button
+            buttons.playButton,
+            buttons.continueButton,
+            buttons.galleryButton,
+            buttons.moreAppsButton,
+            buttons.playPart2Button
         )
+        return MenuScreen(buttons, decor)
+    }
 
+    private fun scheduleMenuAnimation(screen: MenuScreen) {
+        val (buttons, decor) = screen
         // Delay the menu button animations
         Handler(Looper.getMainLooper()).postDelayed({
             val isSaving =
@@ -127,27 +176,26 @@ class MainMenuActivity : AppCompatActivity() {
 
             if (saveExists && !isSaving) {
                 animateMenuButtons(
-                    playButton,
-                    continueButton,
-                    galleryButton,
-                    moreAppsButton,
-                    playPart2Button,
-                    emberfoxLogo,
-                    achievementButton
+                    buttons.playButton,
+                    buttons.continueButton,
+                    buttons.galleryButton,
+                    buttons.moreAppsButton,
+                    buttons.playPart2Button,
+                    decor.emberfoxLogo,
+                    decor.achievementButton
                 )
             } else {
                 animateMenuButtons(
-                    playButton,
-                    galleryButton,
-                    moreAppsButton,
-                    playPart2Button,
-                    emberfoxLogo,
-                    achievementButton
+                    buttons.playButton,
+                    buttons.galleryButton,
+                    buttons.moreAppsButton,
+                    buttons.playPart2Button,
+                    decor.emberfoxLogo,
+                    decor.achievementButton
                 )
-                continueButton.visibility = View.GONE
+                buttons.continueButton.visibility = View.GONE
             }
-        }, 500)
-
+        }, MENU_ANIMATION_DELAY_MS)
     }
 
     override fun onPause() {
@@ -208,18 +256,18 @@ class MainMenuActivity : AppCompatActivity() {
             view.visibility = View.VISIBLE
 
             view.alpha = 0f
-            view.scaleX = 0.5f
-            view.scaleY = 0.5f
+            view.scaleX = MENU_BUTTON_INITIAL_SCALE
+            view.scaleY = MENU_BUTTON_INITIAL_SCALE
 
             val animator = AnimatorSet().apply {
                 playTogether(
                     ObjectAnimator.ofFloat(view, "alpha", 0f, 1f),
-                    ObjectAnimator.ofFloat(view, "scaleX", 0.5f, 1f),
-                    ObjectAnimator.ofFloat(view, "scaleY", 0.5f, 1f)
+                    ObjectAnimator.ofFloat(view, "scaleX", MENU_BUTTON_INITIAL_SCALE, 1f),
+                    ObjectAnimator.ofFloat(view, "scaleY", MENU_BUTTON_INITIAL_SCALE, 1f)
                 )
-                duration = 500
+                duration = MENU_BUTTON_ANIMATION_DURATION_MS
                 interpolator = AccelerateDecelerateInterpolator()
-                startDelay = (index * 200).toLong()
+                startDelay = index * MENU_BUTTON_STAGGER_DELAY_MS
             }
             animator.start()
         }
@@ -254,7 +302,11 @@ class MainMenuActivity : AppCompatActivity() {
         if (!SettingsHelper.load(this).uncoveredPics.isEmpty()) {
             startActivity(Intent(this, GalleryActivity::class.java))
         } else {
-            Snackbar.make(findViewById(android.R.id.content), R.string.main_menu_activity_play_to_uncover, Snackbar.LENGTH_SHORT)
+            Snackbar.make(
+                findViewById(android.R.id.content),
+                R.string.main_menu_activity_play_to_uncover,
+                Snackbar.LENGTH_SHORT
+            )
                 .show()
         }
     }
@@ -297,7 +349,7 @@ class MainMenuActivity : AppCompatActivity() {
     }
 
     private fun showAchievements() {
-        signInSilently() {
+        signInSilently {
             PlayGames.getAchievementsClient(this)
                 .achievementsIntent
                 .addOnSuccessListener { intent ->

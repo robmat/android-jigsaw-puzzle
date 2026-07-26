@@ -49,7 +49,10 @@ object AdHelper {
     fun loadAd(activity: Activity) {
         val adRequest: AdRequest = AdRequest.Builder().build()
 
-        InterstitialAd.load(activity, AD_ID, adRequest,
+        InterstitialAd.load(
+            activity,
+            AD_ID,
+            adRequest,
             object : InterstitialAdLoadCallback() {
                 override fun onAdLoaded(interstitialAd: InterstitialAd) {
                     // The mInterstitialAd reference will be null until
@@ -64,6 +67,7 @@ object AdHelper {
                     FirebaseHelper.logException(activity, "ad_failed_to_load", loadAdError.message)
                     Log.w(AdHelper::class.simpleName, "onAdFailedToLoad: $loadAdError")
                 }
-            })
+            }
+        )
     }
 }

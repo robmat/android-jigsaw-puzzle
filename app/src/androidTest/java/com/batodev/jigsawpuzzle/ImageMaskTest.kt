@@ -92,7 +92,11 @@ class ImageMaskTest {
         // FloodFill benchmark
         val floodFillCutter = com.batodev.jigsawpuzzle.cut.FloodFillPuzzleCutter()
         val floodPieces = createPieces()
-        val floodResultBitmaps = floodFillCutter.cut(originalBitmap, rows, cols, svgString, imageView, progressListener(floodFinished), floodPieces)
+        val floodResultBitmaps = floodFillCutter.cut(
+            com.batodev.jigsawpuzzle.cut.PuzzleCutRequest(
+                originalBitmap, rows, cols, svgString, imageView, progressListener(floodFinished), floodPieces
+            )
+        )
         val floodStartNs = System.nanoTime()
         // Wait until finished or timeout
         val floodTimeoutNs = 30_000_000_000L // 30 seconds
@@ -104,7 +108,11 @@ class ImageMaskTest {
         // MaskBitmap benchmark
         val maskCutter = com.batodev.jigsawpuzzle.cut.MaskBitmapPuzzleCutter()
         val maskPieces = createPieces()
-        val maskResultBitmaps = maskCutter.cut(originalBitmap, rows, cols, svgString, imageView, progressListener(maskFinished), maskPieces)
+        val maskResultBitmaps = maskCutter.cut(
+            com.batodev.jigsawpuzzle.cut.PuzzleCutRequest(
+                originalBitmap, rows, cols, svgString, imageView, progressListener(maskFinished), maskPieces
+            )
+        )
         val maskStartNs = System.nanoTime()
         val maskTimeoutNs = 30_000_000_000L
         while (!maskFinished.get() && System.nanoTime() - maskStartNs < maskTimeoutNs) {

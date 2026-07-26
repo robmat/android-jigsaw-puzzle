@@ -11,11 +11,11 @@ import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.RelativeLayout
+import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
-import com.batodev.jigsawpuzzle.helpers.AchievementHelper
 import com.batodev.jigsawpuzzle.logic.PuzzleGameManager
-import com.batodev.jigsawpuzzle.R
 import com.otaliastudios.zoom.ZoomLayout
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -30,6 +30,12 @@ class TouchListener(
     private val puzzleGameManager: PuzzleGameManager,
     private val zoomableLayout: ZoomLayout
 ) : OnTouchListener {
+    companion object {
+        private const val TOLERANCE_DIVISOR = 10
+        private const val SNAP_ANIMATION_DURATION_MS = 250L
+        private const val ACHIEVEMENT_PROGRESS_STEP = 1
+    }
+
     private var xDelta = 0f
     private var yDelta = 0f
 
@@ -47,7 +53,7 @@ class TouchListener(
         val y = motionEvent.rawY / zoomableLayout.zoom
         val tolerance = sqrt(
             view.width.toDouble().pow(2.0) + view.height.toDouble().pow(2.0)
-        ) / 10
+        ) / TOLERANCE_DIVISOR
         val piece = view as PuzzlePiece
         if (!piece.canMove) {
             return true
@@ -65,7 +71,8 @@ class TouchListener(
             MotionEvent.ACTION_MOVE -> {
                 Log.v(
                     TouchListener::class.simpleName,
-                    "ACTION_MOVE: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, leftMargin=${lParams.leftMargin}, topMargin=${lParams.topMargin}"
+                    "ACTION_MOVE: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, " +
+                        "leftMargin=${lParams.leftMargin}, topMargin=${lParams.topMargin}"
                 )
                 lParams.leftMargin = (x - xDelta).toInt()
                 lParams.topMargin = (y - yDelta).toInt()
@@ -77,7 +84,8 @@ class TouchListener(
                 val yDiff = StrictMath.abs(piece.yCoord - lParams.topMargin)
                 Log.v(
                     TouchListener::class.simpleName,
-                    "ACTION_UP: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, xDiff=$xDiff, yDiff=$yDiff, tolerance=$tolerance"
+                    "ACTION_UP: x=$x, y=$y, xDelta=$xDelta, yDelta=$yDelta, " +
+                        "xDiff=$xDiff, yDiff=$yDiff, tolerance=$tolerance"
                 )
                 if (xDiff <= tolerance && yDiff <= tolerance) { // piece placed correctly
                     FirebaseHelper.logEvent(view.context, "piece_placed_correctly")
@@ -88,30 +96,7 @@ class TouchListener(
                     )
                     piece.canMove = false // Prevent further interaction during animation
                     sendViewToBack(piece)
-                    val animatorSet = AnimatorSet()
-                    animatorSet.playTogether(
-                        ObjectAnimator.ofFloat(view, View.X, piece.xCoord.toFloat()),
-                        ObjectAnimator.ofFloat(view, View.Y, piece.yCoord.toFloat())
-                    )
-                    animatorSet.interpolator = AccelerateDecelerateInterpolator()
-                    animatorSet.duration = 250 // A quick snap
-                    animatorSet.addListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            // Update layout params to finalize position
-                            lParams.leftMargin = piece.xCoord
-                            lParams.topMargin = piece.yCoord
-                            view.layoutParams = lParams
-
-                            // Reset translation properties modified by the animator
-                            view.translationX = 0f
-                            view.translationY = 0f
-
-                            puzzleGameManager.checkGameOver()
-                            PlayGamesHelper.progressAchievement(puzzleGameManager.activity, R.string.achievement_piece_collector, 1)
-                            PlayGamesHelper.progressAchievement(puzzleGameManager.activity, R.string.achievement_piece_enthusiast, 1)
-                        }
-                    })
-                    animatorSet.start()
+                    snapPieceIntoPlace(view, piece, lParams)
                 } else {
                     AchievementHelper.updateInTheZoneAchievement(puzzleGameManager.activity, false)
                     FirebaseHelper.logEvent(view.context, "piece_placed_incorrectly")
@@ -121,6 +106,48 @@ class TouchListener(
         }
         piece.bringToFront()
         return true
+    }
+
+    /**
+     * Animates a correctly-placed piece snapping into its final position, then finalizes its
+     * layout params, checks whether the game is over, and progresses the collector achievements.
+     * @param view The piece's {@link View}.
+     * @param piece The {@link PuzzlePiece} being placed.
+     * @param lParams The piece's layout params, updated once the animation ends.
+     */
+    private fun snapPieceIntoPlace(view: View, piece: PuzzlePiece, lParams: RelativeLayout.LayoutParams) {
+        val animatorSet = AnimatorSet()
+        animatorSet.playTogether(
+            ObjectAnimator.ofFloat(view, View.X, piece.xCoord.toFloat()),
+            ObjectAnimator.ofFloat(view, View.Y, piece.yCoord.toFloat())
+        )
+        animatorSet.interpolator = AccelerateDecelerateInterpolator()
+        animatorSet.duration = SNAP_ANIMATION_DURATION_MS // A quick snap
+        animatorSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                // Update layout params to finalize position
+                lParams.leftMargin = piece.xCoord
+                lParams.topMargin = piece.yCoord
+                view.layoutParams = lParams
+
+                // Reset translation properties modified by the animator
+                view.translationX = 0f
+                view.translationY = 0f
+
+                puzzleGameManager.checkGameOver()
+                PlayGamesHelper.progressAchievement(
+                    puzzleGameManager.activity,
+                    R.string.achievement_piece_collector,
+                    ACHIEVEMENT_PROGRESS_STEP
+                )
+                PlayGamesHelper.progressAchievement(
+                    puzzleGameManager.activity,
+                    R.string.achievement_piece_enthusiast,
+                    ACHIEVEMENT_PROGRESS_STEP
+                )
+            }
+        })
+        animatorSet.start()
     }
 
     /**

@@ -41,13 +41,13 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     init {
         /**
          * Initializes the adapter by listing image files from the "img" asset folder.
-         * If an IOException occurs, it is printed to the stack trace.
+         * If an IOException occurs, it is logged.
          */
         try {
             files = am.list("img")
         } catch (e: IOException) {
             FirebaseHelper.logException(mContext, "ImageAdapter.init", e.message)
-            e.printStackTrace()
+            Log.w(ImageAdapter::class.java.simpleName, "Error listing image assets", e)
         }
     }
 
@@ -89,7 +89,6 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
      *        this view to display the correct data, this method can create a new view.
      * @param parent The parent that this view will eventually be attached to.
      * @return A View corresponding to the data at the specified position.
-     * @throws RuntimeException if an IOException occurs while loading the image from assets.
      */
     @SuppressLint("InflateParams")
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
@@ -103,11 +102,16 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
 
         if (position > lastPosition) {
             val animation = ScaleAnimation(
-                0.0f, 1.0f, 0.0f, 1.0f,
-                ScaleAnimation.RELATIVE_TO_SELF, 0.5f,
-                ScaleAnimation.RELATIVE_TO_SELF, 0.5f
+                0.0f,
+                1.0f,
+                0.0f,
+                1.0f,
+                ScaleAnimation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_RELATIVE,
+                ScaleAnimation.RELATIVE_TO_SELF,
+                ANIMATION_PIVOT_RELATIVE
             )
-            animation.duration = 300
+            animation.duration = ANIMATION_DURATION_MS
             val set = AnimationSet(true)
             set.addAnimation(animation)
             set.interpolator = AccelerateDecelerateInterpolator()
@@ -123,15 +127,14 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
                     val canvas = Canvas(mutableBitmap)
                     val alphaPaint = Paint()
                     if (!settings.uncoveredPics.contains(files!![position])) {
-                        alphaPaint.alpha = 30
+                        alphaPaint.alpha = COVERED_IMAGE_ALPHA
                     }
                     // Draw the original bitmap onto the canvas with the alpha paint
                     canvas.drawBitmap(picFromAsset, 0f, 0f, alphaPaint)
                     imageView.setImageBitmap(mutableBitmap)
                 } catch (e: IOException) {
                     FirebaseHelper.logException(mContext, "ImageAdapter.getView", e.message)
-                    Log.w(ImageAdapter::class.java.simpleName, e.localizedMessage!!)
-                    throw RuntimeException(e)
+                    Log.w(ImageAdapter::class.java.simpleName, "Error loading image for position $position", e)
                 }
             }
         }
@@ -139,6 +142,10 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
     }
 
     companion object {
+        private const val ANIMATION_PIVOT_RELATIVE = 0.5f
+        private const val ANIMATION_DURATION_MS = 300L
+        private const val COVERED_IMAGE_ALPHA = 30
+
         /**
          * Loads a bitmap from the application's assets, scaled to fit target dimensions.
          * @param targetH The target height for the bitmap.

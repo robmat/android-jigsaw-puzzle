@@ -7,11 +7,17 @@ import android.widget.ImageView
 import androidx.core.graphics.scale
 import androidx.exifinterface.media.ExifInterface
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
+import java.io.IOException
 
 /**
  * A class for loading and processing images for the puzzle.
  */
 class ImageLoader(private val imageView: ImageView) {
+    companion object {
+        private const val ROTATE_90_DEGREES = 90f
+        private const val ROTATE_180_DEGREES = 180f
+        private const val ROTATE_270_DEGREES = 270f
+    }
 
     /**
      * Loads a bitmap from the application's assets and scales it to fit the ImageView.
@@ -28,7 +34,7 @@ class ImageLoader(private val imageView: ImageView) {
             val originalBitmap = BitmapFactory.decodeStream(inputStream)
             inputStream.close()
             processBitmap(originalBitmap, targetW, targetH)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             FirebaseHelper.logException(imageView.context, "setPicFromAsset", e.message)
             throw e
         }
@@ -56,7 +62,7 @@ class ImageLoader(private val imageView: ImageView) {
             val bitmap = BitmapFactory.decodeFile(path, bmOptions)
             val rotatedBitmap = uprightBitmap(bitmap, path)
             processBitmap(rotatedBitmap, targetW, targetH)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
             FirebaseHelper.logException(imageView.context, "setPicFromPath", e.message)
             throw e
         }
@@ -110,9 +116,9 @@ class ImageLoader(private val imageView: ImageView) {
 
         val matrix = Matrix()
         when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(ROTATE_90_DEGREES)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(ROTATE_180_DEGREES)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(ROTATE_270_DEGREES)
         }
 
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)

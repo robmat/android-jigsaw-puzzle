@@ -35,6 +35,13 @@ import kotlin.math.abs
  * An activity for displaying a gallery of unlocked images.
  */
 class GalleryActivity : AppCompatActivity() {
+    companion object {
+        private const val SWIPE_THRESHOLD_PX = 200
+        private const val SWIPE_VELOCITY_THRESHOLD = 300
+        private const val ANIMATION_DURATION_MS = 200L
+        private const val COPY_BUFFER_SIZE = 10240
+    }
+
     private var images: MutableList<String> = mutableListOf()
     private var index: Int = 0
     private var isAnimating: Boolean = false
@@ -91,11 +98,9 @@ class GalleryActivity : AppCompatActivity() {
             "onFling: e1=$e1, e2=$e2, velocityX=$velocityX, velocityY=$velocityY"
         )
         FirebaseHelper.logEvent(this, "gallery_fling")
-        val swipeThreshold = 200
-        val swipeVelocityThreshold = 300
         val diffX = e2.x - e1.x
         return if (abs(diffX) > abs(e2.y - e1.y)) {
-            if (abs(diffX) > swipeThreshold && abs(velocityX) > swipeVelocityThreshold) {
+            if (abs(diffX) > SWIPE_THRESHOLD_PX && abs(velocityX) > SWIPE_VELOCITY_THRESHOLD) {
                 if (diffX > 0) {
                     leftClicked()
                 } else {
@@ -169,7 +174,7 @@ class GalleryActivity : AppCompatActivity() {
     private fun animateImageChange(direction: Int) {
         isAnimating = true
         val photoView = findViewById<PhotoView>(R.id.gallery_activity_background)
-        val duration = 200L
+        val duration = ANIMATION_DURATION_MS
 
         val (pivotXOut, pivotXIn) = if (direction == 1) {
             Pair(0f, photoView.width.toFloat()) // Shrink to left, grow from right
@@ -225,25 +230,19 @@ class GalleryActivity : AppCompatActivity() {
      * @param index The index of the image to display from the {@link #images} list.
      */
     private fun setImage(imageName: String) {
-        if (index >= 0 && index < images.size) {
-            try {
-                this.assets.open("img/$imageName")
-                    .use { inputStream -> // .use will auto-close the stream
-                        val bitmap = BitmapFactory.decodeStream(inputStream)
-                        if (bitmap != null) {
-                            findViewById<PhotoView>(R.id.gallery_activity_background)
-                                .setImageBitmap(bitmap)
-                        } else {
-                            Log.w(
-                                "GalleryActivity",
-                                "Failed to decode bitmap for image: img/${images[index]}"
-                            )
-                        }
-                    }
-            } catch (e: java.io.IOException) {
-                FirebaseHelper.logException(this, "setImage", e.message)
-                Log.w("GalleryActivity", "Error opening image: img/${images[index]}", e)
+        if (index < 0 || index >= images.size) return
+        try {
+            val bitmap = this.assets.open("img/$imageName").use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
             }
+            if (bitmap != null) {
+                findViewById<PhotoView>(R.id.gallery_activity_background).setImageBitmap(bitmap)
+            } else {
+                Log.w("GalleryActivity", "Failed to decode bitmap for image: img/${images[index]}")
+            }
+        } catch (e: java.io.IOException) {
+            FirebaseHelper.logException(this, "setImage", e.message)
+            Log.w("GalleryActivity", "Error opening image: img/${images[index]}", e)
         }
     }
 
@@ -258,7 +257,7 @@ class GalleryActivity : AppCompatActivity() {
             val fileShared = copyToTempFile()
             val shareIntent = Intent(Intent.ACTION_SEND)
             val applicationId = this.application.applicationContext.packageName
-            val uri = FileProvider.getUriForFile(this, "${applicationId}.fileprovider", fileShared)
+            val uri = FileProvider.getUriForFile(this, "$applicationId.fileprovider", fileShared)
             shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
             shareIntent.clipData = android.content.ClipData.newRawUri("", uri)
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -310,7 +309,7 @@ class GalleryActivity : AppCompatActivity() {
         }
         fileShared.createNewFile()
         FileOutputStream(fileShared).use {
-            val buffer = ByteArray(10240)
+            val buffer = ByteArray(COPY_BUFFER_SIZE)
             var bytesRead: Int
             while (stream.read(buffer).also { bytes -> bytesRead = bytes } != -1) {
                 it.write(buffer, 0, bytesRead)

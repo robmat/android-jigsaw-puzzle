@@ -10,6 +10,12 @@ import java.util.Locale
  * @param stopwatchText The {@link TextView} to display the elapsed time.
  */
 class Stopwatch(private val stopwatchText: TextView) {
+    companion object {
+        private const val SECONDS_PER_HOUR = 3600
+        private const val SECONDS_PER_MINUTE = 60
+        private const val TICK_INTERVAL_MS = 1000L
+    }
+
     var elapsedTime: Int = 0
     private val stopwatchHandler = Handler(Looper.getMainLooper())
     private lateinit var stopwatchRunnable: Runnable
@@ -23,10 +29,10 @@ class Stopwatch(private val stopwatchText: TextView) {
             stopWatchRunning = true
             stopwatchRunnable = Runnable {
                 elapsedTime++
-                val minutes = (elapsedTime % 3600) / 60
-                val seconds = elapsedTime % 60
+                val minutes = (elapsedTime % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+                val seconds = elapsedTime % SECONDS_PER_MINUTE
                 stopwatchText.text = String.format(Locale.getDefault(), "%02d:%02d", minutes, seconds)
-                stopwatchHandler.postDelayed(stopwatchRunnable, 1000) // Update every second
+                stopwatchHandler.postDelayed(stopwatchRunnable, TICK_INTERVAL_MS)
             }
             stopwatchHandler.post(stopwatchRunnable)
         }

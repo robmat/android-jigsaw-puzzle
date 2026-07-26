@@ -8,7 +8,7 @@ import com.batodev.jigsawpuzzle.R
 import com.smb.glowbutton.NeonButton
 
 object NeonBtnOnPressChangeLook {
-    fun neonBtnOnPressChangeLook(
+    fun applyPressedLook(
         view: View,
         event: MotionEvent,
         appCompatActivity: AppCompatActivity
@@ -43,7 +43,7 @@ object NeonBtnOnPressChangeLook {
     fun setupNeonButtonTouchListeners(activity: AppCompatActivity, vararg buttons: NeonButton) {
         for (button in buttons) {
             button.setOnTouchListener { view, event ->
-                neonBtnOnPressChangeLook(
+                applyPressedLook(
                     view,
                     event,
                     activity
@@ -52,5 +52,4 @@ object NeonBtnOnPressChangeLook {
             }
         }
     }
-
 }

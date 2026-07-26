@@ -10,10 +10,12 @@ interface PuzzleProgressListener {
      * @param max The maximum progress value.
      */
     fun onProgressUpdate(progress: Int, max: Int)
+
     /**
      * Called when the puzzle cutting process has completed.
      */
     fun onCuttingFinished()
+
     /**
      * Posts a {@link Runnable} to be executed on the main thread.
      * @param r The {@link Runnable} to be executed.

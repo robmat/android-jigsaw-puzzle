@@ -15,6 +15,9 @@ import java.util.Random
  * A helper class for requesting app ratings.
  */
 class AppRatingHelper(private val activity: Activity) {
+    companion object {
+        private const val REVIEW_REQUEST_ODDS = 5
+    }
 
     private val manager: ReviewManager by lazy {
         // return@lazy FakeReviewManager(activity)
@@ -26,7 +29,7 @@ class AppRatingHelper(private val activity: Activity) {
      * If the in-app review fails, it falls back to opening the app's page in the Play Store.
      */
     fun requestReview() {
-        if (Random().nextInt(5) == 0) {
+        if (Random().nextInt(REVIEW_REQUEST_ODDS) == 0) {
             FirebaseHelper.logEvent(activity, "request_review")
             try {
                 val request = manager.requestReviewFlow()
@@ -49,7 +52,6 @@ class AppRatingHelper(private val activity: Activity) {
                         Log.w(AppRatingHelper::class.java.simpleName, "review ko: ${task.exception} $reviewErrorCode")
                     }
                 }
-
             } catch (e: Exception) {
                 // Handle error (e.g., log or fallback to browser)
                 FirebaseHelper.logException(activity, "request_review_exception", e.message)
