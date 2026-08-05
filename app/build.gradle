@@ -3,7 +3,6 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.devtools.ksp'
     id 'com.google.gms.google-services'
-    id 'com.github.triplet.play'
     id 'com.batodev.releasetools'
     id 'io.gitlab.arturbosch.detekt'
 }
@@ -91,12 +90,6 @@ android {
             useJUnitPlatform()
         }
     }
-}
-
-play {
-    serviceAccountCredentials.set(rootProject.file("../play-console-api-465319-0f9c399097c5.json"))
-    track.set("internal")
-    defaultToAppBundles.set(true)
 }
 
 dependencies {
