@@ -41,6 +41,11 @@ The project previously used a single static cutter. The cutting code has been re
   - Both cutters use a fixed thread pool; the FloodFill version marks pixels directly on a rendered SVG grid (modifies a working bitmap during flood-fill), while the MaskBitmap version operates on pixel arrays and uses alpha-based transparency checks. The best choice can vary per-device and per-image; use the benchmark test to compare on your target devices.
   - If you need to force a specific cutter at runtime, pass the desired `PuzzleCutter` implementation into `PuzzleGameManager` (a constructor parameter) or change the factory function.
 
+## How to run
+
+1. Clone [release-tools](https://github.com/robmat/release-tools) as a sibling directory (`git clone https://github.com/robmat/release-tools.git ../release-tools`) — this repo's Gradle build pulls shared build logic and the version catalog from it via `includeBuild`.
+2. Import into android studio
+
 ## License
 
 **Warning:** This project is licensed under the **GNU General Public License v3.0**.
