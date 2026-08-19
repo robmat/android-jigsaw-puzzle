@@ -5,8 +5,7 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.annotation.SuppressLint
-import android.app.WallpaperManager
-import android.content.Intent
+import android.content.ActivityNotFoundException
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.util.Log
@@ -17,18 +16,17 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.helpers.AdHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
+import com.batodev.jigsawpuzzle.helpers.GalleryImageExporter
 import com.batodev.jigsawpuzzle.helpers.PlayGamesHelper
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.github.chrisbanes.photoview.PhotoView
-import java.io.File
-import java.io.FileOutputStream
+import java.io.IOException
 import kotlin.math.abs
 
 /**
@@ -39,7 +37,6 @@ class GalleryActivity : AppCompatActivity() {
         private const val SWIPE_THRESHOLD_PX = 200
         private const val SWIPE_VELOCITY_THRESHOLD = 300
         private const val ANIMATION_DURATION_MS = 200L
-        private const val COPY_BUFFER_SIZE = 10240
     }
 
     private var images: MutableList<String> = mutableListOf()
@@ -254,68 +251,45 @@ class GalleryActivity : AppCompatActivity() {
     fun shareClicked() {
         FirebaseHelper.logButtonClick(this, "gallery_share")
         try {
-            val fileShared = copyToTempFile()
-            val shareIntent = Intent(Intent.ACTION_SEND)
-            val applicationId = this.application.applicationContext.packageName
-            val uri = FileProvider.getUriForFile(this, "$applicationId.fileprovider", fileShared)
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            shareIntent.clipData = android.content.ClipData.newRawUri("", uri)
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            shareIntent.type = "image/*"
+            val fileShared = GalleryImageExporter.copyAssetToTempFile(this, "img/${images[index]}")
+            val shareIntent = GalleryImageExporter.shareIntentFor(this, fileShared)
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_show_and_tell)
             ContextCompat.startActivity(this, shareIntent, null)
-        } catch (e: Exception) {
-            FirebaseHelper.logException(this, "shareClicked", e.message)
-            Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
-            Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            reportExportError("shareClicked", e)
+        } catch (e: IllegalArgumentException) {
+            reportExportError("shareClicked", e)
+        } catch (e: ActivityNotFoundException) {
+            reportExportError("shareClicked", e)
         }
     }
 
     /**
      * Handles the click event for the wallpaper button.
      * Sets the current image as the device's wallpaper.
-     * @throws Exception if there is an error setting the wallpaper.
      */
     fun wallpaperClicked() {
         FirebaseHelper.logButtonClick(this, "gallery_wallpaper")
         try {
-            val fileShared = copyToTempFile()
-            val wallpaperManager = WallpaperManager.getInstance(this)
-            val bitmap = BitmapFactory.decodeFile(fileShared.absolutePath)
-            wallpaperManager.setBitmap(bitmap)
+            val fileShared = GalleryImageExporter.copyAssetToTempFile(this, "img/${images[index]}")
+            GalleryImageExporter.setAsWallpaper(this, fileShared)
             PlayGamesHelper.unlockAchievement(this, R.string.achievement_i_like_this_one)
             Toast.makeText(this, getString(R.string.wallpaper_ok), Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            FirebaseHelper.logException(this, "wallpaperClicked", e.message)
-            Log.w(GalleryActivity::class.java.simpleName, "Error setting wallpaper", e)
-            Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
+        } catch (e: IOException) {
+            reportExportError("wallpaperClicked", e)
+        } catch (e: IllegalArgumentException) {
+            reportExportError("wallpaperClicked", e)
         }
     }
+}
 
-    /**
-     * Copies the currently displayed image to a temporary file.
-     * @return The temporary File object.
-     * @throws java.io.IOException if an I/O error occurs during file operations.
-     */
-    private fun copyToTempFile(): File {
-        val stream = this.assets.open("img/${images[index]}")
-        val dirShared = File(filesDir, "shared")
-        if (!dirShared.exists()) {
-            dirShared.mkdir()
-        }
-        val fileShared = File(dirShared, "shared.jpg")
-        if (fileShared.exists()) {
-            fileShared.delete()
-        }
-        fileShared.createNewFile()
-        FileOutputStream(fileShared).use {
-            val buffer = ByteArray(COPY_BUFFER_SIZE)
-            var bytesRead: Int
-            while (stream.read(buffer).also { bytes -> bytesRead = bytes } != -1) {
-                it.write(buffer, 0, bytesRead)
-            }
-            it.flush()
-        }
-        return fileShared
-    }
+/**
+ * Shared error handling for [GalleryActivity.shareClicked] and
+ * [GalleryActivity.wallpaperClicked] - kept as a top-level function so it
+ * doesn't count against the activity's own function budget.
+ */
+private fun GalleryActivity.reportExportError(source: String, e: Exception) {
+    FirebaseHelper.logException(this, source, e.message)
+    Log.w(GalleryActivity::class.java.simpleName, "Error in $source", e)
+    Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()
 }

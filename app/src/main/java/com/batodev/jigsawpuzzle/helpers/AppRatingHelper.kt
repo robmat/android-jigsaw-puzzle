@@ -52,8 +52,9 @@ class AppRatingHelper(private val activity: Activity) {
                         Log.w(AppRatingHelper::class.java.simpleName, "review ko: ${task.exception} $reviewErrorCode")
                     }
                 }
-            } catch (e: Exception) {
-                // Handle error (e.g., log or fallback to browser)
+            } catch (e: IllegalStateException) {
+                // Play Core throws this when the Play Store app isn't installed/available
+                // on the device (e.g. emulators without Play Services).
                 FirebaseHelper.logException(activity, "request_review_exception", e.message)
                 Log.w(AppRatingHelper::class.java.simpleName, "Error requesting review: ${e.message}")
                 fallbackToPlayStore()

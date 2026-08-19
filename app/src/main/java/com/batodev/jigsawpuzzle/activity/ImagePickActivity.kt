@@ -24,21 +24,18 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatImageButton
-import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.batodev.jigsawpuzzle.R
+import com.batodev.jigsawpuzzle.helpers.CameraFileHelper
 import com.batodev.jigsawpuzzle.helpers.FirebaseHelper
 import com.batodev.jigsawpuzzle.helpers.NeonBtnOnPressChangeLook
 import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SettingsHelper
 import com.batodev.jigsawpuzzle.view.ImageAdapter
 import com.smb.glowbutton.NeonButton
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 
 private const val CAMERA_PERMISSION_REQUEST_CODE = 1
@@ -210,6 +207,24 @@ class ImagePickActivity : AppCompatActivity() {
         val indexOfSelection = dimensionsList.lastIndexOf(selectionFromSettings)
         spinner.adapter = adapter
         spinner.setSelection(indexOfSelection)
+
+        // Local (not a class member) so it doesn't add to this activity's function count -
+        // it's only ever used by the listener right below.
+        fun onDifficultyChosen(difficultyItemClicked: String) {
+            FirebaseHelper.logEvent(
+                this,
+                "difficulty_changed",
+                Bundle().apply { putString("difficulty", difficultyItemClicked) }
+            )
+            val split = difficultyItemClicked.substring(
+                difficultyItemClicked.indexOf("(") + 1,
+                difficultyItemClicked.indexOf(")")
+            ).split(DIFF_SPLIT)
+            settings.lastSetDifficultyCustomWidth = Integer.parseInt(split[0])
+            settings.lastSetDifficultyCustomHeight = Integer.parseInt(split[1])
+            SettingsHelper.save(this, settings)
+        }
+
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?, // The AdapterView where the selection happened
@@ -217,36 +232,13 @@ class ImagePickActivity : AppCompatActivity() {
                 difficultyItemClickedIndex: Int, // The position of the view in the adapter
                 id: Long // The row id of the item that is selected
             ) {
-                diffClicked(dimensionsList[difficultyItemClickedIndex], settings)
+                onDifficultyChosen(dimensionsList[difficultyItemClickedIndex])
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // Another interface callback
             }
         }
-    }
-
-    /**
-     * Handles the selection of a difficulty level from the spinner.
-     * Updates the puzzle dimensions in {@link Settings}.
-     * @param difficultyItemClicked The string representation of the selected difficulty.
-     * @param settings The current {@link Settings} object to update.
-     * @see Settings
-     * @see SettingsHelper
-     */
-    private fun diffClicked(difficultyItemClicked: String, settings: Settings) {
-        FirebaseHelper.logEvent(
-            this,
-            "difficulty_changed",
-            Bundle().apply { putString("difficulty", difficultyItemClicked) }
-        )
-        val split = difficultyItemClicked.substring(
-            difficultyItemClicked.indexOf("(") + 1,
-            difficultyItemClicked.indexOf(")")
-        ).split(DIFF_SPLIT)
-        settings.lastSetDifficultyCustomWidth = Integer.parseInt(split[0])
-        settings.lastSetDifficultyCustomHeight = Integer.parseInt(split[1])
-        SettingsHelper.save(this, settings)
     }
 
     /**
@@ -312,7 +304,7 @@ class ImagePickActivity : AppCompatActivity() {
         if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 FirebaseHelper.logEvent(this, "camera_permission_granted")
-                setImageUri()
+                photoUri = CameraFileHelper.createPhotoUri(this)
                 cameraActivityResultLauncher.launch(photoUri)
             } else {
                 FirebaseHelper.logEvent(this, "camera_permission_denied")
@@ -344,25 +336,9 @@ class ImagePickActivity : AppCompatActivity() {
                 CAMERA_PERMISSION_REQUEST_CODE
             )
         } else {
-            setImageUri()
+            photoUri = CameraFileHelper.createPhotoUri(this)
             cameraActivityResultLauncher.launch(photoUri)
         }
-    }
-
-    /**
-     * Sets the URI for the image captured by the camera.
-     * Creates a directory for camera images if it doesn't exist.
-     */
-    private fun setImageUri() {
-        val directory = File(filesDir, "camera_images")
-        if (!directory.exists()) {
-            directory.mkdirs()
-        }
-        photoUri = FileProvider.getUriForFile(
-            this,
-            applicationContext.packageName + ".fileprovider",
-            File(directory, "temp.jpg")
-        )
     }
 
     /**
@@ -375,30 +351,12 @@ class ImagePickActivity : AppCompatActivity() {
         try {
             contentResolver.openFileDescriptor(uri, "r").use { parcelFileDescriptor ->
                 val fd = parcelFileDescriptor?.fileDescriptor ?: return@use
-                val directory = File(filesDir, "camera_images")
-                if (!directory.exists()) {
-                    directory.mkdirs()
-                }
-                val pathToSave = File(directory, "temp.jpg")
-                copyFdToFile(fd, pathToSave)
-                showStartGamePopup(null, pathToSave.toString(), PhotoSource.GALLERY)
+                val savedFile = CameraFileHelper.copyFdToTempFile(this, fd)
+                showStartGamePopup(null, savedFile.toString(), PhotoSource.GALLERY)
             }
         } catch (e: IOException) {
             FirebaseHelper.logException(this, "copyFileAndStartGame", e.message)
             Toast.makeText(this, e.localizedMessage, Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    /**
-     * Copies the contents of a file descriptor to the given destination file.
-     * @param fd The source {@link java.io.FileDescriptor} to read from.
-     * @param destination The destination {@link File} to write to.
-     */
-    private fun copyFdToFile(fd: java.io.FileDescriptor, destination: File) {
-        FileInputStream(fd).use { input ->
-            FileOutputStream(destination).use { output ->
-                input.copyTo(output)
-            }
         }
     }
 

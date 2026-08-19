@@ -2,6 +2,7 @@ package com.batodev.jigsawpuzzle.activity
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.ActivityNotFoundException
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -35,16 +36,8 @@ import java.io.File
  * The main menu activity of the application.
  */
 class MainMenuActivity : AppCompatActivity() {
-    companion object {
-        private const val BACKGROUND_FADE_ALPHA = 0.4f
-        private const val BACKGROUND_FADE_DURATION_MS = 2000L
-        private const val MENU_ANIMATION_DELAY_MS = 500L
-        private const val MENU_BUTTON_INITIAL_SCALE = 0.5f
-        private const val MENU_BUTTON_ANIMATION_DURATION_MS = 500L
-        private const val MENU_BUTTON_STAGGER_DELAY_MS = 200L
-    }
-
-    private lateinit var achievementsLauncher: ActivityResultLauncher<Intent>
+    private lateinit var menuUi: MenuUi
+    private lateinit var achievementsFlow: AchievementsFlow
 
     /**
      * Called when the activity is first created.
@@ -62,215 +55,20 @@ class MainMenuActivity : AppCompatActivity() {
         SettingsHelper.load(this)
         AdHelper.loadAd(this)
         PlayGamesSdk.initialize(this)
-        initializeAchievementsLauncher()
+        menuUi = MenuUi(this)
+        // Registering the ActivityResultLauncher must happen before the activity is STARTED,
+        // so this can't be deferred to showAchievements()'s first call.
+        achievementsFlow = AchievementsFlow(this)
     }
-
-    private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            findViewById<NeonButton>(R.id.main_menu_activity_continue_game).visibility = View.GONE
-        }
-    }
-
-    private val saveCompleteReceiver: BroadcastReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            val continueButton = findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
-            if (checkIfSaveIsAvailable() && continueButton.visibility != View.VISIBLE) {
-                animateMenuButtons(continueButton)
-            }
-        }
-    }
-
-    private class MenuButtons(
-        val playButton: NeonButton,
-        val continueButton: NeonButton,
-        val galleryButton: NeonButton,
-        val moreAppsButton: NeonButton,
-        val playPart2Button: NeonButton,
-    )
-
-    private class MenuDecor(
-        val emberfoxLogo: ImageView,
-        val achievementButton: ImageView,
-    )
-
-    private data class MenuScreen(val buttons: MenuButtons, val decor: MenuDecor)
 
     override fun onResume() {
         super.onResume()
-        fadeInBackground()
-        registerSaveReceivers()
-        val screen = initMenuButtons()
-        scheduleMenuAnimation(screen)
-    }
-
-    private fun fadeInBackground() {
-        val background = findViewById<ImageView>(R.id.main_menu_background)
-        ObjectAnimator.ofFloat(background, "alpha", 0f, BACKGROUND_FADE_ALPHA).apply {
-            duration = BACKGROUND_FADE_DURATION_MS
-            start()
-        }
-    }
-
-    private fun registerSaveReceivers() {
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            saveStartedReceiver,
-            IntentFilter("com.batodev.jigsawpuzzle.SAVE_STARTED")
-        )
-        LocalBroadcastManager.getInstance(this).registerReceiver(
-            saveCompleteReceiver,
-            IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
-        )
-    }
-
-    private fun initMenuButtons(): MenuScreen {
-        val buttons = MenuButtons(
-            playButton = findViewById(R.id.main_menu_activity_play_the_game),
-            continueButton = findViewById(R.id.main_menu_activity_continue_game),
-            galleryButton = findViewById(R.id.main_menu_activity_unlocked_gallery),
-            moreAppsButton = findViewById(R.id.main_menu_activity_more_apps),
-            playPart2Button = findViewById(R.id.main_menu_activity_play_part_2),
-        )
-        val decor = MenuDecor(
-            emberfoxLogo = findViewById(R.id.main_menu_activity_emberfox_logo),
-            achievementButton = findViewById(R.id.main_menu_activity_achievements),
-        )
-
-        val allViews = listOf(
-            buttons.playButton,
-            buttons.continueButton,
-            buttons.galleryButton,
-            buttons.moreAppsButton,
-            buttons.playPart2Button,
-            decor.emberfoxLogo,
-            decor.achievementButton
-        )
-        for (view in allViews) {
-            view.visibility = View.INVISIBLE
-        }
-
-        buttons.playButton.setOnClickListener { play() }
-        buttons.continueButton.setOnClickListener { continueGame() }
-        buttons.galleryButton.setOnClickListener { gallery() }
-        buttons.moreAppsButton.setOnClickListener { moreApps() }
-        buttons.playPart2Button.setOnClickListener { playPart2() }
-        decor.achievementButton.setOnClickListener { showAchievements() }
-
-        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(
-            this,
-            buttons.playButton,
-            buttons.continueButton,
-            buttons.galleryButton,
-            buttons.moreAppsButton,
-            buttons.playPart2Button
-        )
-        return MenuScreen(buttons, decor)
-    }
-
-    private fun scheduleMenuAnimation(screen: MenuScreen) {
-        val (buttons, decor) = screen
-        // Delay the menu button animations
-        Handler(Looper.getMainLooper()).postDelayed({
-            val isSaving =
-                PuzzleActivity.Companion.puzzleStatus.get() == PuzzleActivity.Companion.PuzzleStatus.SAVING
-            val saveExists = checkIfSaveIsAvailable()
-
-            if (saveExists && !isSaving) {
-                animateMenuButtons(
-                    buttons.playButton,
-                    buttons.continueButton,
-                    buttons.galleryButton,
-                    buttons.moreAppsButton,
-                    buttons.playPart2Button,
-                    decor.emberfoxLogo,
-                    decor.achievementButton
-                )
-            } else {
-                animateMenuButtons(
-                    buttons.playButton,
-                    buttons.galleryButton,
-                    buttons.moreAppsButton,
-                    buttons.playPart2Button,
-                    decor.emberfoxLogo,
-                    decor.achievementButton
-                )
-                buttons.continueButton.visibility = View.GONE
-            }
-        }, MENU_ANIMATION_DELAY_MS)
+        menuUi.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(saveStartedReceiver)
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(saveCompleteReceiver)
-    }
-
-    private fun signInSilently(onSuccess: () -> Unit = {}) {
-        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
-        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
-            if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
-                // User is already signed in or silent sign-in was successful
-                Log.d(MainMenuActivity::class.simpleName, "User is authenticated.")
-                // Now you can proceed to show achievements
-                onSuccess.invoke()
-            } else {
-                // User is not signed in or silent sign-in failed
-                Log.d(
-                    MainMenuActivity::class.simpleName,
-                    "User not authenticated. Attempting interactive sign-in."
-                )
-                signInInteractively(onSuccess)
-            }
-        }
-    }
-
-    private fun signInInteractively(onSuccess: () -> Unit = {}) {
-        val gamesSignInClient = PlayGames.getGamesSignInClient(this)
-        gamesSignInClient.signIn().addOnCompleteListener { signInTask ->
-            if (signInTask.isSuccessful && signInTask.result.isAuthenticated) {
-                Log.d(MainMenuActivity::class.simpleName, "Interactive sign-in successful.")
-                onSuccess()
-            } else {
-                Log.e(
-                    MainMenuActivity::class.simpleName,
-                    "Interactive sign-in failed ${signInTask.result} ${signInTask.exception}.",
-                    signInTask.exception
-                )
-            }
-        }
-    }
-
-    private fun initializeAchievementsLauncher() {
-        achievementsLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            Log.d(
-                MainMenuActivity::class.simpleName,
-                "Returned from Achievements ${result.resultCode}"
-            )
-        }
-    }
-
-    private fun animateMenuButtons(vararg views: View) {
-        for ((index, view) in views.withIndex()) {
-            // Make view visible just before animation starts
-            view.visibility = View.VISIBLE
-
-            view.alpha = 0f
-            view.scaleX = MENU_BUTTON_INITIAL_SCALE
-            view.scaleY = MENU_BUTTON_INITIAL_SCALE
-
-            val animator = AnimatorSet().apply {
-                playTogether(
-                    ObjectAnimator.ofFloat(view, "alpha", 0f, 1f),
-                    ObjectAnimator.ofFloat(view, "scaleX", MENU_BUTTON_INITIAL_SCALE, 1f),
-                    ObjectAnimator.ofFloat(view, "scaleY", MENU_BUTTON_INITIAL_SCALE, 1f)
-                )
-                duration = MENU_BUTTON_ANIMATION_DURATION_MS
-                interpolator = AccelerateDecelerateInterpolator()
-                startDelay = index * MENU_BUTTON_STAGGER_DELAY_MS
-            }
-            animator.start()
-        }
+        menuUi.onPause()
     }
 
     /**
@@ -339,33 +137,260 @@ class MainMenuActivity : AppCompatActivity() {
         )
     }
 
+    /**
+     * Shows the Play Games achievements screen, signing the player in first if needed.
+     */
+    fun showAchievements() {
+        achievementsFlow.show()
+    }
+}
+
+private class MenuButtons(
+    val playButton: NeonButton,
+    val continueButton: NeonButton,
+    val galleryButton: NeonButton,
+    val moreAppsButton: NeonButton,
+    val playPart2Button: NeonButton,
+)
+
+private class MenuDecor(
+    val emberfoxLogo: ImageView,
+    val achievementButton: ImageView,
+)
+
+private data class MenuScreen(val buttons: MenuButtons, val decor: MenuDecor)
+
+/**
+ * Owns the main-menu screen's fade-in/stagger animations and the "continue game"
+ * save-state broadcast receivers, split out of [MainMenuActivity] so that class
+ * only holds the button click handlers themselves.
+ */
+private class MenuUi(private val activity: MainMenuActivity) {
+    companion object {
+        private const val BACKGROUND_FADE_ALPHA = 0.4f
+        private const val BACKGROUND_FADE_DURATION_MS = 2000L
+        private const val MENU_ANIMATION_DELAY_MS = 500L
+        private const val MENU_BUTTON_INITIAL_SCALE = 0.5f
+        private const val MENU_BUTTON_ANIMATION_DURATION_MS = 500L
+        private const val MENU_BUTTON_STAGGER_DELAY_MS = 200L
+    }
+
+    private val saveStartedReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            activity.findViewById<NeonButton>(R.id.main_menu_activity_continue_game).visibility = View.GONE
+        }
+    }
+
+    private val saveCompleteReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            val continueButton = activity.findViewById<NeonButton>(R.id.main_menu_activity_continue_game)
+            if (checkIfSaveIsAvailable() && continueButton.visibility != View.VISIBLE) {
+                animateMenuButtons(continueButton)
+            }
+        }
+    }
+
+    fun onResume() {
+        fadeInBackground()
+        registerSaveReceivers()
+        val screen = initMenuButtons()
+        scheduleMenuAnimation(screen)
+    }
+
+    fun onPause() {
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(saveStartedReceiver)
+        LocalBroadcastManager.getInstance(activity).unregisterReceiver(saveCompleteReceiver)
+    }
+
+    private fun fadeInBackground() {
+        val background = activity.findViewById<ImageView>(R.id.main_menu_background)
+        ObjectAnimator.ofFloat(background, "alpha", 0f, BACKGROUND_FADE_ALPHA).apply {
+            duration = BACKGROUND_FADE_DURATION_MS
+            start()
+        }
+    }
+
+    private fun registerSaveReceivers() {
+        LocalBroadcastManager.getInstance(activity).registerReceiver(
+            saveStartedReceiver,
+            IntentFilter("com.batodev.jigsawpuzzle.SAVE_STARTED")
+        )
+        LocalBroadcastManager.getInstance(activity).registerReceiver(
+            saveCompleteReceiver,
+            IntentFilter("com.batodev.jigsawpuzzle.SAVE_COMPLETE")
+        )
+    }
+
+    private fun initMenuButtons(): MenuScreen {
+        val buttons = MenuButtons(
+            playButton = activity.findViewById(R.id.main_menu_activity_play_the_game),
+            continueButton = activity.findViewById(R.id.main_menu_activity_continue_game),
+            galleryButton = activity.findViewById(R.id.main_menu_activity_unlocked_gallery),
+            moreAppsButton = activity.findViewById(R.id.main_menu_activity_more_apps),
+            playPart2Button = activity.findViewById(R.id.main_menu_activity_play_part_2),
+        )
+        val decor = MenuDecor(
+            emberfoxLogo = activity.findViewById(R.id.main_menu_activity_emberfox_logo),
+            achievementButton = activity.findViewById(R.id.main_menu_activity_achievements),
+        )
+
+        val allViews = listOf(
+            buttons.playButton,
+            buttons.continueButton,
+            buttons.galleryButton,
+            buttons.moreAppsButton,
+            buttons.playPart2Button,
+            decor.emberfoxLogo,
+            decor.achievementButton
+        )
+        for (view in allViews) {
+            view.visibility = View.INVISIBLE
+        }
+
+        buttons.playButton.setOnClickListener { activity.play() }
+        buttons.continueButton.setOnClickListener { activity.continueGame() }
+        buttons.galleryButton.setOnClickListener { activity.gallery() }
+        buttons.moreAppsButton.setOnClickListener { activity.moreApps() }
+        buttons.playPart2Button.setOnClickListener { activity.playPart2() }
+        decor.achievementButton.setOnClickListener { activity.showAchievements() }
+
+        NeonBtnOnPressChangeLook.setupNeonButtonTouchListeners(
+            activity,
+            buttons.playButton,
+            buttons.continueButton,
+            buttons.galleryButton,
+            buttons.moreAppsButton,
+            buttons.playPart2Button
+        )
+        return MenuScreen(buttons, decor)
+    }
+
+    private fun scheduleMenuAnimation(screen: MenuScreen) {
+        val (buttons, decor) = screen
+        // Delay the menu button animations
+        Handler(Looper.getMainLooper()).postDelayed({
+            val isSaving =
+                PuzzleActivity.Companion.puzzleStatus.get() == PuzzleActivity.Companion.PuzzleStatus.SAVING
+            val saveExists = checkIfSaveIsAvailable()
+
+            if (saveExists && !isSaving) {
+                animateMenuButtons(
+                    buttons.playButton,
+                    buttons.continueButton,
+                    buttons.galleryButton,
+                    buttons.moreAppsButton,
+                    buttons.playPart2Button,
+                    decor.emberfoxLogo,
+                    decor.achievementButton
+                )
+            } else {
+                animateMenuButtons(
+                    buttons.playButton,
+                    buttons.galleryButton,
+                    buttons.moreAppsButton,
+                    buttons.playPart2Button,
+                    decor.emberfoxLogo,
+                    decor.achievementButton
+                )
+                buttons.continueButton.visibility = View.GONE
+            }
+        }, MENU_ANIMATION_DELAY_MS)
+    }
+
+    private fun animateMenuButtons(vararg views: View) {
+        for ((index, view) in views.withIndex()) {
+            // Make view visible just before animation starts
+            view.visibility = View.VISIBLE
+
+            view.alpha = 0f
+            view.scaleX = MENU_BUTTON_INITIAL_SCALE
+            view.scaleY = MENU_BUTTON_INITIAL_SCALE
+
+            val animator = AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(view, "alpha", 0f, 1f),
+                    ObjectAnimator.ofFloat(view, "scaleX", MENU_BUTTON_INITIAL_SCALE, 1f),
+                    ObjectAnimator.ofFloat(view, "scaleY", MENU_BUTTON_INITIAL_SCALE, 1f)
+                )
+                duration = MENU_BUTTON_ANIMATION_DURATION_MS
+                interpolator = AccelerateDecelerateInterpolator()
+                startDelay = index * MENU_BUTTON_STAGGER_DELAY_MS
+            }
+            animator.start()
+        }
+    }
+
     private fun checkIfSaveIsAvailable(): Boolean {
-        val savedGameFile = File(filesDir, "saved_game/gamestate.json")
+        val savedGameFile = File(activity.filesDir, "saved_game/gamestate.json")
         Log.d(
-            MainMenuActivity::class.simpleName,
+            MenuUi::class.simpleName,
             "savedGameFile.exists(): ${savedGameFile.exists()}"
         )
         return savedGameFile.exists()
     }
+}
 
-    private fun showAchievements() {
+/**
+ * Owns the Play Games sign-in + achievements-screen launch flow, split out of
+ * [MainMenuActivity] so that class only holds the button click handlers themselves.
+ */
+private class AchievementsFlow(private val activity: AppCompatActivity) {
+    private val launcher: ActivityResultLauncher<Intent> = activity.registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        Log.d(AchievementsFlow::class.simpleName, "Returned from Achievements ${result.resultCode}")
+    }
+
+    fun show() {
         signInSilently {
-            PlayGames.getAchievementsClient(this)
+            PlayGames.getAchievementsClient(activity)
                 .achievementsIntent
-                .addOnSuccessListener { intent ->
-                    try {
-                        achievementsLauncher.launch(intent)
-                    } catch (e: Exception) {
-                        Log.e(
-                            MainMenuActivity::class.simpleName,
-                            "Could not launch achievements intent",
-                            e
-                        )
-                    }
-                }
+                .addOnSuccessListener { intent -> launchAchievements(intent) }
                 .addOnFailureListener { e ->
-                    Log.e(MainMenuActivity::class.simpleName, "Couldn't get Achievements Intent", e)
+                    Log.e(AchievementsFlow::class.simpleName, "Couldn't get Achievements Intent", e)
                 }
+        }
+    }
+
+    private fun launchAchievements(intent: Intent) {
+        try {
+            launcher.launch(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.e(AchievementsFlow::class.simpleName, "Could not launch achievements intent", e)
+        }
+    }
+
+    private fun signInSilently(onSuccess: () -> Unit) {
+        val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
+        gamesSignInClient.isAuthenticated.addOnCompleteListener { isAuthenticatedTask ->
+            if (isAuthenticatedTask.isSuccessful && isAuthenticatedTask.result.isAuthenticated) {
+                // User is already signed in or silent sign-in was successful
+                Log.d(AchievementsFlow::class.simpleName, "User is authenticated.")
+                onSuccess.invoke()
+            } else {
+                // User is not signed in or silent sign-in failed
+                Log.d(
+                    AchievementsFlow::class.simpleName,
+                    "User not authenticated. Attempting interactive sign-in."
+                )
+                signInInteractively(onSuccess)
+            }
+        }
+    }
+
+    private fun signInInteractively(onSuccess: () -> Unit) {
+        val gamesSignInClient = PlayGames.getGamesSignInClient(activity)
+        gamesSignInClient.signIn().addOnCompleteListener { signInTask ->
+            if (signInTask.isSuccessful && signInTask.result.isAuthenticated) {
+                Log.d(AchievementsFlow::class.simpleName, "Interactive sign-in successful.")
+                onSuccess()
+            } else {
+                Log.e(
+                    AchievementsFlow::class.simpleName,
+                    "Interactive sign-in failed ${signInTask.result} ${signInTask.exception}.",
+                    signInTask.exception
+                )
+            }
         }
     }
 }
