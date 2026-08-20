@@ -3,13 +3,10 @@ package com.batodev.jigsawpuzzle.logic
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Paint
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.graphics.createBitmap
 import com.batodev.jigsawpuzzle.R
 import com.batodev.jigsawpuzzle.activity.PuzzleActivity
 import com.batodev.jigsawpuzzle.cut.PuzzleCurvesGenerator
@@ -19,7 +16,6 @@ import com.batodev.jigsawpuzzle.helpers.Settings
 import com.batodev.jigsawpuzzle.helpers.SoundsPlayer
 import com.batodev.jigsawpuzzle.view.PuzzlePiece
 import com.batodev.jigsawpuzzle.view.TouchListener
-import com.caverock.androidsvg.SVG
 import com.otaliastudios.zoom.ZoomLayout
 import java.util.Random
 
@@ -35,7 +31,6 @@ class PuzzleGameManager(
     private val puzzleProgressListener: PuzzleProgressListener
 ) {
     companion object {
-        private const val BACKGROUND_IMAGE_ALPHA = 70
         private const val PIECE_OVERLAP_DIVISOR = 3
         private const val PIECE_X_OFFSET = 4
         private const val PIECE_Y_OFFSET = 7
@@ -78,18 +73,7 @@ class PuzzleGameManager(
         puzzleCurvesGenerator.yn = puzzlesHeight.toDouble()
         this.svgString = puzzleCurvesGenerator.generateSvg()
 
-        val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
-        val canvas = Canvas(bitmapCopy)
-        val paint = Paint()
-        paint.alpha = BACKGROUND_IMAGE_ALPHA
-        if (settings.showImageInBackgroundOfThePuzzle) {
-            canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint)
-        }
-        if (settings.showGridInBackgroundOfThePuzzle) {
-            val svg = SVG.getFromString(this.svgString)
-            svg.renderToCanvas(canvas)
-        }
-        imageView.setImageBitmap(bitmapCopy)
+        PuzzleBackgroundRenderer.draw(imageView, bitmap, this.svgString, settings)
 
         val pieceWidth = bitmap.width / puzzlesWidth
         val pieceHeight = bitmap.height / puzzlesHeight

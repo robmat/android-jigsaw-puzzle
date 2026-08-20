@@ -74,6 +74,16 @@ private fun awaitCompletionAsync(
     }.start()
 }
 
+/** The ImageView and progress listener a [PuzzleCutter] reports piece placement and progress to. */
+private class PieceOutput(val imageView: ImageView, val puzzleProgressListener: PuzzleProgressListener)
+
+/** Shared mutable state tracking cut pieces as they complete across the cutting thread pool. */
+private class ProgressTracking(
+    val result: MutableList<Bitmap>,
+    val totalPieces: Int,
+    val progressCounter: AtomicInteger,
+)
+
 class FloodFillPuzzleCutter : PuzzleCutter {
     private val numProcessors = Runtime.getRuntime().availableProcessors()
 
@@ -110,14 +120,6 @@ class FloodFillPuzzleCutter : PuzzleCutter {
         awaitCompletionAsync(executor, "FloodFillPuzzleCutter.cut", request.imageView, request.puzzleProgressListener)
         return result
     }
-
-    private class PieceOutput(val imageView: ImageView, val puzzleProgressListener: PuzzleProgressListener)
-
-    private class ProgressTracking(
-        val result: MutableList<Bitmap>,
-        val totalPieces: Int,
-        val progressCounter: AtomicInteger,
-    )
 
     private class CuttingContext(
         val sourceImage: Bitmap,
@@ -237,14 +239,6 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         awaitCompletionAsync(executor, "MaskBitmapPuzzleCutter.cut", request.imageView, request.puzzleProgressListener)
         return result
     }
-
-    private class PieceOutput(val imageView: ImageView, val puzzleProgressListener: PuzzleProgressListener)
-
-    private class ProgressTracking(
-        val result: MutableList<Bitmap>,
-        val totalPieces: Int,
-        val progressCounter: AtomicInteger,
-    )
 
     private class PieceGrid(val width: Int, val height: Int, val rows: Int, val cols: Int)
 
