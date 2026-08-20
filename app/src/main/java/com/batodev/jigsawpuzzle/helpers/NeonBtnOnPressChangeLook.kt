@@ -15,7 +15,7 @@ object NeonBtnOnPressChangeLook {
     ) {
         val nb: NeonButton = view as NeonButton
         when (event.action) {
-            /**
+            /*
              *             app:nb_gradientEnd="@color/colorAccent"
              *             app:nb_gradientStart="@color/colorPrimary"
              */

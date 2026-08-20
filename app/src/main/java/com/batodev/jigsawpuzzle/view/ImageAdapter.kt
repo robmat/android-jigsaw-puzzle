@@ -27,10 +27,6 @@ import java.io.IOException
 
 /**
  * An adapter for displaying images in a grid view.
- */
-
-/**
- * An adapter for displaying images in a grid view.
  * @param mContext The context of the application.
  */
 class ImageAdapter(
@@ -42,7 +38,7 @@ class ImageAdapter(
     private var lastPosition = -1
 
     init {
-        /**
+        /*
          * Initializes the adapter by listing image files from the "img" asset folder.
          * If an IOException occurs, it is logged.
          */
