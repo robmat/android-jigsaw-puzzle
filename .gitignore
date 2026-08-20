@@ -51,3 +51,5 @@ app/release/*
 /Screenshot_20240208_050056.jpg
 keystore.properties
 play-service-account.json
+
+.idea/
