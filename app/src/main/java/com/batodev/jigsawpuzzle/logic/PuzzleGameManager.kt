@@ -28,7 +28,7 @@ class PuzzleGameManager(
     private val imageView: ImageView,
     private val zoomableLayout: ZoomLayout,
     private val settings: Settings,
-    private val puzzleProgressListener: PuzzleProgressListener
+    private val puzzleProgressListener: PuzzleProgressListener,
 ) {
     companion object {
         private const val PIECE_OVERLAP_DIVISOR = 3
@@ -41,19 +41,36 @@ class PuzzleGameManager(
 
     var pieces: MutableList<PuzzlePiece> = mutableListOf()
     var svgString: String? = null
-    private val winSoundIds = listOf(
-        R.raw.success_1,
-        R.raw.success_2,
-        R.raw.success_3,
-        R.raw.success_4,
-        R.raw.success_5,
-        R.raw.success_6
-    )
-    private val okSoundsIds = listOf(
-        R.raw.ok_1, R.raw.ok_2, R.raw.ok_3, R.raw.ok_4, R.raw.ok_5, R.raw.ok_6, R.raw.ok_7, R.raw.ok_8,
-        R.raw.ok_9, R.raw.ok_10, R.raw.ok_11, R.raw.ok_12, R.raw.ok_13, R.raw.ok_14, R.raw.ok_15,
-        R.raw.ok_16, R.raw.ok_17, R.raw.ok_18
-    )
+    private val winSoundIds =
+        listOf(
+            R.raw.success_1,
+            R.raw.success_2,
+            R.raw.success_3,
+            R.raw.success_4,
+            R.raw.success_5,
+            R.raw.success_6,
+        )
+    private val okSoundsIds =
+        listOf(
+            R.raw.ok_1,
+            R.raw.ok_2,
+            R.raw.ok_3,
+            R.raw.ok_4,
+            R.raw.ok_5,
+            R.raw.ok_6,
+            R.raw.ok_7,
+            R.raw.ok_8,
+            R.raw.ok_9,
+            R.raw.ok_10,
+            R.raw.ok_11,
+            R.raw.ok_12,
+            R.raw.ok_13,
+            R.raw.ok_14,
+            R.raw.ok_15,
+            R.raw.ok_16,
+            R.raw.ok_17,
+            R.raw.ok_18,
+        )
 
     /**
      * Creates the puzzle pieces from the given bitmap and initializes their positions.
@@ -65,7 +82,11 @@ class PuzzleGameManager(
      * @see PuzzleCutter
      * @see PuzzlePiece
      */
-    fun createPuzzle(bitmap: Bitmap, puzzlesWidth: Int, puzzlesHeight: Int) {
+    fun createPuzzle(
+        bitmap: Bitmap,
+        puzzlesWidth: Int,
+        puzzlesHeight: Int,
+    ) {
         val puzzleCurvesGenerator = PuzzleCurvesGenerator()
         puzzleCurvesGenerator.width = bitmap.width.toDouble()
         puzzleCurvesGenerator.height = bitmap.height.toDouble()
@@ -109,8 +130,8 @@ class PuzzleGameManager(
                 svgString = this.svgString,
                 imageView = imageView,
                 puzzleProgressListener = puzzleProgressListener,
-                pieces = pieces
-            )
+                pieces = pieces,
+            ),
         )
     }
 
@@ -136,11 +157,12 @@ class PuzzleGameManager(
             val imageViewBottom = imageView.bottom
             val minTopMargin = imageViewBottom + SCATTER_TOP_MARGIN
             val maxTopMargin = layout.height - piece.pieceHeight
-            lParams.topMargin = if (maxTopMargin > minTopMargin) {
-                minTopMargin + Random().nextInt(maxTopMargin - minTopMargin)
-            } else {
-                minTopMargin
-            }
+            lParams.topMargin =
+                if (maxTopMargin > minTopMargin) {
+                    minTopMargin + Random().nextInt(maxTopMargin - minTopMargin)
+                } else {
+                    minTopMargin
+                }
             piece.layoutParams = lParams
 
             // Animate the piece

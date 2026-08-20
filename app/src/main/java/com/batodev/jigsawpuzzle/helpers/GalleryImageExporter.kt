@@ -16,7 +16,10 @@ import java.io.FileOutputStream
 object GalleryImageExporter {
     private const val COPY_BUFFER_SIZE = 10240
 
-    fun copyAssetToTempFile(context: Context, assetPath: String): File {
+    fun copyAssetToTempFile(
+        context: Context,
+        assetPath: String,
+    ): File {
         val stream = context.assets.open(assetPath)
         val dirShared = File(context.filesDir, "shared")
         if (!dirShared.exists()) {
@@ -40,7 +43,10 @@ object GalleryImageExporter {
         return fileShared
     }
 
-    fun shareIntentFor(context: Context, fileShared: File): Intent {
+    fun shareIntentFor(
+        context: Context,
+        fileShared: File,
+    ): Intent {
         val shareIntent = Intent(Intent.ACTION_SEND)
         val applicationId = context.applicationContext.packageName
         val uri = FileProvider.getUriForFile(context, "$applicationId.fileprovider", fileShared)
@@ -51,7 +57,10 @@ object GalleryImageExporter {
         return shareIntent
     }
 
-    fun setAsWallpaper(context: Context, fileShared: File) {
+    fun setAsWallpaper(
+        context: Context,
+        fileShared: File,
+    ) {
         val wallpaperManager = WallpaperManager.getInstance(context)
         val bitmap = BitmapFactory.decodeFile(fileShared.absolutePath)
         wallpaperManager.setBitmap(bitmap)

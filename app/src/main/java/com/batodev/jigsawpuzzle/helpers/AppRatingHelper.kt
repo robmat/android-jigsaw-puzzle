@@ -14,7 +14,9 @@ import java.util.Random
 /**
  * A helper class for requesting app ratings.
  */
-class AppRatingHelper(private val activity: Activity) {
+class AppRatingHelper(
+    private val activity: Activity,
+) {
     companion object {
         private const val REVIEW_REQUEST_ODDS = 5
     }
@@ -72,13 +74,13 @@ class AppRatingHelper(private val activity: Activity) {
         val packageName = activity.packageName
         try {
             activity.startActivity(
-                Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+                Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()),
             )
         } catch (e: ActivityNotFoundException) {
             FirebaseHelper.logException(activity, "fallback_to_play_store_failed", e.message)
             Log.w(AppRatingHelper::class.java.simpleName, "Error requesting review: ${e.message}")
             activity.startActivity(
-                Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri())
+                Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri()),
             )
         }
     }

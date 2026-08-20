@@ -28,10 +28,13 @@ object CameraFileHelper {
         FileProvider.getUriForFile(
             context,
             context.applicationContext.packageName + ".fileprovider",
-            tempImageFile(context)
+            tempImageFile(context),
         )
 
-    fun copyFdToTempFile(context: Context, fd: FileDescriptor): File {
+    fun copyFdToTempFile(
+        context: Context,
+        fd: FileDescriptor,
+    ): File {
         val destination = tempImageFile(context)
         FileInputStream(fd).use { input ->
             FileOutputStream(destination).use { output ->

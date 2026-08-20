@@ -30,7 +30,10 @@ import org.junit.Assert.assertNotEquals
 // too - see AndroidPuzzleCuties's RELEASE_TRACKER.md entry for the original diagnosis. None of
 // this app's Activities override back-press, so the standard pattern applies everywhere.
 
-fun assertEventuallyDestroyed(scenario: ActivityScenario<*>, timeoutMs: Long = 8_000) {
+fun assertEventuallyDestroyed(
+    scenario: ActivityScenario<*>,
+    timeoutMs: Long = 8_000,
+) {
     val deadline = System.currentTimeMillis() + timeoutMs
     while (scenario.state != Lifecycle.State.DESTROYED && System.currentTimeMillis() < deadline) {
         Thread.sleep(50)
@@ -58,7 +61,11 @@ fun assertBackPressFinishesScenario(scenario: ActivityScenario<*>) {
  */
 fun resetSettings(configure: Settings.() -> Unit = {}) {
     val context = InstrumentationRegistry.getInstrumentation().targetContext
-    context.getSharedPreferences("prefs", android.content.Context.MODE_PRIVATE).edit().clear().apply()
+    context
+        .getSharedPreferences("prefs", android.content.Context.MODE_PRIVATE)
+        .edit()
+        .clear()
+        .apply()
     SettingsHelper.save(context, Settings().apply(configure))
     java.io.File(context.filesDir, "saved_game").deleteRecursively()
 }
@@ -68,13 +75,19 @@ fun resetSettings(configure: Settings.() -> Unit = {}) {
  * Handler.postDelayed(..., 500) animation kickoff in onResume() - a small
  * safety margin wait before the first interaction avoids racing that delay.
  */
-fun waitFor(millis: Long): ViewAction = object : ViewAction {
-    override fun getConstraints(): Matcher<View> = isRoot()
-    override fun getDescription(): String = "wait for ${millis}ms while pumping the main looper"
-    override fun perform(uiController: UiController, view: View) {
-        uiController.loopMainThreadForAtLeast(millis)
+fun waitFor(millis: Long): ViewAction =
+    object : ViewAction {
+        override fun getConstraints(): Matcher<View> = isRoot()
+
+        override fun getDescription(): String = "wait for ${millis}ms while pumping the main looper"
+
+        override fun perform(
+            uiController: UiController,
+            view: View,
+        ) {
+            uiController.loopMainThreadForAtLeast(millis)
+        }
     }
-}
 
 /**
  * onGameOver() loads confetti2 as an animated GIF into konfettiView via
@@ -90,7 +103,10 @@ fun waitFor(millis: Long): ViewAction = object : ViewAction {
  * finish - not for the whole app to go idle first - so it can reach in and
  * stop the drawable (Glide's GifDrawable implements Animatable) regardless.
  */
-fun stopGifAnimation(scenario: ActivityScenario<*>, viewId: Int) {
+fun stopGifAnimation(
+    scenario: ActivityScenario<*>,
+    viewId: Int,
+) {
     scenario.onActivity { activity ->
         val target = activity.findViewById<ImageView>(viewId)
         (target.drawable as? Animatable)?.stop()
@@ -107,19 +123,25 @@ fun stopGifAnimation(scenario: ActivityScenario<*>, viewId: Int) {
  * a separate Handler.postDelayed loop (fakeSomeProgress()) purely for UX,
  * which doesn't affect when the real GONE transition happens.
  */
-fun waitUntilPuzzleReady(timeoutMs: Long = 30_000): ViewAction = object : ViewAction {
-    override fun getConstraints(): Matcher<View> = isRoot()
-    override fun getDescription(): String =
-        "wait until PuzzleActivity's progressBar becomes GONE (cutting finished and pieces scattered)"
-    override fun perform(uiController: UiController, view: View) {
-        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        val deadline = System.currentTimeMillis() + timeoutMs
-        while (progressBar.visibility != View.GONE && System.currentTimeMillis() < deadline) {
-            uiController.loopMainThreadForAtLeast(200)
+fun waitUntilPuzzleReady(timeoutMs: Long = 30_000): ViewAction =
+    object : ViewAction {
+        override fun getConstraints(): Matcher<View> = isRoot()
+
+        override fun getDescription(): String =
+            "wait until PuzzleActivity's progressBar becomes GONE (cutting finished and pieces scattered)"
+
+        override fun perform(
+            uiController: UiController,
+            view: View,
+        ) {
+            val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
+            val deadline = System.currentTimeMillis() + timeoutMs
+            while (progressBar.visibility != View.GONE && System.currentTimeMillis() < deadline) {
+                uiController.loopMainThreadForAtLeast(200)
+            }
+            check(progressBar.visibility == View.GONE) { "puzzle cutting never finished within ${timeoutMs}ms" }
         }
-        check(progressBar.visibility == View.GONE) { "puzzle cutting never finished within ${timeoutMs}ms" }
     }
-}
 
 /**
  * Solves the real puzzle for real: PuzzlePiece exposes its own correct
@@ -137,49 +159,66 @@ fun waitUntilPuzzleReady(timeoutMs: Long = 30_000): ViewAction = object : ViewAc
  * animation/checkGameOver() code path for every piece, the same way a
  * perfectly accurate real drag would.
  */
-fun solvePuzzle(): ViewAction = object : ViewAction {
-    override fun getConstraints(): Matcher<View> =
-        org.hamcrest.core.IsInstanceOf.instanceOf(ZoomLayout::class.java)
+fun solvePuzzle(): ViewAction =
+    object : ViewAction {
+        override fun getConstraints(): Matcher<View> =
+            org.hamcrest.core.IsInstanceOf
+                .instanceOf(ZoomLayout::class.java)
 
-    override fun getDescription(): String =
-        "drag every PuzzlePiece under this ZoomLayout to its correct xCoord/yCoord via synthetic touch events"
+        override fun getDescription(): String =
+            "drag every PuzzlePiece under this ZoomLayout to its correct xCoord/yCoord via synthetic touch events"
 
-    override fun perform(uiController: UiController, view: View) {
-        val zoomLayout = view as ZoomLayout
-        val layout = zoomLayout.getChildAt(0) as RelativeLayout
-        val zoom = zoomLayout.zoom
-        val pieces = (0 until layout.childCount).mapNotNull { layout.getChildAt(it) as? PuzzlePiece }
-        check(pieces.isNotEmpty()) { "no PuzzlePiece children found under the puzzle layout" }
+        override fun perform(
+            uiController: UiController,
+            view: View,
+        ) {
+            val zoomLayout = view as ZoomLayout
+            val layout = zoomLayout.getChildAt(0) as RelativeLayout
+            val zoom = zoomLayout.zoom
+            val pieces = (0 until layout.childCount).mapNotNull { layout.getChildAt(it) as? PuzzlePiece }
+            check(pieces.isNotEmpty()) { "no PuzzlePiece children found under the puzzle layout" }
 
-        for (piece in pieces) {
-            val lParams = piece.layoutParams as RelativeLayout.LayoutParams
-            val downTime = SystemClock.uptimeMillis()
-            val downX = lParams.leftMargin.toFloat() * zoom
-            val downY = lParams.topMargin.toFloat() * zoom
-            val targetX = piece.xCoord.toFloat() * zoom
-            val targetY = piece.yCoord.toFloat() * zoom
+            for (piece in pieces) {
+                val lParams = piece.layoutParams as RelativeLayout.LayoutParams
+                val downTime = SystemClock.uptimeMillis()
+                val downX = lParams.leftMargin.toFloat() * zoom
+                val downY = lParams.topMargin.toFloat() * zoom
+                val targetX = piece.xCoord.toFloat() * zoom
+                val targetY = piece.yCoord.toFloat() * zoom
 
-            val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, downX, downY, 0)
-            piece.dispatchTouchEvent(down)
-            down.recycle()
+                val down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, downX, downY, 0)
+                piece.dispatchTouchEvent(down)
+                down.recycle()
 
-            val move = MotionEvent.obtain(
-                downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_MOVE, targetX, targetY, 0
-            )
-            piece.dispatchTouchEvent(move)
-            move.recycle()
+                val move =
+                    MotionEvent.obtain(
+                        downTime,
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_MOVE,
+                        targetX,
+                        targetY,
+                        0,
+                    )
+                piece.dispatchTouchEvent(move)
+                move.recycle()
 
-            val up = MotionEvent.obtain(
-                downTime, SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, targetX, targetY, 0
-            )
-            piece.dispatchTouchEvent(up)
-            up.recycle()
+                val up =
+                    MotionEvent.obtain(
+                        downTime,
+                        SystemClock.uptimeMillis(),
+                        MotionEvent.ACTION_UP,
+                        targetX,
+                        targetY,
+                        0,
+                    )
+                piece.dispatchTouchEvent(up)
+                up.recycle()
 
-            // Let the real 250ms snap-into-place animation (and, for the
-            // last piece, checkGameOver()'s follow-on work) actually finish
-            // before touching the next piece.
-            uiController.loopMainThreadForAtLeast(350)
+                // Let the real 250ms snap-into-place animation (and, for the
+                // last piece, checkGameOver()'s follow-on work) actually finish
+                // before touching the next piece.
+                uiController.loopMainThreadForAtLeast(350)
+            }
+            uiController.loopMainThreadUntilIdle()
         }
-        uiController.loopMainThreadUntilIdle()
     }
-}

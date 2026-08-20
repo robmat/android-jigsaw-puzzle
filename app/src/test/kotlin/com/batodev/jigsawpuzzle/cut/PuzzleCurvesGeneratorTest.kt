@@ -19,21 +19,23 @@ class PuzzleCurvesGeneratorTest {
         val commonXn = 3.0 // Using a value like 3 for xn and yn
         val commonYn = 3.0 // to have enough curves to show differences
 
-        val generator1 = PuzzleCurvesGenerator().apply {
-            width = commonWidth
-            height = commonHeight
-            xn = commonXn
-            yn = commonYn
-        }
+        val generator1 =
+            PuzzleCurvesGenerator().apply {
+                width = commonWidth
+                height = commonHeight
+                xn = commonXn
+                yn = commonYn
+            }
         val svgString1 = generator1.generateSvg()
 
-        val generator2 = PuzzleCurvesGenerator().apply {
-            width = commonWidth
-            height = commonHeight
-            xn = commonXn
-            yn = commonYn
-            // No changes in parameters, relying on internal randomness
-        }
+        val generator2 =
+            PuzzleCurvesGenerator().apply {
+                width = commonWidth
+                height = commonHeight
+                xn = commonXn
+                yn = commonYn
+                // No changes in parameters, relying on internal randomness
+            }
         val svgString2 = generator2.generateSvg()
 
         assertThat("SVG string 1 should not be null", svgString1, `is`(notNullValue()))
@@ -42,18 +44,19 @@ class PuzzleCurvesGeneratorTest {
         assertThat(
             "Generated SVGs should be different due to internal randomness",
             svgString1,
-            `is`(not(equalTo(svgString2)))
+            `is`(not(equalTo(svgString2))),
         )
     }
 
     @Test
     fun generatesWellFormedSvg() {
-        val generator = PuzzleCurvesGenerator().apply {
-            width = 400.0
-            height = 300.0
-            xn = 4.0
-            yn = 3.0
-        }
+        val generator =
+            PuzzleCurvesGenerator().apply {
+                width = 400.0
+                height = 300.0
+                xn = 4.0
+                yn = 3.0
+            }
         val svgString = generator.generateSvg()
 
         assertThat("SVG should start with <svg", svgString, startsWith("<svg"))

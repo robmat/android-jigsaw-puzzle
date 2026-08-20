@@ -35,7 +35,6 @@ import org.junit.runner.RunWith
 // deleting any saved_game directory, so it's not separately tested here.
 @RunWith(AndroidJUnit4::class)
 class MainMenuActivityTest {
-
     @Before
     fun setUp() {
         resetSettings()
@@ -83,7 +82,10 @@ class MainMenuActivityTest {
 
     @Test
     fun galleryButtonOpensGalleryActivityWithUncoveredPics() {
-        val context = androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+        val context =
+            androidx.test.platform.app.InstrumentationRegistry
+                .getInstrumentation()
+                .targetContext
         val realPic = context.assets.list("img")!!.first()
         resetSettings { uncoveredPics = mutableListOf(realPic) }
         val scenario = launchSettled()

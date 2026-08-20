@@ -21,10 +21,12 @@ import org.junit.runner.RunWith
 // window, which Espresso isn't suited to drive reliably.
 @RunWith(AndroidJUnit4::class)
 class ImagePickActivityTest {
-
     @Before
     fun setUp() {
-        resetSettings { lastSetDifficultyCustomWidth = 2; lastSetDifficultyCustomHeight = 4 }
+        resetSettings {
+            lastSetDifficultyCustomWidth = 2
+            lastSetDifficultyCustomHeight = 4
+        }
     }
 
     @Test

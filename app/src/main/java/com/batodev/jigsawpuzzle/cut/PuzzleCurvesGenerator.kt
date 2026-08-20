@@ -28,12 +28,13 @@ class PuzzleCurvesGenerator {
      * @return A String containing the SVG representation of the puzzle outlines.
      */
     fun generateSvg(): String {
-        val edges = BezierEdgeCurves(
-            GridDimensions(width, height, xn, yn),
-            offset,
-            DEFAULT_TENSION,
-            DEFAULT_JITTER,
-        )
+        val edges =
+            BezierEdgeCurves(
+                GridDimensions(width, height, xn, yn),
+                offset,
+                DEFAULT_TENSION,
+                DEFAULT_JITTER,
+            )
         var data = "<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\" "
         data += "width=\"$width\" height=\"$height\" viewBox=\"0 0 $width $height\">\n"
         data += "<path fill=\"none\" stroke=\"Black\" stroke-width=\"1\" d=\""
@@ -54,7 +55,12 @@ class PuzzleCurvesGenerator {
  * Straight/rounded rectangle border path for the puzzle outline, drawn once
  * around the whole grid (independent of the per-tab curve jitter).
  */
-private fun puzzleBorderPath(offset: Double, width: Double, height: Double, radius: Double): String {
+private fun puzzleBorderPath(
+    offset: Double,
+    width: Double,
+    height: Double,
+    radius: Double,
+): String {
     var str = ""
     str += "M " + (offset + radius) + " " + offset + " "
     str += "L " + (offset + width - radius) + " " + offset + " "
@@ -69,7 +75,12 @@ private fun puzzleBorderPath(offset: Double, width: Double, height: Double, radi
 }
 
 /** Puzzle-grid size, grouped into one value so [BezierEdgeCurves] takes fewer constructor params. */
-private data class GridDimensions(val width: Double, val height: Double, val xn: Double, val yn: Double)
+private data class GridDimensions(
+    val width: Double,
+    val height: Double,
+    val xn: Double,
+    val yn: Double,
+)
 
 /** Three consecutive bezier control points, i.e. the operands of one SVG "C" command. */
 private data class CubicTriple(
@@ -121,7 +132,12 @@ private class BezierEdgeCurves(
             xi = 0.0
             jitterSeq.first()
             val start = controlPoints().start
-            str.append("M ").append(start.first).append(",").append(start.second).append(" ")
+            str
+                .append("M ")
+                .append(start.first)
+                .append(",")
+                .append(start.second)
+                .append(" ")
             while (xi < dims.xn) {
                 val pts = controlPoints()
                 appendCubic(str, pts.out)
@@ -143,7 +159,12 @@ private class BezierEdgeCurves(
             yi = 0.0
             jitterSeq.first()
             val start = controlPoints().start
-            str.append("M ").append(start.second).append(",").append(start.first).append(" ")
+            str
+                .append("M ")
+                .append(start.second)
+                .append(",")
+                .append(start.first)
+                .append(" ")
             while (yi < dims.yn) {
                 val pts = controlPoints()
                 appendCubicSwapped(str, pts.out)
@@ -157,16 +178,44 @@ private class BezierEdgeCurves(
         return str.toString()
     }
 
-    private fun appendCubic(str: StringBuilder, triple: CubicTriple) {
-        str.append("C ").append(triple.p1.first).append(" ").append(triple.p1.second).append(" ")
-            .append(triple.p2.first).append(" ").append(triple.p2.second).append(" ")
-            .append(triple.p3.first).append(" ").append(triple.p3.second).append(" ")
+    private fun appendCubic(
+        str: StringBuilder,
+        triple: CubicTriple,
+    ) {
+        str
+            .append("C ")
+            .append(triple.p1.first)
+            .append(" ")
+            .append(triple.p1.second)
+            .append(" ")
+            .append(triple.p2.first)
+            .append(" ")
+            .append(triple.p2.second)
+            .append(" ")
+            .append(triple.p3.first)
+            .append(" ")
+            .append(triple.p3.second)
+            .append(" ")
     }
 
-    private fun appendCubicSwapped(str: StringBuilder, triple: CubicTriple) {
-        str.append("C ").append(triple.p1.second).append(" ").append(triple.p1.first).append(" ")
-            .append(triple.p2.second).append(" ").append(triple.p2.first).append(" ")
-            .append(triple.p3.second).append(" ").append(triple.p3.first).append(" ")
+    private fun appendCubicSwapped(
+        str: StringBuilder,
+        triple: CubicTriple,
+    ) {
+        str
+            .append("C ")
+            .append(triple.p1.second)
+            .append(" ")
+            .append(triple.p1.first)
+            .append(" ")
+            .append(triple.p2.second)
+            .append(" ")
+            .append(triple.p2.first)
+            .append(" ")
+            .append(triple.p3.second)
+            .append(" ")
+            .append(triple.p3.first)
+            .append(" ")
     }
 
     private fun segmentLength(): Double = if (vertical) dims.height / dims.yn else dims.width / dims.xn
@@ -221,11 +270,14 @@ private class BezierEdgeCurves(
  * neighboring pieces don't look identical, plus the alternating `flip` bit that
  * keeps adjacent tabs pointing in opposite directions.
  */
-private class JitterSequence(private val jitter: Double) {
+private class JitterSequence(
+    private val jitter: Double,
+) {
     companion object {
         private const val RANDOM_MULTIPLIER = 10000.0
         private const val BOOL_THRESHOLD = 0.5
         private val seedOffset = AtomicLong(0L)
+
         private fun initialSeed(): Double = System.nanoTime().toDouble() + seedOffset.incrementAndGet()
     }
 
@@ -265,7 +317,10 @@ private class JitterSequence(private val jitter: Double) {
         return x - floor(x)
     }
 
-    private fun uniform(min: Double, max: Double): Double {
+    private fun uniform(
+        min: Double,
+        max: Double,
+    ): Double {
         val r = random()
         return min + r * (max - min)
     }

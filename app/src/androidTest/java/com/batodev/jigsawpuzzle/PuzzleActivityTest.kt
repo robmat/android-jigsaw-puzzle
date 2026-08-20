@@ -37,24 +37,27 @@ import org.junit.runner.RunWith
 // spinner offers) to keep solvePuzzle()'s per-piece settle wait bounded.
 @RunWith(AndroidJUnit4::class)
 class PuzzleActivityTest {
-
     private lateinit var assetName: String
 
     @Before
     fun setUp() {
         val context = InstrumentationRegistry.getInstrumentation().targetContext
         assetName = context.assets.list("img")!!.first()
-        resetSettings { lastSetDifficultyCustomWidth = 2; lastSetDifficultyCustomHeight = 4 }
+        resetSettings {
+            lastSetDifficultyCustomWidth = 2
+            lastSetDifficultyCustomHeight = 4
+        }
     }
 
     private fun launchWithAsset(): ActivityScenario<PuzzleActivity> {
-        val intent = Intent(
-            InstrumentationRegistry.getInstrumentation().targetContext,
-            PuzzleActivity::class.java
-        ).apply {
-            putExtra("assetName", assetName)
-            putExtra("newGame", true)
-        }
+        val intent =
+            Intent(
+                InstrumentationRegistry.getInstrumentation().targetContext,
+                PuzzleActivity::class.java,
+            ).apply {
+                putExtra("assetName", assetName)
+                putExtra("newGame", true)
+            }
         return ActivityScenario.launch(intent)
     }
 

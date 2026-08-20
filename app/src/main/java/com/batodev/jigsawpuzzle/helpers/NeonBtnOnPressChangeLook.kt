@@ -11,7 +11,7 @@ object NeonBtnOnPressChangeLook {
     fun applyPressedLook(
         view: View,
         event: MotionEvent,
-        appCompatActivity: AppCompatActivity
+        appCompatActivity: AppCompatActivity,
     ) {
         val nb: NeonButton = view as NeonButton
         when (event.action) {
@@ -40,13 +40,16 @@ object NeonBtnOnPressChangeLook {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    fun setupNeonButtonTouchListeners(activity: AppCompatActivity, vararg buttons: NeonButton) {
+    fun setupNeonButtonTouchListeners(
+        activity: AppCompatActivity,
+        vararg buttons: NeonButton,
+    ) {
         for (button in buttons) {
             button.setOnTouchListener { view, event ->
                 applyPressedLook(
                     view,
                     event,
-                    activity
+                    activity,
                 )
                 true
             }

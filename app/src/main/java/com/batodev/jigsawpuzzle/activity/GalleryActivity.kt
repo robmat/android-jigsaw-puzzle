@@ -92,7 +92,7 @@ class GalleryActivity : AppCompatActivity() {
     ): Boolean {
         Log.d(
             "GalleryActivity",
-            "onFling: e1=$e1, e2=$e2, velocityX=$velocityX, velocityY=$velocityY"
+            "onFling: e1=$e1, e2=$e2, velocityX=$velocityX, velocityY=$velocityY",
         )
         FirebaseHelper.logEvent(this, "gallery_fling")
         val diffX = e2.x - e1.x
@@ -173,52 +173,58 @@ class GalleryActivity : AppCompatActivity() {
         val photoView = findViewById<PhotoView>(R.id.gallery_activity_background)
         val duration = ANIMATION_DURATION_MS
 
-        val (pivotXOut, pivotXIn) = if (direction == 1) {
-            Pair(0f, photoView.width.toFloat()) // Shrink to left, grow from right
-        } else {
-            Pair(photoView.width.toFloat(), 0f) // Shrink to right, grow from left
-        }
+        val (pivotXOut, pivotXIn) =
+            if (direction == 1) {
+                Pair(0f, photoView.width.toFloat()) // Shrink to left, grow from right
+            } else {
+                Pair(photoView.width.toFloat(), 0f) // Shrink to right, grow from left
+            }
 
         photoView.pivotX = pivotXOut
         photoView.pivotY = photoView.height / 2f
 
-        val outSet = AnimatorSet().apply {
-            playTogether(
-                ObjectAnimator.ofFloat(photoView, "scaleX", 1f, 0f),
-                ObjectAnimator.ofFloat(photoView, "scaleY", 1f, 0f)
-            )
-            this.duration = duration
-            interpolator = AccelerateDecelerateInterpolator()
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    if (direction == 1) {
-                        index++
-                    } else {
-                        index--
-                    }
-                    setImage(images[index])
-                    checkIfImageLeftRightButtonsShouldBeVisible()
-
-                    photoView.pivotX = pivotXIn
-                    photoView.pivotY = photoView.height / 2f
-
-                    AnimatorSet().apply {
-                        playTogether(
-                            ObjectAnimator.ofFloat(photoView, "scaleX", 0f, 1f),
-                            ObjectAnimator.ofFloat(photoView, "scaleY", 0f, 1f)
-                        )
-                        this.duration = duration
-                        interpolator = AccelerateDecelerateInterpolator()
-                        addListener(object : AnimatorListenerAdapter() {
-                            override fun onAnimationEnd(animation: Animator) {
-                                isAnimating = false
+        val outSet =
+            AnimatorSet().apply {
+                playTogether(
+                    ObjectAnimator.ofFloat(photoView, "scaleX", 1f, 0f),
+                    ObjectAnimator.ofFloat(photoView, "scaleY", 1f, 0f),
+                )
+                this.duration = duration
+                interpolator = AccelerateDecelerateInterpolator()
+                addListener(
+                    object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            if (direction == 1) {
+                                index++
+                            } else {
+                                index--
                             }
-                        })
-                        start()
-                    }
-                }
-            })
-        }
+                            setImage(images[index])
+                            checkIfImageLeftRightButtonsShouldBeVisible()
+
+                            photoView.pivotX = pivotXIn
+                            photoView.pivotY = photoView.height / 2f
+
+                            AnimatorSet().apply {
+                                playTogether(
+                                    ObjectAnimator.ofFloat(photoView, "scaleX", 0f, 1f),
+                                    ObjectAnimator.ofFloat(photoView, "scaleY", 0f, 1f),
+                                )
+                                this.duration = duration
+                                interpolator = AccelerateDecelerateInterpolator()
+                                addListener(
+                                    object : AnimatorListenerAdapter() {
+                                        override fun onAnimationEnd(animation: Animator) {
+                                            isAnimating = false
+                                        }
+                                    },
+                                )
+                                start()
+                            }
+                        }
+                    },
+                )
+            }
         outSet.start()
     }
 
@@ -229,9 +235,10 @@ class GalleryActivity : AppCompatActivity() {
     private fun setImage(imageName: String) {
         if (index < 0 || index >= images.size) return
         try {
-            val bitmap = this.assets.open("img/$imageName").use { inputStream ->
-                BitmapFactory.decodeStream(inputStream)
-            }
+            val bitmap =
+                this.assets.open("img/$imageName").use { inputStream ->
+                    BitmapFactory.decodeStream(inputStream)
+                }
             if (bitmap != null) {
                 findViewById<PhotoView>(R.id.gallery_activity_background).setImageBitmap(bitmap)
             } else {
@@ -288,7 +295,10 @@ class GalleryActivity : AppCompatActivity() {
  * [GalleryActivity.wallpaperClicked] - kept as a top-level function so it
  * doesn't count against the activity's own function budget.
  */
-private fun GalleryActivity.reportExportError(source: String, e: Exception) {
+private fun GalleryActivity.reportExportError(
+    source: String,
+    e: Exception,
+) {
     FirebaseHelper.logException(this, source, e.message)
     Log.w(GalleryActivity::class.java.simpleName, "Error in $source", e)
     Toast.makeText(this, "Error: $e", Toast.LENGTH_SHORT).show()

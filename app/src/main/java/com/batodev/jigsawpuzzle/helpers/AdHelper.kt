@@ -67,7 +67,7 @@ object AdHelper {
                     FirebaseHelper.logException(activity, "ad_failed_to_load", loadAdError.message)
                     Log.w(AdHelper::class.simpleName, "onAdFailedToLoad: $loadAdError")
                 }
-            }
+            },
         )
     }
 }

@@ -12,7 +12,9 @@ import java.io.IOException
 /**
  * A class for loading and processing images for the puzzle.
  */
-class ImageLoader(private val imageView: ImageView) {
+class ImageLoader(
+    private val imageView: ImageView,
+) {
     companion object {
         private const val ROTATE_90_DEGREES = 90f
         private const val ROTATE_180_DEGREES = 180f
@@ -26,8 +28,11 @@ class ImageLoader(private val imageView: ImageView) {
      * @return The scaled and processed {@link Bitmap}.
      * @throws java.io.IOException if the asset file cannot be opened or read.
      */
-    fun setPicFromAsset(assetName: String, assets: android.content.res.AssetManager): Bitmap {
-        return try {
+    fun setPicFromAsset(
+        assetName: String,
+        assets: android.content.res.AssetManager,
+    ): Bitmap =
+        try {
             val targetW = imageView.width
             val targetH = imageView.height
             val inputStream = assets.open("img/$assetName")
@@ -38,7 +43,6 @@ class ImageLoader(private val imageView: ImageView) {
             FirebaseHelper.logException(imageView.context, "setPicFromAsset", e.message)
             throw e
         }
-    }
 
     /**
      * Loads a bitmap from a given file path and scales it to fit the ImageView.
@@ -47,8 +51,8 @@ class ImageLoader(private val imageView: ImageView) {
      * @return The scaled and processed {@link Bitmap}.
      * @throws java.io.IOException if the file cannot be opened or read.
      */
-    fun setPicFromPath(path: String): Bitmap {
-        return try {
+    fun setPicFromPath(path: String): Bitmap =
+        try {
             val targetW = imageView.width
             val targetH = imageView.height
             val bmOptions = BitmapFactory.Options()
@@ -66,7 +70,6 @@ class ImageLoader(private val imageView: ImageView) {
             FirebaseHelper.logException(imageView.context, "setPicFromPath", e.message)
             throw e
         }
-    }
 
     /**
      * Processes a bitmap by cropping and scaling it to fit the target dimensions.
@@ -76,7 +79,11 @@ class ImageLoader(private val imageView: ImageView) {
      * @param targetH The target height for the bitmap.
      * @return The cropped and scaled {@link Bitmap}.
      */
-    private fun processBitmap(bitmap: Bitmap, targetW: Int, targetH: Int): Bitmap {
+    private fun processBitmap(
+        bitmap: Bitmap,
+        targetW: Int,
+        targetH: Int,
+    ): Bitmap {
         val origW = bitmap.width
         val origH = bitmap.height
         val targetRatio = targetW.toFloat() / targetH.toFloat()
@@ -107,12 +114,16 @@ class ImageLoader(private val imageView: ImageView) {
      * @param imagePath The path to the image file, used to read EXIF data.
      * @return The upright {@link Bitmap}.
      */
-    private fun uprightBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
+    private fun uprightBitmap(
+        bitmap: Bitmap,
+        imagePath: String,
+    ): Bitmap {
         val exifInterface = ExifInterface(imagePath)
-        val orientation = exifInterface.getAttributeInt(
-            ExifInterface.TAG_ORIENTATION,
-            ExifInterface.ORIENTATION_NORMAL
-        )
+        val orientation =
+            exifInterface.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL,
+            )
 
         val matrix = Matrix()
         when (orientation) {

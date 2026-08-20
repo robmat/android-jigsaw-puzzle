@@ -9,7 +9,10 @@ interface PuzzleProgressListener {
      * @param progress The current progress value.
      * @param max The maximum progress value.
      */
-    fun onProgressUpdate(progress: Int, max: Int)
+    fun onProgressUpdate(
+        progress: Int,
+        max: Int,
+    )
 
     /**
      * Called when the puzzle cutting process has completed.

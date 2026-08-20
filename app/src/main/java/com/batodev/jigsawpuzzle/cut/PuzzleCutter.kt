@@ -75,7 +75,10 @@ private fun awaitCompletionAsync(
 }
 
 /** The ImageView and progress listener a [PuzzleCutter] reports piece placement and progress to. */
-private class PieceOutput(val imageView: ImageView, val puzzleProgressListener: PuzzleProgressListener)
+private class PieceOutput(
+    val imageView: ImageView,
+    val puzzleProgressListener: PuzzleProgressListener,
+)
 
 /** Shared mutable state tracking cut pieces as they complete across the cutting thread pool. */
 private class ProgressTracking(
@@ -94,19 +97,21 @@ class FloodFillPuzzleCutter : PuzzleCutter {
         val height = request.sourceImage.height
         val puzzleGridBitmap = createBitmap(width, height)
         val puzzleGridCanvas = Canvas(puzzleGridBitmap)
-        val whiteFill = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            style = Paint.Style.FILL
-            color = Color.WHITE
-        }
+        val whiteFill =
+            Paint(Paint.ANTI_ALIAS_FLAG).apply {
+                style = Paint.Style.FILL
+                color = Color.WHITE
+            }
         puzzleGridCanvas.drawRect(0f, 0f, width.toFloat(), height.toFloat(), whiteFill)
         svg.renderToCanvas(puzzleGridCanvas)
         val executor = Executors.newFixedThreadPool(numProcessors)
-        val context = CuttingContext(
-            sourceImage = request.sourceImage,
-            puzzleGridBitmap = puzzleGridBitmap,
-            output = PieceOutput(request.imageView, request.puzzleProgressListener),
-            tracking = ProgressTracking(result, request.rows * request.cols, AtomicInteger(0)),
-        )
+        val context =
+            CuttingContext(
+                sourceImage = request.sourceImage,
+                puzzleGridBitmap = puzzleGridBitmap,
+                output = PieceOutput(request.imageView, request.puzzleProgressListener),
+                tracking = ProgressTracking(result, request.rows * request.cols, AtomicInteger(0)),
+            )
         val puzzlesCenterPoints = divideImage(puzzleGridBitmap, request.rows, request.cols)
         var puzzleIndex = 0
         for (rowIndex in 0 until request.rows) {
@@ -128,34 +133,43 @@ class FloodFillPuzzleCutter : PuzzleCutter {
         val tracking: ProgressTracking,
     )
 
-    private fun cutPieceJob(context: CuttingContext, puzzleCenter: Point, piece: PuzzlePiece): Runnable = Runnable {
-        val reg = floodFill(context.puzzleGridBitmap, puzzleCenter.x, puzzleCenter.y)
-        val regionWidth = reg.width
-        val regionHeight = reg.height
-        val regionMinX = reg.minX
-        val regionMinY = reg.minY
-        val puzzleBitmap = createBitmap(regionWidth + 1, regionHeight + 1)
-        reg.points.forEach(
-            Consumer { (x1, y1): Point ->
-                val rgbSource = context.sourceImage[x1, y1]
-                puzzleBitmap[x1 - regionMinX, y1 - regionMinY] = rgbSource
+    private fun cutPieceJob(
+        context: CuttingContext,
+        puzzleCenter: Point,
+        piece: PuzzlePiece,
+    ): Runnable =
+        Runnable {
+            val reg = floodFill(context.puzzleGridBitmap, puzzleCenter.x, puzzleCenter.y)
+            val regionWidth = reg.width
+            val regionHeight = reg.height
+            val regionMinX = reg.minX
+            val regionMinY = reg.minY
+            val puzzleBitmap = createBitmap(regionWidth + 1, regionHeight + 1)
+            reg.points.forEach(
+                Consumer { (x1, y1): Point ->
+                    val rgbSource = context.sourceImage[x1, y1]
+                    puzzleBitmap[x1 - regionMinX, y1 - regionMinY] = rgbSource
+                },
+            )
+            synchronized(context.tracking.result) { context.tracking.result.add(puzzleBitmap) }
+            context.output.puzzleProgressListener.postToHandler {
+                piece.setImageBitmap(puzzleBitmap)
+                piece.pieceWidth = regionWidth
+                piece.pieceHeight = regionHeight
+                piece.xCoord = regionMinX + context.output.imageView.left
+                piece.yCoord = regionMinY + context.output.imageView.top
             }
-        )
-        synchronized(context.tracking.result) { context.tracking.result.add(puzzleBitmap) }
-        context.output.puzzleProgressListener.postToHandler {
-            piece.setImageBitmap(puzzleBitmap)
-            piece.pieceWidth = regionWidth
-            piece.pieceHeight = regionHeight
-            piece.xCoord = regionMinX + context.output.imageView.left
-            piece.yCoord = regionMinY + context.output.imageView.top
+            val progress = context.tracking.progressCounter.incrementAndGet()
+            context.output.puzzleProgressListener.postToHandler {
+                context.output.puzzleProgressListener.onProgressUpdate(progress, context.tracking.totalPieces)
+            }
         }
-        val progress = context.tracking.progressCounter.incrementAndGet()
-        context.output.puzzleProgressListener.postToHandler {
-            context.output.puzzleProgressListener.onProgressUpdate(progress, context.tracking.totalPieces)
-        }
-    }
 
-    private fun floodFill(image: Bitmap, startX: Int, startY: Int): Region {
+    private fun floodFill(
+        image: Bitmap,
+        startX: Int,
+        startY: Int,
+    ): Region {
         val reg = Region(ArrayList())
         val queue: Queue<Point> = ArrayDeque()
         val width = image.width
@@ -179,10 +193,18 @@ class FloodFillPuzzleCutter : PuzzleCutter {
         return reg
     }
 
-    private fun isOutOfBounds(x: Int, y: Int, width: Int, height: Int): Boolean =
-        x !in 0 until width || y !in 0 until height
+    private fun isOutOfBounds(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+    ): Boolean = x !in 0 until width || y !in 0 until height
 
-    private fun divideImage(image: Bitmap, rows: Int, cols: Int): Array<Array<Point?>> {
+    private fun divideImage(
+        image: Bitmap,
+        rows: Int,
+        cols: Int,
+    ): Array<Array<Point?>> {
         val cellWidth = image.width / cols
         val cellHeight = image.height / rows
         return Array(rows) { i ->
@@ -190,12 +212,18 @@ class FloodFillPuzzleCutter : PuzzleCutter {
         }
     }
 
-    internal class Point(var x: Int, var y: Int) {
+    internal class Point(
+        var x: Int,
+        var y: Int,
+    ) {
         operator fun component1(): Int = x
+
         operator fun component2(): Int = y
     }
 
-    internal class Region(val points: MutableCollection<Point>) {
+    internal class Region(
+        val points: MutableCollection<Point>,
+    ) {
         private val maxX: Int get() = points.maxOfOrNull { it.x } ?: 0
         val minX: Int get() = points.minOfOrNull { it.x } ?: 0
         private val maxY: Int get() = points.maxOfOrNull { it.y } ?: 0
@@ -225,13 +253,14 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         val executor = Executors.newFixedThreadPool(numProcessors)
         val result = mutableListOf<Bitmap>()
         val totalPieces = request.rows * request.cols
-        val context = CuttingContext(
-            sourceImage = request.sourceImage,
-            basePixels = basePixels,
-            grid = PieceGrid(width, height, request.rows, request.cols),
-            output = PieceOutput(request.imageView, request.puzzleProgressListener),
-            tracking = ProgressTracking(result, totalPieces, AtomicInteger(0)),
-        )
+        val context =
+            CuttingContext(
+                sourceImage = request.sourceImage,
+                basePixels = basePixels,
+                grid = PieceGrid(width, height, request.rows, request.cols),
+                output = PieceOutput(request.imageView, request.puzzleProgressListener),
+                tracking = ProgressTracking(result, totalPieces, AtomicInteger(0)),
+            )
         for (i in 0 until totalPieces) {
             executor.submit(cutPieceJob(context, i, request.pieces[i]))
         }
@@ -240,7 +269,12 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         return result
     }
 
-    private class PieceGrid(val width: Int, val height: Int, val rows: Int, val cols: Int)
+    private class PieceGrid(
+        val width: Int,
+        val height: Int,
+        val rows: Int,
+        val cols: Int,
+    )
 
     private class CuttingContext(
         val sourceImage: Bitmap,
@@ -250,37 +284,45 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         val tracking: ProgressTracking,
     )
 
-    private fun cutPieceJob(context: CuttingContext, pieceIndex: Int, piece: PuzzlePiece): Runnable = Runnable {
-        val grid = context.grid
-        val pieceX = pieceIndex % grid.cols
-        val pieceY = pieceIndex / grid.cols
-        val pixelsForPiece = context.basePixels.clone()
-        val startX = (grid.width / grid.cols.toDouble() * (pieceX + PIECE_CENTER_OFFSET)).toInt()
-        val startY = (grid.height / grid.rows.toDouble() * (pieceY + PIECE_CENTER_OFFSET)).toInt()
-        // The mask uses transparent as the target color and white as a temporary marker.
-        // Use the simplified floodFill which uses fixed colors internally.
-        floodFill(pixelsForPiece, grid.width, grid.height, startX, startY)
-        for (j in pixelsForPiece.indices) {
-            if (pixelsForPiece[j] != Color.WHITE) pixelsForPiece[j] = Color.TRANSPARENT
-        }
-        val finalBitmap = buildMaskedBitmap(context.sourceImage, pixelsForPiece, grid.width, grid.height)
-        synchronized(context.tracking.result) { context.tracking.result.add(finalBitmap.bitmap) }
-        context.output.puzzleProgressListener.postToHandler {
-            piece.setImageBitmap(finalBitmap.bitmap)
-            piece.pieceWidth = finalBitmap.bitmap.width
-            piece.pieceHeight = finalBitmap.bitmap.height
-            if (finalBitmap.bounds != null) {
-                piece.xCoord = finalBitmap.bounds.left + context.output.imageView.left
-                piece.yCoord = finalBitmap.bounds.top + context.output.imageView.top
+    private fun cutPieceJob(
+        context: CuttingContext,
+        pieceIndex: Int,
+        piece: PuzzlePiece,
+    ): Runnable =
+        Runnable {
+            val grid = context.grid
+            val pieceX = pieceIndex % grid.cols
+            val pieceY = pieceIndex / grid.cols
+            val pixelsForPiece = context.basePixels.clone()
+            val startX = (grid.width / grid.cols.toDouble() * (pieceX + PIECE_CENTER_OFFSET)).toInt()
+            val startY = (grid.height / grid.rows.toDouble() * (pieceY + PIECE_CENTER_OFFSET)).toInt()
+            // The mask uses transparent as the target color and white as a temporary marker.
+            // Use the simplified floodFill which uses fixed colors internally.
+            floodFill(pixelsForPiece, grid.width, grid.height, startX, startY)
+            for (j in pixelsForPiece.indices) {
+                if (pixelsForPiece[j] != Color.WHITE) pixelsForPiece[j] = Color.TRANSPARENT
+            }
+            val finalBitmap = buildMaskedBitmap(context.sourceImage, pixelsForPiece, grid.width, grid.height)
+            synchronized(context.tracking.result) { context.tracking.result.add(finalBitmap.bitmap) }
+            context.output.puzzleProgressListener.postToHandler {
+                piece.setImageBitmap(finalBitmap.bitmap)
+                piece.pieceWidth = finalBitmap.bitmap.width
+                piece.pieceHeight = finalBitmap.bitmap.height
+                if (finalBitmap.bounds != null) {
+                    piece.xCoord = finalBitmap.bounds.left + context.output.imageView.left
+                    piece.yCoord = finalBitmap.bounds.top + context.output.imageView.top
+                }
+            }
+            val progress = context.tracking.progressCounter.incrementAndGet()
+            context.output.puzzleProgressListener.postToHandler {
+                context.output.puzzleProgressListener.onProgressUpdate(progress, context.tracking.totalPieces)
             }
         }
-        val progress = context.tracking.progressCounter.incrementAndGet()
-        context.output.puzzleProgressListener.postToHandler {
-            context.output.puzzleProgressListener.onProgressUpdate(progress, context.tracking.totalPieces)
-        }
-    }
 
-    private class MaskedPieceBitmap(val bitmap: Bitmap, val bounds: Rect?)
+    private class MaskedPieceBitmap(
+        val bitmap: Bitmap,
+        val bounds: Rect?,
+    )
 
     private fun buildMaskedBitmap(
         sourceImage: Bitmap,
@@ -297,11 +339,12 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN)
         pieceCanvas.drawBitmap(sourceImage, 0f, 0f, paint)
         val bounds = findVisibleBounds(maskedBitmap)
-        val finalBitmap = if (bounds != null && bounds.width() > 0 && bounds.height() > 0) {
-            Bitmap.createBitmap(maskedBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
-        } else {
-            maskedBitmap
-        }
+        val finalBitmap =
+            if (bounds != null && bounds.width() > 0 && bounds.height() > 0) {
+                Bitmap.createBitmap(maskedBitmap, bounds.left, bounds.top, bounds.width(), bounds.height())
+            } else {
+                maskedBitmap
+            }
         return MaskedPieceBitmap(finalBitmap, bounds)
     }
 
@@ -330,7 +373,13 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
 
     // Flood fill that treats transparent pixels as the target and marks them with white. This
     // variant uses fixed colors to avoid redundant parameters and analyzer warnings.
-    private fun floodFill(pixels: IntArray, width: Int, height: Int, x: Int, y: Int) {
+    private fun floodFill(
+        pixels: IntArray,
+        width: Int,
+        height: Int,
+        x: Int,
+        y: Int,
+    ) {
         // We'll treat 'transparent' as target: alpha == 0. Mark visited pixels with opaque white.
         if (isOutOfBounds(x, y, width, height)) return
         val startIndex = y * width + x
@@ -353,8 +402,15 @@ class MaskBitmapPuzzleCutter : PuzzleCutter {
         }
     }
 
-    private fun isOutOfBounds(x: Int, y: Int, width: Int, height: Int): Boolean =
-        x !in 0 until width || y !in 0 until height
+    private fun isOutOfBounds(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+    ): Boolean = x !in 0 until width || y !in 0 until height
 
-    private data class Point(val x: Int, val y: Int)
+    private data class Point(
+        val x: Int,
+        val y: Int,
+    )
 }

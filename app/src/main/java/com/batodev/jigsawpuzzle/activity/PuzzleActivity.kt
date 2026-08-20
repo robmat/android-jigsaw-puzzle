@@ -64,7 +64,9 @@ const val FAKE_PROGRESS_MAX = 10
 /**
  * The main activity for the puzzle game.
  */
-class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
+class PuzzleActivity :
+    AppCompatActivity(),
+    PuzzleProgressListener {
     internal var imageFileName: String? = null
     internal val handler: Handler = Handler(Looper.getMainLooper())
     private val rateHelper: AppRatingHelper = AppRatingHelper(this)
@@ -77,9 +79,12 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         enum class PuzzleStatus {
             IDLE,
             CUTTING,
-            SAVING
+            SAVING,
         }
-        val puzzleStatus = java.util.concurrent.atomic.AtomicReference(PuzzleStatus.IDLE)
+
+        val puzzleStatus =
+            java.util.concurrent.atomic
+                .AtomicReference(PuzzleStatus.IDLE)
 
         private const val FAKE_PROGRESS_BASE_DELAY_MS = 1000L
         private const val FAKE_PROGRESS_JITTER_RANGE = 600
@@ -156,7 +161,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
                     NeonBtnOnPressChangeLook.applyPressedLook(
                         view,
                         event,
-                        this@PuzzleActivity
+                        this@PuzzleActivity,
                     )
                     true
                 }
@@ -176,7 +181,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      */
     internal fun isPuzzleGameManagerReady(): Boolean = this::puzzleGameManager.isInitialized
 
-    private fun resumeOrStartNewGame(imageView: ImageView, settings: Settings) {
+    private fun resumeOrStartNewGame(
+        imageView: ImageView,
+        settings: Settings,
+    ) {
         val savedGameFile = File(filesDir, "saved_game/gamestate.json")
         if (savedGameFile.exists()) {
             imageView.post { gameStateController.load(savedGameFile) }
@@ -188,12 +196,13 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
 
             imageView.post {
                 val imageLoader = ImageLoader(imageView)
-                val bitmap = if (imageFileName != null) {
-                    imageLoader.setPicFromAsset(imageFileName!!, assets)
-                } else {
-                    val photoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
-                    imageLoader.setPicFromPath(photoPath)
-                }
+                val bitmap =
+                    if (imageFileName != null) {
+                        imageLoader.setPicFromAsset(imageFileName!!, assets)
+                    } else {
+                        val photoPath = File(File(filesDir, "camera_images"), "temp.jpg").toString()
+                        imageLoader.setPicFromPath(photoPath)
+                    }
                 if (puzzleStatus.compareAndSet(PuzzleStatus.IDLE, PuzzleStatus.CUTTING)) {
                     puzzleGameManager.createPuzzle(bitmap, puzzlesWidth, puzzlesHeight)
                 }
@@ -243,7 +252,10 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
      * @param progress The current progress value.
      * @param max The maximum progress value.
      */
-    override fun onProgressUpdate(progress: Int, max: Int) {
+    override fun onProgressUpdate(
+        progress: Int,
+        max: Int,
+    ) {
         handler.post {
             val progressBar = findViewById<ProgressBar>(R.id.progressBar)
             progressBar.max = max + FAKE_PROGRESS_MAX
@@ -282,7 +294,11 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         val settings = completionFlow.handleAchievements(elapsedTime)
 
         val konfetti = findViewById<ImageView>(R.id.konfettiView)
-        Glide.with(konfetti).asGif().load(R.drawable.confetti2).into(konfetti)
+        Glide
+            .with(konfetti)
+            .asGif()
+            .load(R.drawable.confetti2)
+            .into(konfetti)
         konfetti.visibility = View.VISIBLE
         imageFileName?.let {
             if (!settings.uncoveredPics.contains(it)) {
@@ -309,7 +325,7 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
         settings.marathonerPlaytime += elapsedTime
         Log.d(
             PuzzleActivity::class.simpleName,
-            "Total playtime: ${settings.marathonerPlaytime} seconds, elapsed this game: $elapsedTime seconds"
+            "Total playtime: ${settings.marathonerPlaytime} seconds, elapsed this game: $elapsedTime seconds",
         )
         if (settings.marathonerPlaytime >= MARATHONER_SECONDS_THRESHOLD) {
             settings.marathonerPlaytime = 0
@@ -332,7 +348,9 @@ class PuzzleActivity : AppCompatActivity(), PuzzleProgressListener {
  * Owns saving/loading the in-progress game to disk, split out of [PuzzleActivity]
  * so that class only holds the puzzle-screen lifecycle and callbacks.
  */
-private class GameStateController(private val activity: PuzzleActivity) {
+private class GameStateController(
+    private val activity: PuzzleActivity,
+) {
     companion object {
         private const val PNG_COMPRESS_QUALITY = 100
     }
@@ -380,15 +398,16 @@ private class GameStateController(private val activity: PuzzleActivity) {
         }
 
         val settings = SettingsHelper.load(activity)
-        val gameState = GameState(
-            imageFileName = activity.imageFileName,
-            photoPath = savedPhotoPath,
-            puzzlesWidth = settings.lastSetDifficultyCustomWidth,
-            puzzlesHeight = settings.lastSetDifficultyCustomHeight,
-            elapsedTime = activity.stopwatch.elapsedTime,
-            pieces = pieceStates,
-            svgString = activity.puzzleGameManager.svgString
-        )
+        val gameState =
+            GameState(
+                imageFileName = activity.imageFileName,
+                photoPath = savedPhotoPath,
+                puzzlesWidth = settings.lastSetDifficultyCustomWidth,
+                puzzlesHeight = settings.lastSetDifficultyCustomHeight,
+                elapsedTime = activity.stopwatch.elapsedTime,
+                pieces = pieceStates,
+                svgString = activity.puzzleGameManager.svgString,
+            )
         writeGameStateFile(savedGameDir, gameState)
 
         activity.handler.post {
@@ -419,11 +438,12 @@ private class GameStateController(private val activity: PuzzleActivity) {
         SettingsHelper.save(activity, settings)
 
         val imageLoader = ImageLoader(imageView)
-        val bitmap = if (gameState.imageFileName != null) {
-            imageLoader.setPicFromAsset(gameState.imageFileName, activity.assets)
-        } else {
-            imageLoader.setPicFromPath(gameState.photoPath!!)
-        }
+        val bitmap =
+            if (gameState.imageFileName != null) {
+                imageLoader.setPicFromAsset(gameState.imageFileName, activity.assets)
+            } else {
+                imageLoader.setPicFromPath(gameState.photoPath!!)
+            }
 
         val svgString = gameState.svgString ?: generateSvgString(bitmap, gameState)
         activity.puzzleGameManager.svgString = svgString
@@ -466,14 +486,17 @@ private class GameStateController(private val activity: PuzzleActivity) {
                     pieceWidth = piece.pieceWidth,
                     pieceHeight = piece.pieceHeight,
                     canMove = piece.canMove,
-                    imagePath = pieceImageFile.absolutePath
-                )
+                    imagePath = pieceImageFile.absolutePath,
+                ),
             )
         }
         return pieceStates
     }
 
-    private fun writeGameStateFile(savedGameDir: File, gameState: GameState) {
+    private fun writeGameStateFile(
+        savedGameDir: File,
+        gameState: GameState,
+    ) {
         val gson = Gson()
         val jsonState = gson.toJson(gameState)
         val gameStateFile = File(savedGameDir, "gamestate.json")
@@ -486,7 +509,10 @@ private class GameStateController(private val activity: PuzzleActivity) {
         Log.d(GameStateController::class.simpleName, "Game state saved to: ${gameStateFile.absolutePath}")
     }
 
-    private fun generateSvgString(bitmap: Bitmap, gameState: GameState): String {
+    private fun generateSvgString(
+        bitmap: Bitmap,
+        gameState: GameState,
+    ): String {
         val puzzleCurvesGenerator = PuzzleCurvesGenerator()
         puzzleCurvesGenerator.width = bitmap.width.toDouble()
         puzzleCurvesGenerator.height = bitmap.height.toDouble()
@@ -533,7 +559,9 @@ private class GameStateController(private val activity: PuzzleActivity) {
  * of [PuzzleActivity] so that class only holds the puzzle-screen lifecycle and
  * callbacks.
  */
-private class PuzzleCompletionFlow(private val activity: PuzzleActivity) {
+private class PuzzleCompletionFlow(
+    private val activity: PuzzleActivity,
+) {
     companion object {
         private const val SECONDS_PER_MINUTE = 60
         private const val MAX_HIGH_SCORES = 10
@@ -601,18 +629,23 @@ private class PuzzleCompletionFlow(private val activity: PuzzleActivity) {
      * @see Settings
      * @see SettingsHelper
      */
-    fun updateAndShowHighScores(newTime: Int, difficultyKey: String, settings: Settings) {
+    fun updateAndShowHighScores(
+        newTime: Int,
+        difficultyKey: String,
+        settings: Settings,
+    ) {
         val highScores = settings.highscores.getOrPut(difficultyKey) { mutableListOf() }
 
         val currentScoreInSeconds = newTime
         val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-        val newScoreString = String.format(
-            Locale.getDefault(),
-            "%02d:%02d",
-            currentScoreInSeconds / SECONDS_PER_MINUTE,
-            currentScoreInSeconds % SECONDS_PER_MINUTE
-        ) +
-            " - " + dateFormat.format(Date())
+        val newScoreString =
+            String.format(
+                Locale.getDefault(),
+                "%02d:%02d",
+                currentScoreInSeconds / SECONDS_PER_MINUTE,
+                currentScoreInSeconds % SECONDS_PER_MINUTE,
+            ) +
+                " - " + dateFormat.format(Date())
 
         highScores.add(newScoreString)
 
@@ -632,13 +665,14 @@ private class PuzzleCompletionFlow(private val activity: PuzzleActivity) {
         if (indexOfNewScore <= MAX_HIGH_SCORES && indexOfNewScore != -1) {
             Log.d(
                 PuzzleCompletionFlow::class.simpleName,
-                "New high score! indexOfNewScore: $indexOfNewScore, highScores.size: ${highScores.size}"
+                "New high score! indexOfNewScore: $indexOfNewScore, highScores.size: ${highScores.size}",
             )
             if (indexOfNewScore == 0 && highScores.size == MAX_HIGH_SCORES) {
                 PlayGamesHelper.unlockAchievement(activity, R.string.achievement_top_of_the_charts)
             }
             FirebaseHelper.logEvent(activity, "new_highscore")
-            Toast.makeText(activity, activity.getString(R.string.congratulations_top_10), Toast.LENGTH_LONG)
+            Toast
+                .makeText(activity, activity.getString(R.string.congratulations_top_10), Toast.LENGTH_LONG)
                 .show()
         }
     }

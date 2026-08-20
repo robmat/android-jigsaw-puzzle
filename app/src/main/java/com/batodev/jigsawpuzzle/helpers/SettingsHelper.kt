@@ -38,7 +38,10 @@ object SettingsHelper {
      * @param context The {@link Context} used to access shared preferences.
      * @param settings The {@link Settings} object to be saved.
      */
-    fun save(context: Context, settings: Settings) {
+    fun save(
+        context: Context,
+        settings: Settings,
+    ) {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
         prefs.edit {
             putInt(DISPLAY_ADD_EVERY_X_PIC_VIEW, settings.displayAddEveryXPicView)

@@ -15,6 +15,7 @@ object AchievementHelper {
     private const val GALLERY_COMPLETE_PROGRESS_STEP = 20
 
     val TAG: String = AchievementHelper::class.java.simpleName
+
     fun updateDailyRitualAchievement(context: Context) {
         val settings = SettingsHelper.load(context)
         val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
@@ -62,7 +63,11 @@ object AchievementHelper {
         Log.v(TAG, "Settings saved.")
     }
 
-    fun checkRecordSetterAchievement(context: Activity, elapsedTime: Int, settings: Settings) {
+    fun checkRecordSetterAchievement(
+        context: Activity,
+        elapsedTime: Int,
+        settings: Settings,
+    ) {
         val difficultyKey =
             "${settings.lastSetDifficultyCustomWidth}x${settings.lastSetDifficultyCustomHeight}"
         val highScores = settings.highscores[difficultyKey]
@@ -77,7 +82,10 @@ object AchievementHelper {
         }
     }
 
-    fun updateInTheZoneAchievement(context: Activity, isCorrect: Boolean) {
+    fun updateInTheZoneAchievement(
+        context: Activity,
+        isCorrect: Boolean,
+    ) {
         val settings = SettingsHelper.load(context)
         Log.v(TAG, "updateInTheZoneAchievement called. isCorrect: $isCorrect")
         if (isCorrect) {
@@ -89,7 +97,7 @@ object AchievementHelper {
                 PlayGamesHelper.progressAchievement(
                     context,
                     R.string.achievement_in_the_zone,
-                    1
+                    1,
                 )
             }
         } else {
@@ -100,23 +108,29 @@ object AchievementHelper {
         Log.v(TAG, "Settings saved.")
     }
 
-    fun checkCollectorAchievement(context: Context, settings: Settings) {
+    fun checkCollectorAchievement(
+        context: Context,
+        settings: Settings,
+    ) {
         if (settings.uncoveredPics.size >= COLLECTOR_UNCOVERED_THRESHOLD) {
             PlayGamesHelper.progressAchievement(
                 context as Activity,
                 R.string.achievement_collector,
-                COLLECTOR_UNCOVERED_THRESHOLD
+                COLLECTOR_UNCOVERED_THRESHOLD,
             )
         }
     }
 
-    fun checkGalleryCompleteAchievement(context: Context, settings: Settings) {
+    fun checkGalleryCompleteAchievement(
+        context: Context,
+        settings: Settings,
+    ) {
         val allImages = context.assets.list("img")?.filter { it.endsWith(".jpg") || it.endsWith(".png") }
         if (allImages != null && settings.uncoveredPics.containsAll(allImages)) {
             PlayGamesHelper.progressAchievement(
                 context as Activity,
                 R.string.achievement_gallery_complete,
-                GALLERY_COMPLETE_PROGRESS_STEP
+                GALLERY_COMPLETE_PROGRESS_STEP,
             )
         }
     }

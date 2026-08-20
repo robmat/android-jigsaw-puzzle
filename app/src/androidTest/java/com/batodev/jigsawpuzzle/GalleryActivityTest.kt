@@ -30,7 +30,6 @@ import org.junit.runner.RunWith
 // assets/img filenames before every launch here.
 @RunWith(AndroidJUnit4::class)
 class GalleryActivityTest {
-
     private lateinit var images: List<String>
 
     @Before
@@ -46,8 +45,7 @@ class GalleryActivityTest {
         Intents.release()
     }
 
-    private fun launch(): ActivityScenario<GalleryActivity> =
-        ActivityScenario.launch(GalleryActivity::class.java)
+    private fun launch(): ActivityScenario<GalleryActivity> = ActivityScenario.launch(GalleryActivity::class.java)
 
     @Test
     fun launchesShowingFirstImageWithLeftHiddenAndRightVisible() {

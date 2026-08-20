@@ -28,11 +28,14 @@ import java.io.IOException
 /**
  * An adapter for displaying images in a grid view.
  */
+
 /**
  * An adapter for displaying images in a grid view.
  * @param mContext The context of the application.
  */
-class ImageAdapter(private val mContext: Context) : BaseAdapter() {
+class ImageAdapter(
+    private val mContext: Context,
+) : BaseAdapter() {
     private val am: AssetManager = mContext.assets
     private var files: Array<String>? = null
     private val handler = Handler(Looper.getMainLooper())
@@ -55,9 +58,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
      * Returns the number of items in the adapter.
      * @return The total count of image files.
      */
-    override fun getCount(): Int {
-        return files!!.size
-    }
+    override fun getCount(): Int = files!!.size
 
     /**
      * Returns the data item associated with the specified position in the data set.
@@ -65,9 +66,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
      * @param position Position of the item whose data we want within the adapter's data set.
      * @return The data at the specified position.
      */
-    override fun getItem(position: Int): Any? {
-        return null
-    }
+    override fun getItem(position: Int): Any? = null
 
     /**
      * Returns the row id associated with the specified position in the list.
@@ -75,9 +74,7 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
      * @param position The position of the item within the adapter's data set whose row id we want.
      * @return The id of the item at the specified position.
      */
-    override fun getItemId(position: Int): Long {
-        return 0
-    }
+    override fun getItemId(position: Int): Long = 0
 
     /**
      * Get a View that displays the data at the specified position in the data set.
@@ -91,7 +88,11 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
      * @return A View corresponding to the data at the specified position.
      */
     @SuppressLint("InflateParams")
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+    override fun getView(
+        position: Int,
+        convertView: View?,
+        parent: ViewGroup,
+    ): View {
         val settings = load(mContext)
         var convertViewVar = convertView
         if (convertViewVar == null) {
@@ -101,16 +102,17 @@ class ImageAdapter(private val mContext: Context) : BaseAdapter() {
         val imageView = convertViewVar!!.findViewById<ImageView>(R.id.gridImageview)
 
         if (position > lastPosition) {
-            val animation = ScaleAnimation(
-                0.0f,
-                1.0f,
-                0.0f,
-                1.0f,
-                ScaleAnimation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_RELATIVE,
-                ScaleAnimation.RELATIVE_TO_SELF,
-                ANIMATION_PIVOT_RELATIVE
-            )
+            val animation =
+                ScaleAnimation(
+                    0.0f,
+                    1.0f,
+                    0.0f,
+                    1.0f,
+                    ScaleAnimation.RELATIVE_TO_SELF,
+                    ANIMATION_PIVOT_RELATIVE,
+                    ScaleAnimation.RELATIVE_TO_SELF,
+                    ANIMATION_PIVOT_RELATIVE,
+                )
             animation.duration = ANIMATION_DURATION_MS
             val set = AnimationSet(true)
             set.addAnimation(animation)

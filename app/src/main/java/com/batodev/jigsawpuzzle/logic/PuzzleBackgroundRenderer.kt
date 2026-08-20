@@ -22,7 +22,12 @@ object PuzzleBackgroundRenderer {
      * @param svgString The SVG string describing the puzzle piece grid.
      * @param settings The current app settings controlling what to show.
      */
-    fun draw(imageView: ImageView, bitmap: Bitmap, svgString: String?, settings: Settings) {
+    fun draw(
+        imageView: ImageView,
+        bitmap: Bitmap,
+        svgString: String?,
+        settings: Settings,
+    ) {
         val bitmapCopy = createBitmap(bitmap.width, bitmap.height)
         val canvas = Canvas(bitmapCopy)
         val paint = Paint()
