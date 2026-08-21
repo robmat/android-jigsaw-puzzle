@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "355233798290",
+    "project_id": "puzzled-girls",
+    "storage_bucket": "puzzled-girls.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:355233798290:android:6e8a3a147bf7633be9ae4b",
+        "android_client_info": {
+          "package_name": "com.batodev.jigsawpuzzle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBXNbS1YCb2wJZWjWl_GVyOutsyGsqY9l0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
