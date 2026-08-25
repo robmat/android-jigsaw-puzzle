@@ -173,11 +173,15 @@ class ImageMaskTest {
 
         Log.i(
             "PuzzleCutterBenchmark",
-            "FloodFill pieces=${floodResultBitmaps.size} elapsedMs=${"%.2f".format(floodDurationMs)} finished=${floodFinished.get()}",
+            "FloodFill pieces=${floodResultBitmaps.size} elapsedMs=${"%.2f".format(
+                floodDurationMs,
+            )} finished=${floodFinished.get()}",
         )
         Log.i(
             "PuzzleCutterBenchmark",
-            "MaskBitmap pieces=${maskResultBitmaps.size} elapsedMs=${"%.2f".format(maskDurationMs)} finished=${maskFinished.get()}",
+            "MaskBitmap pieces=${maskResultBitmaps.size} elapsedMs=${"%.2f".format(
+                maskDurationMs,
+            )} finished=${maskFinished.get()}",
         )
 
         // Assertions
