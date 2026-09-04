@@ -1,10 +1,16 @@
+<!-- Overdraw suppressed: this is a GridView cell inflated via layoutInflater.inflate() in
+     ImageAdapter.kt, not an Activity content root - lint's Overdraw check mis-attributes it
+     to the app's window theme (its own docs note the activity-association heuristic can be
+     wrong), but there is no window here to double-paint. -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:padding="2dp"
     android:background="@drawable/puzzle_frame"
+    tools:ignore="Overdraw"
     >
 
     <ImageView

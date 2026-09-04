@@ -19,6 +19,7 @@
             android:name=".activity.MainMenuActivity"
             android:exported="true"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoWindowBackground"
             tools:ignore="DiscouragedApi,LockedOrientationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,11 +36,13 @@
             android:name=".activity.ImagePickActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoWindowBackground"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
         <activity
             android:name=".activity.PuzzleActivity"
             android:exported="false"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoWindowBackground"
             tools:ignore="DiscouragedApi,LockedOrientationActivity" />
 
         <provider

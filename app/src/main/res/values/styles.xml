@@ -8,4 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <!-- MainMenuActivity/ImagePickActivity/PuzzleActivity's root layouts already paint an
+         opaque background - avoid the window painting its own on top. Not applied to
+         GalleryActivity, which doesn't paint a root background. -->
+    <style name="AppTheme.NoWindowBackground">
+        <item name="android:windowBackground">@null</item>
+    </style>
+
 </resources>
