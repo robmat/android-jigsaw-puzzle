@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <issue id="GifUsage">
+        <!-- PuzzleActivity.kt loads this via Glide's .asGif(), which only decodes
+             GIF - re-encoding to WebP would need the call site switched to
+             .asDrawable()/plain .load() too, not just an asset swap. -->
+        <ignore regexp="src/main/res/drawable-nodpi/confetti2\.gif" />
+    </issue>
+</lint>
