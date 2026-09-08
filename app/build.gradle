@@ -99,6 +99,10 @@ dependencies {
     implementation libs.androidx.exifinterface
     implementation libs.chrisbanes.photoview
     implementation libs.play.services.ads
+    // play-services-ads transitively pins the ancient androidx.work:work-runtime:2.7.0 -
+    // override it so WorkManager's own WorkDatabase creation doesn't crash on real
+    // devices (see sgtpuzzles' fix for the full incident writeup).
+    implementation libs.androidx.work.runtime
     implementation libs.androidx.multidex
     implementation libs.bumptech.glide
     implementation libs.caverock.androidsvg.aar
