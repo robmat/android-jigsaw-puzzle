@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# WorkManager (pulled in transitively by play-services-ads) instantiates its Room-
+# generated WorkDatabase_Impl reflectively (Class.forName + newInstance) at startup via
+# androidx.startup.InitializationProvider. Nothing calls that constructor directly, so R8
+# strips it as unused - confirmed crash-on-open via device logcat on
+# beautiful_asian_girl_pics_2: "NoSuchMethodException: androidx.work.impl.WorkDatabase_Impl.<init> []".
+-keep class androidx.work.impl.WorkDatabase_Impl { <init>(); }
+-keep class * extends androidx.room.RoomDatabase { <init>(); }

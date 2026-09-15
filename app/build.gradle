@@ -73,14 +73,26 @@ android {
         }
     }
 
+    // Instrumented tests run against releaseTest - the same R8 output as release - so
+    // they exercise minified code rather than the unminified debug APK.
+    testBuildType = 'releaseTest'
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
         debugProdSigned {
             signingConfig signingConfigs.prodSigned
+        }
+
+        // Same R8 pipeline and signing as release, plus keeps that only the instrumentation
+        // harness needs - so the release APK users get stays fully shrunk and obfuscated.
+        releaseTest {
+            initWith release
+            matchingFallbacks = ['release']
+            proguardFile 'proguard-rules-test.pro'
         }
     }
     namespace 'com.batodev.jigsawpuzzle'
@@ -115,6 +127,11 @@ dependencies {
     implementation(libs.smehranb.glowbutton)
     implementation libs.play.services.games.v2
 
+    // Something in the release graph drags in concurrent-futures-ktx 1.1.0, which predates
+    // SuspendToFutureAdapter. androidx.test:core needs 1.2.0, but consistent resolution pins
+    // androidTest to whatever release resolved - so R8 fails the androidTest minify with
+    // "Missing class androidx.concurrent.futures.SuspendToFutureAdapter". Declaring it lifts both.
+    releaseTestImplementation libs.androidx.concurrent.futures.ktx
     testImplementation libs.junit.jupiter.api
     testRuntimeOnly libs.junit.jupiter.engine
     testImplementation libs.junit.jupiter.params
