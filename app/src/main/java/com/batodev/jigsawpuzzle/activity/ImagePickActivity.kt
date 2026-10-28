@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -39,7 +38,6 @@ import com.smb.glowbutton.NeonButton
 import java.io.IOException
 
 private const val CAMERA_PERMISSION_REQUEST_CODE = 1
-private const val EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE = 2
 
 private const val DIFF_SPLIT = "X"
 
@@ -302,7 +300,7 @@ class ImagePickActivity : AppCompatActivity() {
 
     /**
      * Callback for the result of requesting permissions.
-     * Handles camera and external storage permission requests.
+     * Handles the camera permission request.
      * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
      * @param permissions The requested permissions. Never null.
      * @param grantResults The grant results for the corresponding permissions
@@ -323,15 +321,6 @@ class ImagePickActivity : AppCompatActivity() {
             } else {
                 FirebaseHelper.logEvent(this, "camera_permission_denied")
                 Toast.makeText(this, "Camera permission denied.", Toast.LENGTH_SHORT).show()
-            }
-        }
-        if (requestCode == EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                FirebaseHelper.logEvent(this, "storage_permission_granted")
-                pickImageFromGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-            } else {
-                FirebaseHelper.logEvent(this, "storage_permission_denied")
-                Toast.makeText(this, "Exetrnal storage permission denied.", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -392,33 +381,10 @@ class ImagePickActivity : AppCompatActivity() {
 
     /**
      * Initiates the process of picking an image from the gallery.
-     * Requests appropriate external storage permissions based on Android version.
+     * The system photo picker needs no storage permission: Play policy forbids requesting one for it.
      */
     fun onImageFromGalleryClick() {
         FirebaseHelper.logButtonClick(this, "image_from_gallery")
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            askForReadExternalImagesPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-        } else {
-            askForReadExternalImagesPermission(Manifest.permission.READ_MEDIA_IMAGES)
-        }
-    }
-
-    /**
-     * Requests the specified external storage permission.
-     * @param readExternalStorage The permission string to request
-     *     (e.g., {@link Manifest.permission#READ_EXTERNAL_STORAGE}).
-     */
-    private fun askForReadExternalImagesPermission(readExternalStorage: String) {
-        if (checkSelfPermission(
-                readExternalStorage,
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissions(
-                arrayOf(readExternalStorage),
-                EXTERNAL_STORAGE_PERMISSION_REQUEST_CODE,
-            )
-        } else {
-            pickImageFromGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-        }
+        pickImageFromGallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 }
